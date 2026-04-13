@@ -1,0 +1,79 @@
+@use '../../styles-shared' as *;
+
+.page {
+  padding: 32px;
+
+  @media (max-width: $mobile-breakpoint) {
+    padding: 20px 16px 80px;
+  }
+}
+
+.page-title {
+  @include h3;
+  margin: 0 0 24px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+
+  @media (max-width: $mobile-breakpoint) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}
+
+.stat-card {
+  @include card;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-left: 4px solid transparent;
+
+  &.accent-eucalyptus { border-left-color: $eucalyptus; }
+  &.accent-buttercup { border-left-color: $buttercup; }
+  &.accent-cobalt { border-left-color: $cobalt; }
+  &.accent-crimson { border-left-color: $crimson; }
+}
+
+.stat-label {
+  @include subtitle;
+}
+
+.stat-value {
+  @include h3;
+  margin: 0;
+
+  @media (max-width: $mobile-breakpoint) {
+    font-size: 28px;
+  }
+}
+
+.tables-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+
+  @media (max-width: $mobile-breakpoint) {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+.table-section {
+  @include card;
+}
+
+.section-title {
+  @include h4;
+  margin: 0 0 16px;
+}
+
+.empty-state {
+  @include p3;
+  color: $muted-text;
+  text-align: center;
+  padding: 24px 0;
+}

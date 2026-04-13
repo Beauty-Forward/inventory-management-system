@@ -1,0 +1,8 @@
+@if (showNav) {
+  <app-sidebar />
+  <app-bottom-nav />
+}
+
+<main [class.has-sidebar]="showNav">
+  <router-outlet />
+</main>

@@ -1,0 +1,42 @@
+<nav class="sidebar">
+  <div class="sidebar-brand">
+    <span class="brand-text">beauty f<span class="oo">oo</span>rward</span>
+  </div>
+
+  <ul class="sidebar-nav">
+    <li>
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <span class="nav-icon">&#9632;</span>
+        Dashboard
+      </a>
+    </li>
+    <li>
+      <a routerLink="/donations" routerLinkActive="active">
+        <span class="nav-icon">&#9656;</span>
+        Donations
+      </a>
+    </li>
+    <li>
+      <a routerLink="/inventory" routerLinkActive="active">
+        <span class="nav-icon">&#9638;</span>
+        Inventory
+      </a>
+    </li>
+    <li>
+      <a routerLink="/shelters" routerLinkActive="active">
+        <span class="nav-icon">&#9750;</span>
+        Shelters
+      </a>
+    </li>
+    <li>
+      <a routerLink="/batches" routerLinkActive="active">
+        <span class="nav-icon">&#9654;</span>
+        Batches
+      </a>
+    </li>
+  </ul>
+
+  <div class="sidebar-footer">
+    <button class="sign-out-btn" (click)="onSignOut()">Sign Out</button>
+  </div>
+</nav>

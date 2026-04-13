@@ -1,0 +1,68 @@
+@use '../../styles-shared' as *;
+
+.login-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.login-card {
+  @include card;
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+}
+
+.login-title {
+  font-family: $font-heading;
+  font-weight: 700;
+  font-size: 32px;
+  letter-spacing: -0.02em;
+  color: $double-espresso;
+  margin: 0 0 4px;
+
+  .oo {
+    display: inline-block;
+    letter-spacing: -0.06em;
+  }
+}
+
+.login-subtitle {
+  @include subtitle;
+  margin: 0 0 32px;
+}
+
+.login-form {
+  text-align: left;
+}
+
+.login-error {
+  @include p3;
+  color: $crimson;
+  background: rgba($crimson, 0.08);
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.field {
+  margin-bottom: 16px;
+
+  label {
+    @include p3;
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+
+  input {
+    @include form-input;
+  }
+}
+
+.login-btn {
+  width: 100%;
+  margin-top: 8px;
+}
