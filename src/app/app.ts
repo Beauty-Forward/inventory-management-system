@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { SidebarComponent } from './shared/components/sidebar/sidebar.component';
 import { BottomNavComponent } from './shared/components/bottom-nav/bottom-nav.component';
-import { AuthService } from './core/services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -14,10 +13,7 @@ import { AuthService } from './core/services/auth.service';
 export class App {
   isLoginPage = false;
 
-  constructor(
-    public auth: AuthService,
-    private router: Router,
-  ) {
+  constructor(private router: Router) {
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.isLoginPage = event.urlAfterRedirects === '/login';
@@ -25,7 +21,9 @@ export class App {
     });
   }
 
+  // Nav is visible on every route except the login page.
+  // When auth is turned on later, add `&& this.auth.isAuthenticated`.
   get showNav(): boolean {
-    return this.auth.isAuthenticated && !this.isLoginPage;
+    return !this.isLoginPage;
   }
 }

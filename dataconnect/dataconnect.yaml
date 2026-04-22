@@ -1,0 +1,13 @@
+specVersion: "v1"
+serviceId: "beauty-forward-service"
+location: "us-central1"
+schemaValidation: "COMPATIBLE"
+schema:
+  source: "./schema"
+  datasource:
+    postgresql:
+      database: "fdcdb"
+      cloudSql:
+        instanceId: "beauty-forward-fdc"
+connectorDirs:
+  - "./connector"

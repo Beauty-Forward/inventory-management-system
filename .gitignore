@@ -41,3 +41,13 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+dataconnect-debug.log
+pglite-debug.log
+firebase-debug.*.log
+.firebaserc.local

@@ -1,0 +1,114 @@
+<div class="page">
+  <a routerLink="/shelters" class="back-link">← Shelters</a>
+
+  @if (loading()) {
+    <p class="empty-state">Loading…</p>
+  } @else if (error()) {
+    <div class="error-banner">{{ error() }}</div>
+  } @else if (shelter(); as s) {
+    <div class="header">
+      <div>
+        <h1 class="shelter-name">{{ s.name }}</h1>
+        <p class="shelter-location">
+          {{ s.addressLine1 }}@if (s.addressLine2) {, {{ s.addressLine2 }}}<br />
+          {{ s.city }}, {{ s.state }} {{ s.postalCode }}
+        </p>
+      </div>
+      <div class="header-actions">
+        @if (!s.isActive) {
+          <span class="badge-expired">Inactive</span>
+        }
+        <a [routerLink]="['/shelters', s.id, 'edit']" class="btn-secondary">Edit</a>
+        <button
+          type="button"
+          class="btn-secondary"
+          [disabled]="mutating()"
+          (click)="toggleActive()"
+        >
+          {{ s.isActive ? 'Deactivate' : 'Reactivate' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="card-grid">
+      <section class="info-card">
+        <h2 class="section-title">Contact</h2>
+        <dl class="info-list">
+          <dt>Name</dt><dd>{{ s.contactName }}</dd>
+          @if (s.contactEmail) {
+            <dt>Email</dt><dd>{{ s.contactEmail }}</dd>
+          }
+          @if (s.contactPhone) {
+            <dt>Phone</dt><dd>{{ s.contactPhone }}</dd>
+          }
+        </dl>
+      </section>
+
+      <section class="info-card">
+        <h2 class="section-title">Preferences</h2>
+        <div class="pref-group">
+          <h3 class="pref-label">Accepts</h3>
+          @if (acceptedLabels().length) {
+            <div class="pill-row">
+              @for (label of acceptedLabels(); track label) {
+                <span class="pref-pill accept">{{ label }}</span>
+              }
+            </div>
+          } @else {
+            <p class="pref-empty">No preferences set.</p>
+          }
+        </div>
+        @if (rejectedLabels().length) {
+          <div class="pref-group">
+            <h3 class="pref-label">Rejects</h3>
+            <div class="pill-row">
+              @for (label of rejectedLabels(); track label) {
+                <span class="pref-pill reject">{{ label }}</span>
+              }
+            </div>
+          </div>
+        }
+        @if (s.preferredBrands?.length) {
+          <div class="pref-group">
+            <h3 class="pref-label">Preferred brands</h3>
+            <div class="pill-row">
+              @for (brand of s.preferredBrands ?? []; track brand) {
+                <span class="pref-pill">{{ brand }}</span>
+              }
+            </div>
+          </div>
+        }
+      </section>
+
+      @if (s.notes || s.capacityPerBatch) {
+        <section class="info-card">
+          <h2 class="section-title">Details</h2>
+          @if (s.capacityPerBatch) {
+            <p><strong>Capacity per batch:</strong> {{ s.capacityPerBatch }} products</p>
+          }
+          @if (s.notes) {
+            <p class="notes">{{ s.notes }}</p>
+          }
+        </section>
+      }
+
+      <section class="info-card">
+        <h2 class="section-title">Recent batches</h2>
+        @if (s.batches.length === 0) {
+          <p class="pref-empty">No batches yet.</p>
+        } @else {
+          <ul class="batch-list">
+            @for (b of s.batches; track b.id) {
+              <li class="batch-item">
+                <a [routerLink]="['/batches', b.id]" class="batch-link">
+                  <span [class]="batchStatusClass(b.status)">{{ b.status }}</span>
+                  <span class="batch-date">{{ b.createdAt | date:'mediumDate' }}</span>
+                </a>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+    </div>
+  }
+</div>

@@ -1,0 +1,24 @@
+<div class="overlay" role="dialog" aria-label="Scan barcode">
+  <div class="viewport">
+    <header class="head">
+      <span class="title">Scan barcode</span>
+      <button type="button" class="close-btn" (click)="onCancel()" aria-label="Close">×</button>
+    </header>
+
+    <div class="video-wrap">
+      <video #videoEl playsinline muted></video>
+      <div #qrRegion id="qr-region" class="qr-region"></div>
+      <div class="aim-box"></div>
+    </div>
+
+    <div class="status">
+      @switch (status()) {
+        @case ('starting') { <p>Starting camera…</p> }
+        @case ('scanning') { <p>Point at the barcode</p> }
+        @case ('error') {
+          <p class="err">{{ errorMessage() }}</p>
+        }
+      }
+    </div>
+  </div>
+</div>

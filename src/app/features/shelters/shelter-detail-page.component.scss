@@ -1,0 +1,166 @@
+@use '../../styles-shared' as *;
+
+.page {
+  padding: 32px;
+  max-width: 1100px;
+  margin: 0 auto;
+  @media (max-width: $mobile-breakpoint) {
+    padding: 20px 16px 100px;
+  }
+}
+
+.back-link {
+  @include subtitle;
+  color: $muted-text;
+  text-decoration: none;
+  display: inline-block;
+  margin-bottom: 16px;
+  &:hover { color: $double-espresso; text-decoration: none; }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.shelter-name {
+  @include h3;
+  margin: 0 0 4px;
+}
+
+.shelter-location {
+  @include p3;
+  color: $muted-text;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.info-card {
+  @include card;
+}
+
+.section-title {
+  @include h4;
+  margin: 0 0 16px;
+}
+
+.info-list {
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 16px;
+
+  dt {
+    @include subtitle;
+    color: $muted-text;
+    margin: 0;
+  }
+  dd {
+    @include p3;
+    margin: 0;
+  }
+}
+
+.pref-group {
+  margin-bottom: 16px;
+  &:last-child { margin-bottom: 0; }
+}
+
+.pref-label {
+  @include subtitle;
+  color: $muted-text;
+  margin: 0 0 8px;
+}
+
+.pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pref-pill {
+  @include subtitle;
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 14px;
+  background: rgba($dusty-blue, 0.2);
+  color: $cobalt;
+
+  &.accept {
+    background: rgba($eucalyptus, 0.3);
+    color: $hunter-green;
+  }
+  &.reject {
+    background: rgba($crimson, 0.15);
+    color: $crimson;
+  }
+}
+
+.pref-empty {
+  @include p3;
+  color: $muted-text;
+  margin: 0;
+}
+
+.notes {
+  @include p3;
+  white-space: pre-wrap;
+}
+
+.batch-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.batch-item {
+  border-bottom: 1px solid $card-border;
+  &:last-child { border-bottom: none; }
+}
+
+.batch-link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  text-decoration: none;
+  color: inherit;
+  &:hover { text-decoration: none; }
+}
+
+.batch-date {
+  @include p3;
+  color: $muted-text;
+}
+
+.error-banner {
+  @include p3;
+  background: rgba($crimson, 0.1);
+  color: $crimson;
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.empty-state {
+  @include p3;
+  color: $muted-text;
+  text-align: center;
+  padding: 48px 0;
+}

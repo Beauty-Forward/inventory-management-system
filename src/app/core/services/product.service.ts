@@ -1,0 +1,84 @@
+import { Injectable, inject } from '@angular/core';
+import {
+  getProduct,
+  listAvailableProductsForShelter,
+  listExpiringSoon,
+  listInventoryInStock,
+  listProductsInBatch,
+  markProductDiscarded,
+  markProductExpired,
+  GetProductData,
+  ListInventoryInStockData,
+  ListExpiringSoonData,
+  ListAvailableProductsForShelterData,
+} from '../dataconnect';
+import { FirebaseClientService } from './firebase-client.service';
+
+export type InventoryRow = ListInventoryInStockData['products'][number];
+export type ProductDetail = NonNullable<GetProductData['product']>;
+export type ExpiringRow = ListExpiringSoonData['products'][number];
+export type AvailableForShelterRow =
+  ListAvailableProductsForShelterData['products'][number];
+
+export interface InventoryFilter {
+  type?: string;
+  brand?: string;
+  limit?: number;
+  offset?: number;
+}
+
+@Injectable({ providedIn: 'root' })
+export class ProductService {
+  private readonly firebase = inject(FirebaseClientService);
+
+  async listInStock(filter: InventoryFilter = {}): Promise<InventoryRow[]> {
+    const result = await listInventoryInStock(this.firebase.dataConnect, {
+      type: filter.type || null,
+      brand: filter.brand || null,
+      limit: filter.limit ?? 100,
+      offset: filter.offset ?? 0,
+    });
+    return result.data.products;
+  }
+
+  async get(id: string): Promise<ProductDetail | null> {
+    const result = await getProduct(this.firebase.dataConnect, { id });
+    return result.data.product ?? null;
+  }
+
+  async listAvailableForShelter(
+    types: string[],
+    limit = 200,
+  ): Promise<AvailableForShelterRow[]> {
+    const result = await listAvailableProductsForShelter(
+      this.firebase.dataConnect,
+      { types: types.length > 0 ? types : null, limit },
+    );
+    return result.data.products;
+  }
+
+  async listInBatch(batchId: string) {
+    const result = await listProductsInBatch(this.firebase.dataConnect, {
+      batchId,
+    });
+    return result.data.products;
+  }
+
+  async listExpiringSoon(daysFromNow = 30): Promise<ExpiringRow[]> {
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() + daysFromNow);
+    const before = cutoff.toISOString().slice(0, 10);
+    const result = await listExpiringSoon(this.firebase.dataConnect, {
+      beforeDate: before,
+    });
+    return result.data.products;
+  }
+
+  async markExpired(id: string): Promise<void> {
+    await markProductExpired(this.firebase.dataConnect, { productId: id });
+  }
+
+  async markDiscarded(id: string): Promise<void> {
+    await markProductDiscarded(this.firebase.dataConnect, { productId: id });
+  }
+}

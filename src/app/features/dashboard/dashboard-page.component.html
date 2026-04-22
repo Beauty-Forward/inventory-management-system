@@ -1,33 +1,86 @@
 <div class="page">
   <h1 class="page-title">Dashboard</h1>
 
+  @if (error()) {
+    <div class="error-banner">{{ error() }}</div>
+  }
+
   <div class="stats-grid">
     <div class="stat-card accent-eucalyptus">
       <span class="stat-label">In Stock</span>
-      <span class="stat-value">—</span>
+      <span class="stat-value">
+        @if (loading()) { — } @else { {{ inStockCount() }} }
+      </span>
     </div>
     <div class="stat-card accent-buttercup">
       <span class="stat-label">Received This Week</span>
-      <span class="stat-value">—</span>
+      <span class="stat-value">
+        @if (loading()) { — } @else { {{ receivedThisWeek() }} }
+      </span>
     </div>
     <div class="stat-card accent-cobalt">
       <span class="stat-label">Shipped This Week</span>
-      <span class="stat-value">—</span>
+      <span class="stat-value">
+        @if (loading()) { — } @else { {{ shippedThisWeek() }} }
+      </span>
     </div>
     <div class="stat-card accent-crimson">
       <span class="stat-label">Expiring Soon</span>
-      <span class="stat-value">—</span>
+      <span class="stat-value">
+        @if (loading()) { — } @else { {{ expiringSoonCount() }} }
+      </span>
     </div>
   </div>
 
   <div class="tables-grid">
     <div class="table-section">
-      <h2 class="section-title">Recent Donations</h2>
-      <p class="empty-state">No donations yet.</p>
+      <div class="section-head">
+        <h2 class="section-title">Recent Donations</h2>
+        <a routerLink="/donations" class="section-link">View all →</a>
+      </div>
+      @if (recentDonations().length === 0) {
+        <p class="empty-state">
+          @if (loading()) { Loading… } @else { No donations yet. }
+        </p>
+      } @else {
+        <ul class="simple-list">
+          @for (d of recentDonations(); track d.id) {
+            <li>
+              <a [routerLink]="['/donations', d.id]">
+                <span class="main">{{ d.donor.fullName }}</span>
+                <span class="meta">
+                  <span class="method-pill">{{ d.method }}</span>
+                  {{ d.createdAt | date:'MMM d' }}
+                </span>
+              </a>
+            </li>
+          }
+        </ul>
+      }
     </div>
     <div class="table-section">
-      <h2 class="section-title">Pending Batches</h2>
-      <p class="empty-state">No pending batches.</p>
+      <div class="section-head">
+        <h2 class="section-title">Pending Batches</h2>
+        <a routerLink="/batches" class="section-link">View all →</a>
+      </div>
+      @if (pendingBatches().length === 0) {
+        <p class="empty-state">
+          @if (loading()) { Loading… } @else { No pending batches. }
+        </p>
+      } @else {
+        <ul class="simple-list">
+          @for (b of pendingBatches(); track b.id) {
+            <li>
+              <a [routerLink]="['/batches', b.id]">
+                <span class="main">{{ b.shelter.name }}</span>
+                <span class="meta">
+                  <span [class]="statusClass(b.status)">{{ b.status }}</span>
+                </span>
+              </a>
+            </li>
+          }
+        </ul>
+      }
     </div>
   </div>
 </div>

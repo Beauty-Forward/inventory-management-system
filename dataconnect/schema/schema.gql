@@ -1,0 +1,140 @@
+# ============================================================
+# Beauty Forward IMS — Data Connect Schema
+# ============================================================
+
+# --- Enums ---
+
+enum ProductStatus {
+  IN_STOCK
+  ALLOCATED
+  SHIPPED
+  EXPIRED
+  DISCARDED
+}
+
+enum BatchStatus {
+  DRAFT
+  FINALIZED
+  SHIPPED
+  DELIVERED
+}
+
+# --- Donor: a person who donated products ---
+type Donor @table {
+  fullName: String!
+  email: String! @unique
+  phone: String!
+  smsOptIn: Boolean! @default(value: false)
+  city: String!
+  state: String! @col(dataType: "varchar(2)")
+  instagramHandle: String
+  # Optional link back to the delivery app's most recent donation_requests doc
+  linkedRequestId: String
+  donationCount: Int! @default(value: 0)
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
+
+# --- Donation: a package of products received at the warehouse ---
+type Donation @table @index(fields: ["createdAt"], order: [DESC]) {
+  donor: Donor!
+  # For delivery-app donations: the Firestore doc ID from donation_requests.
+  # For walk-ins: null, or a locally-generated BFW-YYYYMMDD-XXXXXXXX reference.
+  donationRequestId: String
+  # Human-readable warehouse-generated reference (always set).
+  # BFD-YYYYMMDD-XXXXXXXX for delivery-app donations (echoes the donor's code),
+  # BFW-YYYYMMDD-XXXXXXXX for walk-ins.
+  warehouseReference: String!
+  date: Date!
+  # pickup | shipping | dropoff | walk-in
+  method: String!
+  notes: String
+  # Firebase Auth UID of the warehouse manager who processed it
+  processedBy: String!
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
+
+# --- Shelter: a distribution partner ---
+type Shelter @table {
+  name: String!
+  addressLine1: String!
+  addressLine2: String
+  city: String!
+  state: String! @col(dataType: "varchar(2)")
+  postalCode: String!
+  contactName: String!
+  contactEmail: String
+  contactPhone: String
+  acceptedTypes: [String!]
+  rejectedTypes: [String!]
+  preferredBrands: [String!]
+  notes: String
+  capacityPerBatch: Int
+  isActive: Boolean! @default(value: true)
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
+
+# --- Batch: an outgoing shipment to a shelter ---
+type Batch
+  @table
+  @index(fields: ["status", "createdAt"], order: [ASC, DESC]) {
+  shelter: Shelter!
+  status: BatchStatus! @default(value: DRAFT)
+  notes: String
+  # Firebase Auth UID of the creator
+  createdBy: String!
+  finalizedAt: Timestamp
+  shippedAt: Timestamp
+  deliveredAt: Timestamp
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
+
+# --- Product: an individual item in inventory ---
+# Core of the inventory system. Status field drives availability:
+# IN_STOCK -> ALLOCATED (when added to a batch) -> SHIPPED -> DELIVERED
+type Product
+  @table
+  @index(fields: ["status", "createdAt"], order: [ASC, DESC])
+  @index(fields: ["status", "type"], order: [ASC, ASC])
+  @index(fields: ["status", "expirationDate"], order: [ASC, ASC]) {
+  donation: Donation!
+  # When allocated to a batch, this is set. Otherwise null.
+  batch: Batch
+  name: String!
+  brand: String!
+  # Controlled enum enforced at app layer (see product-types.ts)
+  type: String!
+  quantity: Int!
+  price: String
+  color: String
+  colorCategory: String
+  keyIngredients: String
+  # Flexible JSON: { hairType, skinType, scentFamily, size, ... }
+  details: Any
+  expirationDate: Date
+  barcode: String
+  status: ProductStatus! @default(value: IN_STOCK)
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
+
+# --- Product Catalog: cached lookups for barcode scanning (Phase 7) ---
+# Keyed by barcode, not UUID. When a barcode is scanned, check here first
+# before calling Open Food Facts API.
+type ProductCatalog @table(key: "barcode") {
+  barcode: String!
+  name: String!
+  brand: String!
+  type: String!
+  price: String
+  color: String
+  keyIngredients: String
+  # manual | open_food_facts | scan
+  source: String!
+  timesUsed: Int! @default(value: 1)
+  lastUsedAt: Timestamp! @default(expr: "request.time")
+  createdAt: Timestamp! @default(expr: "request.time")
+}

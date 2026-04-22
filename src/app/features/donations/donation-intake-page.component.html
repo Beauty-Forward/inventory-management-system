@@ -1,0 +1,244 @@
+<div class="page">
+  <div class="page-head">
+    <a routerLink="/donations" class="back-link">← Donations</a>
+    <h1 class="page-title">Process Donation</h1>
+  </div>
+
+  <!-- Step: lookup -->
+  @if (step() === 'lookup') {
+    <section class="step-card">
+      <h2 class="step-title">Reference code</h2>
+      <p class="step-help">
+        Enter the drop-off reference on the package (e.g. <code>BFD-20260422-ABC12345</code>)
+        to pull donor info from the delivery app.
+      </p>
+      <div class="inline-form">
+        <input
+          type="text"
+          class="text-input"
+          [value]="referenceCode()"
+          (input)="referenceCode.set($any($event.target).value)"
+          placeholder="BFD-…"
+          autofocus
+        />
+        <button
+          type="button"
+          class="btn-primary"
+          (click)="lookupReference()"
+          [disabled]="lookupLoading()"
+        >
+          {{ lookupLoading() ? 'Looking up…' : 'Look up' }}
+        </button>
+      </div>
+      @if (lookupError()) {
+        <p class="error-text">{{ lookupError() }}</p>
+      }
+
+      <div class="divider"><span>or</span></div>
+
+      <button type="button" class="btn-secondary" (click)="skipLookup()">
+        Register walk-in donation
+      </button>
+    </section>
+  }
+
+  <!-- Step: walk-in donor entry -->
+  @if (step() === 'donor') {
+    <section class="step-card">
+      <h2 class="step-title">Donor info</h2>
+      <p class="step-help">
+        Walk-in donations create a new record in the delivery app so every donation has a
+        single source of truth.
+      </p>
+
+      <div class="field-grid">
+        <div class="form-field full">
+          <label>Full name</label>
+          <input
+            type="text"
+            class="text-input"
+            [value]="donor().fullName"
+            (input)="updateDonor('fullName', $any($event.target).value)"
+          />
+        </div>
+        <div class="form-field">
+          <label>Email</label>
+          <input
+            type="email"
+            class="text-input"
+            [value]="donor().email"
+            (input)="updateDonor('email', $any($event.target).value)"
+          />
+        </div>
+        <div class="form-field">
+          <label>Phone</label>
+          <input
+            type="tel"
+            class="text-input"
+            [value]="donor().phone"
+            (input)="updateDonor('phone', $any($event.target).value)"
+          />
+        </div>
+        <div class="form-field">
+          <label>City</label>
+          <input
+            type="text"
+            class="text-input"
+            [value]="donor().city"
+            (input)="updateDonor('city', $any($event.target).value)"
+          />
+        </div>
+        <div class="form-field">
+          <label>State</label>
+          <input
+            type="text"
+            maxlength="2"
+            class="text-input"
+            [value]="donor().state"
+            (input)="updateDonor('state', $any($event.target).value.toUpperCase())"
+          />
+        </div>
+        <div class="form-field">
+          <label>Instagram handle (optional)</label>
+          <input
+            type="text"
+            class="text-input"
+            [value]="donor().instagramHandle"
+            (input)="updateDonor('instagramHandle', $any($event.target).value)"
+            placeholder="@username"
+          />
+        </div>
+        <div class="form-field checkbox-field full">
+          <label>
+            <input
+              type="checkbox"
+              [checked]="donor().smsOptIn"
+              (change)="updateDonor('smsOptIn', $any($event.target).checked)"
+            />
+            Donor opted in to SMS updates
+          </label>
+        </div>
+      </div>
+
+      @if (fieldErrors()['donor']) {
+        <p class="error-text">{{ fieldErrors()['donor'] }}</p>
+      }
+      @if (savingError()) {
+        <div class="error-banner">{{ savingError() }}</div>
+      }
+
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="goBackToLookup()">Back</button>
+        <button
+          type="button"
+          class="btn-primary"
+          (click)="continueFromDonor()"
+          [disabled]="saving()"
+        >
+          {{ saving() ? 'Registering…' : 'Continue to products' }}
+        </button>
+      </div>
+    </section>
+  }
+
+  <!-- Step: products -->
+  @if (step() === 'products') {
+    <section class="step-card summary-card">
+      <div class="summary-row">
+        <div>
+          <span class="summary-label">Donor</span>
+          <p class="summary-value">{{ donor().fullName }} — {{ donor().email }}</p>
+        </div>
+        <div>
+          <span class="summary-label">Reference</span>
+          <p class="summary-value">{{ referenceCode() || 'walk-in' }}</p>
+        </div>
+        <div>
+          <span class="summary-label">Method</span>
+          <p class="summary-value">{{ donationMethod() }}</p>
+        </div>
+        <div>
+          <span class="summary-label">Date</span>
+          <p class="summary-value">{{ donationDate() }}</p>
+        </div>
+      </div>
+      <button type="button" class="btn-secondary small" (click)="goBackToLookup()">
+        Start over
+      </button>
+    </section>
+
+    <h2 class="section-title">
+      Products ({{ productCount() }})
+    </h2>
+
+    @if (lookupMessage()) {
+      <div class="lookup-toast">{{ lookupMessage() }}</div>
+    }
+
+    <div class="product-list">
+      @for (product of products(); track $index; let i = $index) {
+        <app-product-form-card
+          [index]="i"
+          [model]="product"
+          [errors]="productErrorsAt(i)"
+          [canRemove]="products().length > 1"
+          (modelChange)="updateProduct(i, $event)"
+          (remove)="removeProduct(i)"
+          (scanBarcode)="openScanner(i)"
+          (capturePhoto)="openPhotoCapture(i)"
+        />
+      }
+    </div>
+
+    <button type="button" class="btn-secondary add-product" (click)="addProduct()">
+      + Add another product
+    </button>
+
+    <div class="form-field">
+      <label>Donation notes (optional)</label>
+      <textarea
+        class="text-input textarea"
+        rows="2"
+        [value]="donationNotes()"
+        (input)="donationNotes.set($any($event.target).value)"
+        placeholder="Anything we should know about this batch"
+      ></textarea>
+    </div>
+
+    @if (savingError()) {
+      <div class="error-banner">{{ savingError() }}</div>
+    }
+
+    <div class="form-actions sticky">
+      <button type="button" class="btn-secondary" (click)="goBackToLookup()">Cancel</button>
+      <button
+        type="button"
+        class="btn-primary"
+        (click)="completeDonation()"
+        [disabled]="saving()"
+      >
+        {{ saving() ? 'Saving…' : 'Complete Donation' }}
+      </button>
+    </div>
+  }
+
+  @if (step() === 'saving') {
+    <section class="step-card">
+      <p class="step-help">Saving {{ productCount() }} product(s) to inventory…</p>
+    </section>
+  }
+
+  @if (scannerOpen()) {
+    <app-camera-scanner
+      (scanned)="onBarcodeScanned($event)"
+      (cancelled)="closeScanner()"
+    />
+  }
+
+  @if (photoCaptureOpen()) {
+    <app-photo-capture
+      (captured)="onPhotoCaptured($event)"
+      (cancelled)="closePhotoCapture()"
+    />
+  }
+</div>

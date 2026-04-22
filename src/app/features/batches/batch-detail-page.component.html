@@ -1,0 +1,136 @@
+<div class="page">
+  <a routerLink="/batches" class="back-link">← Batches</a>
+
+  @if (loading()) {
+    <p class="empty-state">Loading…</p>
+  } @else if (error()) {
+    <div class="error-banner">{{ error() }}</div>
+  } @else if (batch(); as b) {
+    <header class="header">
+      <div class="header-main">
+        <h1 class="batch-title">Batch to {{ b.shelter.name }}</h1>
+        <p class="batch-sub">
+          {{ b.shelter.city }}, {{ b.shelter.state }}
+          · {{ productCount() }} product(s)
+        </p>
+      </div>
+      <div class="header-actions">
+        <span [class]="statusClass(b.status)">{{ b.status }}</span>
+      </div>
+    </header>
+
+    <!-- Status timeline -->
+    <section class="timeline">
+      <div class="timeline-step" [class.done]="true">
+        <span class="dot"></span>
+        <span class="label">Drafted</span>
+        <span class="date">{{ b.createdAt | date:'shortDate' }}</span>
+      </div>
+      <div class="timeline-step" [class.done]="!!b.finalizedAt">
+        <span class="dot"></span>
+        <span class="label">Finalized</span>
+        <span class="date">
+          @if (b.finalizedAt) {{{ b.finalizedAt | date:'shortDate' }}} @else { — }
+        </span>
+      </div>
+      <div class="timeline-step" [class.done]="!!b.shippedAt">
+        <span class="dot"></span>
+        <span class="label">Shipped</span>
+        <span class="date">
+          @if (b.shippedAt) {{{ b.shippedAt | date:'shortDate' }}} @else { — }
+        </span>
+      </div>
+      <div class="timeline-step" [class.done]="!!b.deliveredAt">
+        <span class="dot"></span>
+        <span class="label">Delivered</span>
+        <span class="date">
+          @if (b.deliveredAt) {{{ b.deliveredAt | date:'shortDate' }}} @else { — }
+        </span>
+      </div>
+    </section>
+
+    <!-- Status actions -->
+    <section class="status-actions">
+      @if (canFinalize()) {
+        <button type="button" class="btn-primary" [disabled]="mutating()" (click)="finalize()">
+          Finalize batch
+        </button>
+      }
+      @if (canShip()) {
+        <button type="button" class="btn-primary" [disabled]="mutating()" (click)="ship()">
+          Mark shipped
+        </button>
+      }
+      @if (canDeliver()) {
+        <button type="button" class="btn-primary" [disabled]="mutating()" (click)="deliver()">
+          Mark delivered
+        </button>
+      }
+    </section>
+
+    <div class="card-grid">
+      <section class="info-card">
+        <h2 class="section-title">Destination</h2>
+        <dl class="info-list">
+          <dt>Shelter</dt><dd>{{ b.shelter.name }}</dd>
+          <dt>Address</dt>
+          <dd>
+            {{ b.shelter.addressLine1 }}@if (b.shelter.addressLine2) {, {{ b.shelter.addressLine2 }}}<br />
+            {{ b.shelter.city }}, {{ b.shelter.state }} {{ b.shelter.postalCode }}
+          </dd>
+          <dt>Contact</dt>
+          <dd>
+            {{ b.shelter.contactName }}
+            @if (b.shelter.contactEmail) {<br />{{ b.shelter.contactEmail }}}
+          </dd>
+        </dl>
+        <a [routerLink]="['/shelters', b.shelter.id]" class="link">View shelter →</a>
+      </section>
+
+      @if (typeSummary().length > 0) {
+        <section class="info-card">
+          <h2 class="section-title">Type breakdown</h2>
+          <div class="summary-pills">
+            @for (s of typeSummary(); track s.type) {
+              <span class="summary-pill">{{ s.label }}: {{ s.count }}</span>
+            }
+          </div>
+        </section>
+      }
+
+      @if (b.notes) {
+        <section class="info-card">
+          <h2 class="section-title">Notes</h2>
+          <p class="notes">{{ b.notes }}</p>
+        </section>
+      }
+    </div>
+
+    <h2 class="section-title products-heading">Products in batch</h2>
+    @if (b.products.length === 0) {
+      <p class="empty-state">No products in this batch yet.</p>
+    } @else {
+      <div class="product-list">
+        @for (p of b.products; track p.id) {
+          <div class="product-row">
+            <a [routerLink]="['/inventory', p.id]" class="row-main">
+              <span class="product-name">{{ p.name }}</span>
+              <span class="product-meta">
+                {{ p.brand }} · {{ typeLabel(p.type) }} · Qty {{ p.quantity }}
+              </span>
+            </a>
+            @if (b.status === 'DRAFT') {
+              <button
+                type="button"
+                class="remove-btn"
+                [disabled]="mutating()"
+                (click)="removeProduct(p.id)"
+                title="Remove from batch"
+              >×</button>
+            }
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

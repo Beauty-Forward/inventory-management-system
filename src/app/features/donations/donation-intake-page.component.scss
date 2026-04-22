@@ -1,0 +1,244 @@
+@use '../../styles-shared' as *;
+
+.page {
+  padding: 24px;
+  max-width: 900px;
+  margin: 0 auto;
+  padding-bottom: 120px;
+
+  @media (max-width: $mobile-breakpoint) {
+    padding: 16px 12px 140px;
+  }
+}
+
+.page-head {
+  margin-bottom: 24px;
+}
+
+.back-link {
+  @include subtitle;
+  color: $muted-text;
+  text-decoration: none;
+  display: inline-block;
+  margin-bottom: 8px;
+  &:hover { color: $double-espresso; text-decoration: none; }
+}
+
+.page-title {
+  @include h3;
+  margin: 0;
+}
+
+.step-card {
+  @include card;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.step-title {
+  @include h4;
+  margin: 0;
+}
+
+.step-help {
+  @include p3;
+  color: $muted-text;
+  margin: 0;
+
+  code {
+    font-family: monospace;
+    background: $porcelain;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+}
+
+.inline-form {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+
+  .text-input { flex: 1; min-width: 200px; }
+  .btn-primary { flex-shrink: 0; }
+}
+
+.text-input {
+  @include form-input;
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.divider {
+  position: relative;
+  text-align: center;
+  margin: 8px 0;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0; right: 0;
+    height: 1px;
+    background: $card-border;
+  }
+
+  span {
+    @include subtitle;
+    position: relative;
+    background: $white;
+    padding: 0 12px;
+    color: $muted-text;
+  }
+}
+
+.field-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  &.full { grid-column: 1 / -1; }
+
+  label {
+    @include subtitle;
+    font-size: 11px;
+    color: $double-espresso;
+  }
+}
+
+.checkbox-field label {
+  @include p3;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+
+  input[type="checkbox"] {
+    width: 18px; height: 18px;
+    accent-color: $hunter-green;
+  }
+}
+
+.summary-card {
+  background: $porcelain;
+}
+
+.summary-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+}
+
+.summary-label {
+  @include subtitle;
+  color: $muted-text;
+  font-size: 11px;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.summary-value {
+  @include p3;
+  margin: 0;
+  font-size: 15px;
+}
+
+.section-title {
+  @include h4;
+  margin: 24px 0 12px;
+}
+
+.product-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.add-product {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.lookup-toast {
+  @include subtitle;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+  font-size: 14px;
+  padding: 10px 16px;
+  margin-bottom: 12px;
+  background: rgba($buttercup, 0.3);
+  color: $double-espresso;
+  border-radius: 8px;
+  animation: slide-down 0.2s ease;
+}
+
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.btn-secondary.small {
+  min-height: 36px;
+  padding: 6px 16px;
+  font-size: 13px;
+  align-self: flex-start;
+}
+
+.error-text {
+  @include p3;
+  color: $crimson;
+  margin: 0;
+}
+
+.error-banner {
+  @include p3;
+  background: rgba($crimson, 0.1);
+  color: $crimson;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+
+  &.sticky {
+    position: sticky;
+    bottom: 0;
+    background: $porcelain;
+    padding: 16px 0;
+    margin: 0 -24px;
+    padding-left: 24px;
+    padding-right: 24px;
+    border-top: 1px solid $card-border;
+
+    @media (max-width: $mobile-breakpoint) {
+      margin: 0 -12px;
+      padding: 12px;
+      bottom: 64px; // above bottom nav
+      background: rgba($porcelain, 0.98);
+      backdrop-filter: blur(8px);
+    }
+  }
+
+  @media (max-width: $mobile-breakpoint) {
+    .btn-primary, .btn-secondary { flex: 1; }
+  }
+}

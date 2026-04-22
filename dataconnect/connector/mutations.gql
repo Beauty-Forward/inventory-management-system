@@ -1,0 +1,352 @@
+# ============================================================
+# Beauty Forward IMS — Mutations
+# ============================================================
+
+# --- Donors ---
+# Upsert by email is done client-side: GetDonorByEmail -> CreateDonor or UpdateDonor.
+# Data Connect _upsert requires the primary key, and our donor key is an auto-generated UUID.
+
+mutation CreateDonor(
+  $email: String!
+  $fullName: String!
+  $phone: String!
+  $city: String!
+  $state: String!
+  $smsOptIn: Boolean
+  $instagramHandle: String
+  $linkedRequestId: String
+) @auth(level: PUBLIC) {
+  donor_insert(
+    data: {
+      email: $email
+      fullName: $fullName
+      phone: $phone
+      city: $city
+      state: $state
+      smsOptIn: $smsOptIn
+      instagramHandle: $instagramHandle
+      linkedRequestId: $linkedRequestId
+    }
+  )
+}
+
+mutation UpdateDonor(
+  $id: UUID!
+  $fullName: String
+  $phone: String
+  $city: String
+  $state: String
+  $smsOptIn: Boolean
+  $instagramHandle: String
+  $linkedRequestId: String
+) @auth(level: PUBLIC) {
+  donor_update(
+    id: $id
+    data: {
+      fullName: $fullName
+      phone: $phone
+      city: $city
+      state: $state
+      smsOptIn: $smsOptIn
+      instagramHandle: $instagramHandle
+      linkedRequestId: $linkedRequestId
+      updatedAt_expr: "request.time"
+    }
+  )
+}
+
+mutation IncrementDonorDonationCount($id: UUID!) @auth(level: PUBLIC) {
+  donor_update(
+    id: $id
+    data: {
+      donationCount_update: { inc: 1 }
+      updatedAt_expr: "request.time"
+    }
+  )
+}
+
+# --- Donations ---
+
+mutation CreateDonation(
+  $donorId: UUID!
+  $donationRequestId: String
+  $warehouseReference: String!
+  $date: Date!
+  $method: String!
+  $notes: String
+  $processedBy: String!
+) @auth(level: PUBLIC) {
+  donation_insert(
+    data: {
+      donorId: $donorId
+      donationRequestId: $donationRequestId
+      warehouseReference: $warehouseReference
+      date: $date
+      method: $method
+      notes: $notes
+      processedBy: $processedBy
+    }
+  )
+}
+
+# --- Products ---
+
+mutation CreateProduct(
+  $donationId: UUID!
+  $name: String!
+  $brand: String!
+  $type: String!
+  $quantity: Int!
+  $price: String
+  $color: String
+  $colorCategory: String
+  $keyIngredients: String
+  $details: Any
+  $expirationDate: Date
+  $barcode: String
+) @auth(level: PUBLIC) {
+  product_insert(
+    data: {
+      donationId: $donationId
+      name: $name
+      brand: $brand
+      type: $type
+      quantity: $quantity
+      price: $price
+      color: $color
+      colorCategory: $colorCategory
+      keyIngredients: $keyIngredients
+      details: $details
+      expirationDate: $expirationDate
+      barcode: $barcode
+    }
+  )
+}
+
+mutation AllocateProductToBatch($productId: UUID!, $batchId: UUID!)
+  @auth(level: PUBLIC) {
+  product_update(
+    id: $productId
+    data: {
+      batchId: $batchId
+      status: ALLOCATED
+      updatedAt_expr: "request.time"
+    }
+  )
+}
+
+mutation UnallocateProduct($productId: UUID!) @auth(level: PUBLIC) {
+  product_update(
+    id: $productId
+    data: {
+      batchId: null
+      status: IN_STOCK
+      updatedAt_expr: "request.time"
+    }
+  )
+}
+
+mutation MarkBatchProductsShipped($batchId: UUID!) @auth(level: PUBLIC) {
+  product_updateMany(
+    where: { batchId: { eq: $batchId } }
+    data: { status: SHIPPED, updatedAt_expr: "request.time" }
+  )
+}
+
+mutation MarkProductExpired($productId: UUID!) @auth(level: PUBLIC) {
+  product_update(
+    id: $productId
+    data: { status: EXPIRED, updatedAt_expr: "request.time" }
+  )
+}
+
+mutation MarkProductDiscarded($productId: UUID!) @auth(level: PUBLIC) {
+  product_update(
+    id: $productId
+    data: { status: DISCARDED, updatedAt_expr: "request.time" }
+  )
+}
+
+# --- Shelters ---
+
+mutation CreateShelter(
+  $name: String!
+  $addressLine1: String!
+  $addressLine2: String
+  $city: String!
+  $state: String!
+  $postalCode: String!
+  $contactName: String!
+  $contactEmail: String
+  $contactPhone: String
+  $acceptedTypes: [String!]
+  $rejectedTypes: [String!]
+  $preferredBrands: [String!]
+  $notes: String
+  $capacityPerBatch: Int
+) @auth(level: PUBLIC) {
+  shelter_insert(
+    data: {
+      name: $name
+      addressLine1: $addressLine1
+      addressLine2: $addressLine2
+      city: $city
+      state: $state
+      postalCode: $postalCode
+      contactName: $contactName
+      contactEmail: $contactEmail
+      contactPhone: $contactPhone
+      acceptedTypes: $acceptedTypes
+      rejectedTypes: $rejectedTypes
+      preferredBrands: $preferredBrands
+      notes: $notes
+      capacityPerBatch: $capacityPerBatch
+    }
+  )
+}
+
+mutation UpdateShelter(
+  $id: UUID!
+  $name: String
+  $addressLine1: String
+  $addressLine2: String
+  $city: String
+  $state: String
+  $postalCode: String
+  $contactName: String
+  $contactEmail: String
+  $contactPhone: String
+  $acceptedTypes: [String!]
+  $rejectedTypes: [String!]
+  $preferredBrands: [String!]
+  $notes: String
+  $capacityPerBatch: Int
+) @auth(level: PUBLIC) {
+  shelter_update(
+    id: $id
+    data: {
+      name: $name
+      addressLine1: $addressLine1
+      addressLine2: $addressLine2
+      city: $city
+      state: $state
+      postalCode: $postalCode
+      contactName: $contactName
+      contactEmail: $contactEmail
+      contactPhone: $contactPhone
+      acceptedTypes: $acceptedTypes
+      rejectedTypes: $rejectedTypes
+      preferredBrands: $preferredBrands
+      notes: $notes
+      capacityPerBatch: $capacityPerBatch
+      updatedAt_expr: "request.time"
+    }
+  )
+}
+
+mutation DeactivateShelter($id: UUID!) @auth(level: PUBLIC) {
+  shelter_update(
+    id: $id
+    data: { isActive: false, updatedAt_expr: "request.time" }
+  )
+}
+
+mutation ReactivateShelter($id: UUID!) @auth(level: PUBLIC) {
+  shelter_update(
+    id: $id
+    data: { isActive: true, updatedAt_expr: "request.time" }
+  )
+}
+
+# --- Batches ---
+
+mutation CreateBatch(
+  $shelterId: UUID!
+  $createdBy: String!
+  $notes: String
+) @auth(level: PUBLIC) {
+  batch_insert(
+    data: {
+      shelterId: $shelterId
+      createdBy: $createdBy
+      notes: $notes
+    }
+  )
+}
+
+mutation FinalizeBatch($id: UUID!) @auth(level: PUBLIC) {
+  batch_update(
+    id: $id
+    data: {
+      status: FINALIZED
+      finalizedAt_expr: "request.time"
+      updatedAt_expr: "request.time"
+    }
+  )
+}
+
+mutation ShipBatch($id: UUID!) @auth(level: PUBLIC) {
+  batch_update(
+    id: $id
+    data: {
+      status: SHIPPED
+      shippedAt_expr: "request.time"
+      updatedAt_expr: "request.time"
+    }
+  )
+}
+
+mutation DeliverBatch($id: UUID!) @auth(level: PUBLIC) {
+  batch_update(
+    id: $id
+    data: {
+      status: DELIVERED
+      deliveredAt_expr: "request.time"
+      updatedAt_expr: "request.time"
+    }
+  )
+}
+
+mutation UpdateBatchNotes($id: UUID!, $notes: String) @auth(level: PUBLIC) {
+  batch_update(
+    id: $id
+    data: { notes: $notes, updatedAt_expr: "request.time" }
+  )
+}
+
+# --- Product Catalog (Phase 7) ---
+
+mutation UpsertCatalogEntry(
+  $barcode: String!
+  $name: String!
+  $brand: String!
+  $type: String!
+  $price: String
+  $color: String
+  $keyIngredients: String
+  $source: String!
+) @auth(level: PUBLIC) {
+  productCatalog_upsert(
+    data: {
+      barcode: $barcode
+      name: $name
+      brand: $brand
+      type: $type
+      price: $price
+      color: $color
+      keyIngredients: $keyIngredients
+      source: $source
+      lastUsedAt_expr: "request.time"
+    }
+  )
+}
+
+mutation IncrementCatalogUsage($barcode: String!) @auth(level: PUBLIC) {
+  productCatalog_update(
+    key: { barcode: $barcode }
+    data: {
+      timesUsed_update: { inc: 1 }
+      lastUsedAt_expr: "request.time"
+    }
+  )
+}

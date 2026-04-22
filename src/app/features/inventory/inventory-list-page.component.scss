@@ -1,0 +1,167 @@
+@use '../../styles-shared' as *;
+
+.page {
+  padding: 32px;
+  @media (max-width: $mobile-breakpoint) { padding: 20px 16px 80px; }
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.page-title { @include h3; margin: 0; }
+
+.summary {
+  display: flex;
+  gap: 16px;
+}
+
+.stat {
+  @include card;
+  padding: 12px 20px;
+  min-width: 100px;
+
+  &.accent { border-left: 3px solid $crimson; }
+}
+
+.stat-value {
+  @include h4;
+  display: block;
+  font-size: 24px;
+}
+
+.stat-label {
+  @include subtitle;
+  color: $muted-text;
+  font-size: 11px;
+}
+
+.filter-bar {
+  @include card;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  padding: 12px;
+
+  .search { flex: 2; min-width: 200px; }
+  .brand { flex: 1; min-width: 120px; }
+  select.text-input { flex: 1; min-width: 140px; }
+}
+
+.text-input {
+  @include form-input;
+  padding: 8px 12px;
+  font-size: 14px;
+}
+
+select.text-input {
+  appearance: none;
+  padding-right: 28px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%231A1A1A' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+
+.checkbox-label {
+  @include p3;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  white-space: nowrap;
+
+  input[type="checkbox"] {
+    width: 16px; height: 16px;
+    accent-color: $hunter-green;
+  }
+}
+
+.clear-btn {
+  @include subtitle;
+  background: transparent;
+  border: 1px solid $border-color;
+  color: $muted-text;
+  padding: 8px 12px;
+  border-radius: 16px;
+  cursor: pointer;
+
+  &:hover { border-color: $double-espresso; color: $double-espresso; }
+}
+
+.empty-state {
+  @include p3;
+  color: $muted-text;
+  text-align: center;
+  padding: 48px 0;
+}
+
+.error-banner {
+  @include p3;
+  background: rgba($crimson, 0.1);
+  color: $crimson;
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.result-count {
+  @include subtitle;
+  color: $muted-text;
+  margin: 0 0 8px 4px;
+}
+
+.inventory-table {
+  background: $white;
+  border: 1px solid $card-border;
+  border-radius: 12px;
+  overflow: hidden;
+
+  .row {
+    display: grid;
+    grid-template-columns: 2fr 1.2fr 1fr 60px 100px 100px;
+    gap: 12px;
+    padding: 12px 20px;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    border-bottom: 1px solid $card-border;
+
+    &:last-child { border-bottom: none; }
+    &:hover:not(.header-row) { background: $porcelain; text-decoration: none; }
+
+    @media (max-width: $mobile-breakpoint) {
+      grid-template-columns: 1fr auto;
+      grid-template-areas:
+        'name qty'
+        'brand type'
+        'exp date';
+      gap: 4px 12px;
+
+      .col-name { grid-area: name; font-weight: 600; }
+      .col-brand { grid-area: brand; @include subtitle; text-transform: none; letter-spacing: 0; font-weight: 400; color: $muted-text; font-size: 13px; }
+      .col-type { grid-area: type; font-size: 13px; color: $muted-text; text-align: right; }
+      .col-qty { grid-area: qty; font-weight: 600; text-align: right; }
+      .col-exp { grid-area: exp; font-size: 12px; color: $muted-text; }
+      .col-date { grid-area: date; font-size: 12px; color: $muted-text; text-align: right; }
+    }
+  }
+
+  .header-row {
+    background: $porcelain;
+    @include subtitle;
+    font-size: 12px;
+
+    span { color: $muted-text; }
+
+    @media (max-width: $mobile-breakpoint) { display: none; }
+  }
+}
+
+.col-qty { font-weight: 600; }
+.muted { color: $muted-text; }

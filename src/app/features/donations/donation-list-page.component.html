@@ -1,0 +1,29 @@
+<div class="page">
+  <div class="page-header">
+    <h1 class="page-title">Donations</h1>
+    <a routerLink="/donations/new" class="btn-primary">Process Donation</a>
+  </div>
+
+  @if (loading()) {
+    <p class="empty-state">Loading…</p>
+  } @else if (error()) {
+    <div class="error-banner">{{ error() }}</div>
+  } @else if (donations().length === 0) {
+    <p class="empty-state">No donations processed yet.</p>
+  } @else {
+    <div class="donation-list">
+      @for (d of donations(); track d.id) {
+        <a [routerLink]="['/donations', d.id]" class="donation-row">
+          <div class="row-main">
+            <span class="donor-name">{{ d.donor.fullName }}</span>
+            <span class="donor-email">{{ d.donor.email }}</span>
+          </div>
+          <div class="row-meta">
+            <span class="method-pill">{{ d.method }}</span>
+            <span class="date">{{ d.createdAt | date:'mediumDate' }}</span>
+          </div>
+        </a>
+      }
+    </div>
+  }
+</div>

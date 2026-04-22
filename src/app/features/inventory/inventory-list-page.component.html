@@ -1,0 +1,97 @@
+<div class="page">
+  <div class="page-header">
+    <h1 class="page-title">Inventory</h1>
+    <div class="summary">
+      <div class="stat">
+        <span class="stat-value">{{ totalCount() }}</span>
+        <span class="stat-label">In stock</span>
+      </div>
+      <div class="stat accent">
+        <span class="stat-value">{{ expiringCount() }}</span>
+        <span class="stat-label">Expiring ≤ 30d</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <input
+      type="search"
+      class="text-input search"
+      placeholder="Search name, brand, or type…"
+      [value]="searchQuery()"
+      (input)="searchQuery.set($any($event.target).value)"
+    />
+    <select
+      class="text-input"
+      [value]="typeFilter() ?? ''"
+      (change)="typeFilter.set($any($event.target).value || null)"
+    >
+      <option value="">All types</option>
+      @for (cat of categories; track cat.label) {
+        <optgroup [label]="cat.label">
+          @for (t of cat.types; track t.value) {
+            <option [value]="t.value">{{ t.label }}</option>
+          }
+        </optgroup>
+      }
+    </select>
+    <input
+      type="text"
+      class="text-input brand"
+      placeholder="Brand"
+      [value]="brandFilter()"
+      (input)="brandFilter.set($any($event.target).value)"
+    />
+    <label class="checkbox-label">
+      <input
+        type="checkbox"
+        [checked]="expiringOnly()"
+        (change)="expiringOnly.set($any($event.target).checked)"
+      />
+      Expiring soon
+    </label>
+    <button type="button" class="clear-btn" (click)="clearFilters()">Clear</button>
+  </div>
+
+  @if (loading()) {
+    <p class="empty-state">Loading inventory…</p>
+  } @else if (error()) {
+    <div class="error-banner">{{ error() }}</div>
+  } @else if (filtered().length === 0) {
+    <p class="empty-state">
+      @if (totalCount() === 0) {
+        No products in stock yet.
+      } @else {
+        No products match your filters.
+      }
+    </p>
+  } @else {
+    <p class="result-count">{{ filteredCount() }} of {{ totalCount() }} products</p>
+    <div class="inventory-table" role="table">
+      <div class="row header-row" role="row">
+        <span class="col-name">Name</span>
+        <span class="col-brand">Brand</span>
+        <span class="col-type">Type</span>
+        <span class="col-qty">Qty</span>
+        <span class="col-exp">Expires</span>
+        <span class="col-date">Received</span>
+      </div>
+      @for (p of filtered(); track p.id) {
+        <a [routerLink]="['/inventory', p.id]" class="row" role="row">
+          <span class="col-name">{{ p.name }}</span>
+          <span class="col-brand">{{ p.brand }}</span>
+          <span class="col-type">{{ typeLabel(p.type) }}</span>
+          <span class="col-qty">{{ p.quantity }}</span>
+          <span class="col-exp">
+            @if (p.expirationDate) {
+              {{ p.expirationDate | date:'MMM yyyy' }}
+            } @else {
+              <span class="muted">—</span>
+            }
+          </span>
+          <span class="col-date">{{ p.createdAt | date:'shortDate' }}</span>
+        </a>
+      }
+    </div>
+  }
+</div>

@@ -1,23 +1,57 @@
-import { Component } from '@angular/core';
+import { DatePipe } from '@angular/common';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import {
+  BatchListRow,
+  BatchService,
+} from '../../core/services/batch.service';
+
+type StatusFilter = 'all' | 'DRAFT' | 'FINALIZED' | 'SHIPPED' | 'DELIVERED';
 
 @Component({
   selector: 'app-batch-list-page',
   standalone: true,
-  template: `
-    <div class="page">
-      <div class="page-header">
-        <h1 class="page-title">Batches</h1>
-        <button class="btn-primary">Create Batch</button>
-      </div>
-      <p class="empty-state">No outgoing batches yet.</p>
-    </div>
-  `,
-  styles: [`
-    @use '../../styles-shared' as *;
-    .page { padding: 32px; @media (max-width: $mobile-breakpoint) { padding: 20px 16px 80px; } }
-    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
-    .page-title { @include h3; margin: 0; }
-    .empty-state { @include p3; color: $muted-text; text-align: center; padding: 48px 0; }
-  `],
+  imports: [RouterLink, DatePipe],
+  templateUrl: './batch-list-page.component.html',
+  styleUrl: './batch-list-page.component.scss',
 })
-export class BatchListPageComponent {}
+export class BatchListPageComponent implements OnInit {
+  private readonly batchService = inject(BatchService);
+
+  readonly batches = signal<BatchListRow[]>([]);
+  readonly loading = signal(true);
+  readonly error = signal<string | null>(null);
+  readonly statusFilter = signal<StatusFilter>('all');
+
+  readonly filtered = computed(() => {
+    const s = this.statusFilter();
+    if (s === 'all') return this.batches();
+    return this.batches().filter((b) => b.status === s);
+  });
+
+  async ngOnInit(): Promise<void> {
+    await this.load();
+  }
+
+  async load(): Promise<void> {
+    this.loading.set(true);
+    this.error.set(null);
+    try {
+      const rows = await this.batchService.listAll();
+      this.batches.set(rows);
+    } catch (err) {
+      console.error(err);
+      this.error.set('Could not load batches.');
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  setFilter(f: StatusFilter): void {
+    this.statusFilter.set(f);
+  }
+
+  statusClass(status: string): string {
+    return `badge-${status.toLowerCase()}`;
+  }
+}

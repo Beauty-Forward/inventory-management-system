@@ -1,0 +1,384 @@
+# ============================================================
+# Beauty Forward IMS — Queries
+# ============================================================
+# Auth is set to PUBLIC while the app is in development. When we
+# turn on auth, change these to @auth(level: USER).
+
+# --- Donors ---
+
+query GetDonorByEmail($email: String!) @auth(level: PUBLIC) {
+  donors(where: { email: { eq: $email } }, limit: 1) {
+    id
+    fullName
+    email
+    phone
+    smsOptIn
+    city
+    state
+    instagramHandle
+    donationCount
+  }
+}
+
+query GetDonor($id: UUID!) @auth(level: PUBLIC) {
+  donor(id: $id) {
+    id
+    fullName
+    email
+    phone
+    smsOptIn
+    city
+    state
+    instagramHandle
+    linkedRequestId
+    donationCount
+    createdAt
+  }
+}
+
+# --- Donations ---
+
+query ListRecentDonations($limit: Int) @auth(level: PUBLIC) {
+  donations(orderBy: [{ createdAt: DESC }], limit: $limit) {
+    id
+    date
+    method
+    notes
+    createdAt
+    donor {
+      id
+      fullName
+      email
+    }
+  }
+}
+
+query GetDonation($id: UUID!) @auth(level: PUBLIC) {
+  donation(id: $id) {
+    id
+    donationRequestId
+    warehouseReference
+    date
+    method
+    notes
+    processedBy
+    createdAt
+    donor {
+      id
+      fullName
+      email
+      phone
+      city
+      state
+    }
+    products: products_on_donation {
+      id
+      name
+      brand
+      type
+      quantity
+      status
+      expirationDate
+    }
+  }
+}
+
+# --- Shelters ---
+
+query ListShelters($isActive: Boolean) @auth(level: PUBLIC) {
+  shelters(
+    where: { isActive: { eq: $isActive } }
+    orderBy: [{ name: ASC }]
+  ) {
+    id
+    name
+    city
+    state
+    contactName
+    contactEmail
+    contactPhone
+    acceptedTypes
+    rejectedTypes
+    isActive
+  }
+}
+
+query ListAllShelters @auth(level: PUBLIC) {
+  shelters(orderBy: [{ name: ASC }]) {
+    id
+    name
+    city
+    state
+    contactName
+    contactEmail
+    contactPhone
+    acceptedTypes
+    rejectedTypes
+    isActive
+  }
+}
+
+query GetShelter($id: UUID!) @auth(level: PUBLIC) {
+  shelter(id: $id) {
+    id
+    name
+    addressLine1
+    addressLine2
+    city
+    state
+    postalCode
+    contactName
+    contactEmail
+    contactPhone
+    acceptedTypes
+    rejectedTypes
+    preferredBrands
+    notes
+    capacityPerBatch
+    isActive
+    createdAt
+    batches: batches_on_shelter(orderBy: [{ createdAt: DESC }], limit: 10) {
+      id
+      status
+      createdAt
+      finalizedAt
+      shippedAt
+    }
+  }
+}
+
+# --- Products / Inventory ---
+
+query ListInventoryInStock(
+  $limit: Int
+  $offset: Int
+  $type: String
+  $brand: String
+) @auth(level: PUBLIC) {
+  products(
+    where: {
+      status: { eq: IN_STOCK }
+      type: { eq: $type }
+      brand: { eq: $brand }
+    }
+    orderBy: [{ createdAt: DESC }]
+    limit: $limit
+    offset: $offset
+  ) {
+    id
+    name
+    brand
+    type
+    quantity
+    color
+    colorCategory
+    expirationDate
+    barcode
+    status
+    createdAt
+    donation {
+      id
+      date
+      donor {
+        fullName
+      }
+    }
+  }
+}
+
+query GetProduct($id: UUID!) @auth(level: PUBLIC) {
+  product(id: $id) {
+    id
+    name
+    brand
+    type
+    quantity
+    price
+    color
+    colorCategory
+    keyIngredients
+    details
+    expirationDate
+    barcode
+    status
+    createdAt
+    donation {
+      id
+      date
+      method
+      donor {
+        id
+        fullName
+        email
+      }
+    }
+    batch {
+      id
+      status
+      shelter {
+        id
+        name
+      }
+    }
+  }
+}
+
+query ListAvailableProductsForShelter(
+  $types: [String!]
+  $limit: Int
+) @auth(level: PUBLIC) {
+  products(
+    where: {
+      status: { eq: IN_STOCK }
+      type: { in: $types }
+    }
+    orderBy: [{ createdAt: ASC }]
+    limit: $limit
+  ) {
+    id
+    name
+    brand
+    type
+    quantity
+    color
+    expirationDate
+  }
+}
+
+query ListProductsInBatch($batchId: UUID!) @auth(level: PUBLIC) {
+  products(where: { batchId: { eq: $batchId } }) {
+    id
+    name
+    brand
+    type
+    quantity
+    status
+  }
+}
+
+query ListExpiringSoon($beforeDate: Date!) @auth(level: PUBLIC) {
+  products(
+    where: {
+      status: { eq: IN_STOCK }
+      expirationDate: { le: $beforeDate }
+    }
+    orderBy: [{ expirationDate: ASC }]
+    limit: 50
+  ) {
+    id
+    name
+    brand
+    type
+    expirationDate
+    quantity
+  }
+}
+
+# --- Batches ---
+
+query ListBatches($status: BatchStatus) @auth(level: PUBLIC) {
+  batches(
+    where: { status: { eq: $status } }
+    orderBy: [{ createdAt: DESC }]
+  ) {
+    id
+    status
+    createdAt
+    finalizedAt
+    shippedAt
+    deliveredAt
+    shelter {
+      id
+      name
+      city
+      state
+    }
+  }
+}
+
+query ListAllBatches @auth(level: PUBLIC) {
+  batches(orderBy: [{ createdAt: DESC }]) {
+    id
+    status
+    createdAt
+    finalizedAt
+    shippedAt
+    deliveredAt
+    shelter {
+      id
+      name
+      city
+      state
+    }
+  }
+}
+
+query GetBatch($id: UUID!) @auth(level: PUBLIC) {
+  batch(id: $id) {
+    id
+    status
+    notes
+    createdBy
+    finalizedAt
+    shippedAt
+    deliveredAt
+    createdAt
+    shelter {
+      id
+      name
+      addressLine1
+      addressLine2
+      city
+      state
+      postalCode
+      contactName
+      contactEmail
+      acceptedTypes
+    }
+    products: products_on_batch {
+      id
+      name
+      brand
+      type
+      quantity
+      status
+      expirationDate
+    }
+  }
+}
+
+# --- Dashboard stats ---
+
+query DashboardInStockCount @auth(level: PUBLIC) {
+  products(where: { status: { eq: IN_STOCK } }) {
+    id
+  }
+}
+
+query DashboardStats @auth(level: PUBLIC) {
+  inStock: products(where: { status: { eq: IN_STOCK } }) {
+    id
+  }
+  allocated: products(where: { status: { eq: ALLOCATED } }) {
+    id
+  }
+  shipped: products(where: { status: { eq: SHIPPED } }) {
+    id
+  }
+}
+
+# --- Product Catalog (Phase 7) ---
+
+query GetCatalogByBarcode($barcode: String!) @auth(level: PUBLIC) {
+  productCatalog(key: { barcode: $barcode }) {
+    barcode
+    name
+    brand
+    type
+    price
+    color
+    keyIngredients
+    source
+    timesUsed
+  }
+}

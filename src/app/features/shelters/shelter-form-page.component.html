@@ -1,0 +1,220 @@
+<div class="page">
+  <div class="page-header">
+    <a routerLink="/shelters" class="back-link">← Shelters</a>
+    <h1 class="page-title">{{ pageTitle() }}</h1>
+  </div>
+
+  @if (loading()) {
+    <p class="empty-state">Loading…</p>
+  } @else {
+    <form (submit)="save(); $event.preventDefault()" class="form">
+      <!-- Basic info -->
+      <section class="form-section">
+        <h2 class="section-title">Basic info</h2>
+        <div class="form-field">
+          <label>Name</label>
+          <input
+            type="text"
+            [value]="form().name"
+            (input)="updateField('name', $any($event.target).value)"
+            class="text-input"
+            placeholder="Shelter name"
+          />
+          @if (fieldErrors()['name']) {
+            <p class="field-error">{{ fieldErrors()['name'] }}</p>
+          }
+        </div>
+      </section>
+
+      <!-- Address -->
+      <section class="form-section">
+        <h2 class="section-title">Address</h2>
+        <div class="form-field">
+          <label>Street address</label>
+          <input
+            type="text"
+            [value]="form().addressLine1"
+            (input)="updateField('addressLine1', $any($event.target).value)"
+            class="text-input"
+          />
+          @if (fieldErrors()['addressLine1']) {
+            <p class="field-error">{{ fieldErrors()['addressLine1'] }}</p>
+          }
+        </div>
+        <div class="form-field">
+          <label>Suite, apt, unit (optional)</label>
+          <input
+            type="text"
+            [value]="form().addressLine2"
+            (input)="updateField('addressLine2', $any($event.target).value)"
+            class="text-input"
+          />
+        </div>
+        <div class="form-row">
+          <div class="form-field flex-2">
+            <label>City</label>
+            <input
+              type="text"
+              [value]="form().city"
+              (input)="updateField('city', $any($event.target).value)"
+              class="text-input"
+            />
+            @if (fieldErrors()['city']) {
+              <p class="field-error">{{ fieldErrors()['city'] }}</p>
+            }
+          </div>
+          <div class="form-field flex-1">
+            <label>State</label>
+            <input
+              type="text"
+              maxlength="2"
+              [value]="form().state"
+              (input)="updateField('state', $any($event.target).value.toUpperCase())"
+              class="text-input"
+              placeholder="NY"
+            />
+            @if (fieldErrors()['state']) {
+              <p class="field-error">{{ fieldErrors()['state'] }}</p>
+            }
+          </div>
+          <div class="form-field flex-1">
+            <label>ZIP</label>
+            <input
+              type="text"
+              [value]="form().postalCode"
+              (input)="updateField('postalCode', $any($event.target).value)"
+              class="text-input"
+            />
+            @if (fieldErrors()['postalCode']) {
+              <p class="field-error">{{ fieldErrors()['postalCode'] }}</p>
+            }
+          </div>
+        </div>
+      </section>
+
+      <!-- Contact -->
+      <section class="form-section">
+        <h2 class="section-title">Contact</h2>
+        <div class="form-field">
+          <label>Contact name</label>
+          <input
+            type="text"
+            [value]="form().contactName"
+            (input)="updateField('contactName', $any($event.target).value)"
+            class="text-input"
+          />
+          @if (fieldErrors()['contactName']) {
+            <p class="field-error">{{ fieldErrors()['contactName'] }}</p>
+          }
+        </div>
+        <div class="form-row">
+          <div class="form-field flex-1">
+            <label>Email</label>
+            <input
+              type="email"
+              [value]="form().contactEmail"
+              (input)="updateField('contactEmail', $any($event.target).value)"
+              class="text-input"
+            />
+            @if (fieldErrors()['contactEmail']) {
+              <p class="field-error">{{ fieldErrors()['contactEmail'] }}</p>
+            }
+          </div>
+          <div class="form-field flex-1">
+            <label>Phone</label>
+            <input
+              type="tel"
+              [value]="form().contactPhone"
+              (input)="updateField('contactPhone', $any($event.target).value)"
+              class="text-input"
+            />
+          </div>
+        </div>
+      </section>
+
+      <!-- Product preferences -->
+      <section class="form-section">
+        <h2 class="section-title">Product preferences</h2>
+        <p class="section-help">
+          Mark which product types this shelter accepts or rejects. Types not marked
+          either way are neutral.
+        </p>
+
+        @for (category of categories; track category.label) {
+          <div class="category-block">
+            <h3 class="category-label">{{ category.label }}</h3>
+            <div class="type-grid">
+              @for (type of category.types; track type.value) {
+                <div class="type-row">
+                  <span class="type-name">{{ type.label }}</span>
+                  <div class="type-actions">
+                    <button
+                      type="button"
+                      class="tag-btn"
+                      [class.accepted]="isAccepted(type.value)"
+                      (click)="toggleAccepted(type.value)"
+                    >Accept</button>
+                    <button
+                      type="button"
+                      class="tag-btn reject"
+                      [class.rejected]="isRejected(type.value)"
+                      (click)="toggleRejected(type.value)"
+                    >Reject</button>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </section>
+
+      <!-- Additional -->
+      <section class="form-section">
+        <h2 class="section-title">Additional</h2>
+        <div class="form-field">
+          <label>Preferred brands <span class="field-hint">(comma separated)</span></label>
+          <input
+            type="text"
+            [value]="form().preferredBrandsRaw"
+            (input)="updateField('preferredBrandsRaw', $any($event.target).value)"
+            class="text-input"
+            placeholder="Fenty Beauty, Pattern Beauty"
+          />
+        </div>
+        <div class="form-field">
+          <label>Capacity per batch <span class="field-hint">(# of products)</span></label>
+          <input
+            type="number"
+            min="1"
+            [value]="form().capacityPerBatch ?? ''"
+            (input)="updateField('capacityPerBatch', $any($event.target).valueAsNumber || null)"
+            class="text-input"
+          />
+          @if (fieldErrors()['capacityPerBatch']) {
+            <p class="field-error">{{ fieldErrors()['capacityPerBatch'] }}</p>
+          }
+        </div>
+        <div class="form-field">
+          <label>Notes</label>
+          <textarea
+            [value]="form().notes"
+            (input)="updateField('notes', $any($event.target).value)"
+            class="text-input textarea"
+            rows="3"
+          ></textarea>
+        </div>
+      </section>
+
+      @if (error()) {
+        <div class="error-banner">{{ error() }}</div>
+      }
+
+      <div class="form-actions">
+        <a routerLink="/shelters" class="btn-secondary">Cancel</a>
+        <button type="submit" class="btn-primary" [disabled]="saving()">
+          {{ saving() ? 'Saving…' : (isEditMode() ? 'Save Changes' : 'Create Shelter') }}
+        </button>
+      </div>
+    </form>
+  }
+</div>

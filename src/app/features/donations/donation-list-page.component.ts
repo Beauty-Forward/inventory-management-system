@@ -1,23 +1,40 @@
-import { Component } from '@angular/core';
+import { DatePipe } from '@angular/common';
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import {
+  DonationListRow,
+  DonationService,
+} from '../../core/services/donation.service';
 
 @Component({
   selector: 'app-donation-list-page',
   standalone: true,
-  template: `
-    <div class="page">
-      <div class="page-header">
-        <h1 class="page-title">Donations</h1>
-        <button class="btn-primary">Process Donation</button>
-      </div>
-      <p class="empty-state">No donations processed yet.</p>
-    </div>
-  `,
-  styles: [`
-    @use '../../styles-shared' as *;
-    .page { padding: 32px; @media (max-width: $mobile-breakpoint) { padding: 20px 16px 80px; } }
-    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
-    .page-title { @include h3; margin: 0; }
-    .empty-state { @include p3; color: $muted-text; text-align: center; padding: 48px 0; }
-  `],
+  imports: [RouterLink, DatePipe],
+  templateUrl: './donation-list-page.component.html',
+  styleUrl: './donation-list-page.component.scss',
 })
-export class DonationListPageComponent {}
+export class DonationListPageComponent implements OnInit {
+  private readonly donationService = inject(DonationService);
+
+  readonly donations = signal<DonationListRow[]>([]);
+  readonly loading = signal(true);
+  readonly error = signal<string | null>(null);
+
+  async ngOnInit(): Promise<void> {
+    await this.load();
+  }
+
+  async load(): Promise<void> {
+    this.loading.set(true);
+    this.error.set(null);
+    try {
+      const rows = await this.donationService.listRecent(50);
+      this.donations.set(rows);
+    } catch (err) {
+      console.error(err);
+      this.error.set('Could not load donations.');
+    } finally {
+      this.loading.set(false);
+    }
+  }
+}

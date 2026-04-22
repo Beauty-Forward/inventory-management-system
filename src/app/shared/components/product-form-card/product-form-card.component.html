@@ -1,0 +1,193 @@
+<article class="card">
+  <header class="card-head">
+    <span class="index-label">Product {{ index + 1 }}</span>
+    <div class="head-actions">
+      <button type="button" class="scan-btn" (click)="onScanBarcode()" title="Scan barcode">
+        📷 Scan
+      </button>
+      <button type="button" class="photo-btn" (click)="onCapturePhoto()" title="Identify from photo">
+        📸 Photo
+      </button>
+      @if (canRemove) {
+        <button type="button" class="remove-btn" (click)="onRemove()" title="Remove">×</button>
+      }
+    </div>
+  </header>
+
+  <div class="field-grid">
+    <div class="form-field full">
+      <label>Name</label>
+      <input
+        type="text"
+        class="text-input"
+        [value]="model.name"
+        (input)="updateField('name', $any($event.target).value)"
+        placeholder="e.g. Moisture Milk Conditioner"
+      />
+      @if (errors['name']) {<p class="field-error">{{ errors['name'] }}</p>}
+    </div>
+
+    <div class="form-field">
+      <label>Brand</label>
+      <input
+        type="text"
+        class="text-input"
+        [value]="model.brand"
+        (input)="updateField('brand', $any($event.target).value)"
+        placeholder="e.g. Pattern Beauty"
+      />
+      @if (errors['brand']) {<p class="field-error">{{ errors['brand'] }}</p>}
+    </div>
+
+    <div class="form-field">
+      <label>Type</label>
+      <select
+        class="text-input"
+        [value]="model.type"
+        (change)="updateField('type', $any($event.target).value)"
+      >
+        <option value="">— Select —</option>
+        @for (cat of categories; track cat.label) {
+          <optgroup [label]="cat.label">
+            @for (t of cat.types; track t.value) {
+              <option [value]="t.value">{{ t.label }}</option>
+            }
+          </optgroup>
+        }
+      </select>
+      @if (errors['type']) {<p class="field-error">{{ errors['type'] }}</p>}
+    </div>
+
+    <div class="form-field">
+      <label>Quantity</label>
+      <input
+        type="number"
+        min="1"
+        class="text-input"
+        [value]="model.quantity"
+        (input)="updateField('quantity', $any($event.target).valueAsNumber || 1)"
+      />
+      @if (errors['quantity']) {<p class="field-error">{{ errors['quantity'] }}</p>}
+    </div>
+
+    <div class="form-field">
+      <label>Expires</label>
+      <input
+        type="date"
+        class="text-input"
+        [value]="model.expirationDate"
+        (input)="updateField('expirationDate', $any($event.target).value)"
+      />
+    </div>
+  </div>
+
+  <button type="button" class="expand-btn" (click)="toggleExpanded()">
+    {{ expanded() ? '− Fewer details' : '+ More details' }}
+  </button>
+
+  @if (expanded()) {
+    <div class="field-grid">
+      <div class="form-field">
+        <label>Barcode</label>
+        <input
+          type="text"
+          class="text-input"
+          [value]="model.barcode"
+          (input)="updateField('barcode', $any($event.target).value)"
+        />
+      </div>
+
+      <div class="form-field">
+        <label>Price</label>
+        <input
+          type="text"
+          class="text-input"
+          [value]="model.price"
+          (input)="updateField('price', $any($event.target).value)"
+          placeholder="e.g. $24"
+        />
+      </div>
+
+      <div class="form-field">
+        <label>Color</label>
+        <input
+          type="text"
+          class="text-input"
+          [value]="model.color"
+          (input)="updateField('color', $any($event.target).value)"
+        />
+      </div>
+
+      <div class="form-field">
+        <label>Color Category</label>
+        <input
+          type="text"
+          class="text-input"
+          [value]="model.colorCategory"
+          (input)="updateField('colorCategory', $any($event.target).value)"
+          placeholder="e.g. warm nude"
+        />
+      </div>
+
+      <div class="form-field full">
+        <label>Key Ingredients</label>
+        <input
+          type="text"
+          class="text-input"
+          [value]="model.keyIngredients"
+          (input)="updateField('keyIngredients', $any($event.target).value)"
+        />
+      </div>
+
+      @if (isHairCare()) {
+        <div class="form-field">
+          <label>Hair Type</label>
+          <input
+            type="text"
+            class="text-input"
+            [value]="model.hairType"
+            (input)="updateField('hairType', $any($event.target).value)"
+            placeholder="e.g. 4C, curly"
+          />
+        </div>
+      }
+
+      @if (isSkinCare()) {
+        <div class="form-field">
+          <label>Skin Type</label>
+          <input
+            type="text"
+            class="text-input"
+            [value]="model.skinType"
+            (input)="updateField('skinType', $any($event.target).value)"
+            placeholder="e.g. oily, sensitive"
+          />
+        </div>
+      }
+
+      @if (isFragrance()) {
+        <div class="form-field">
+          <label>Scent Family</label>
+          <input
+            type="text"
+            class="text-input"
+            [value]="model.scentFamily"
+            (input)="updateField('scentFamily', $any($event.target).value)"
+            placeholder="e.g. floral, woody"
+          />
+        </div>
+      }
+
+      <div class="form-field">
+        <label>Size</label>
+        <input
+          type="text"
+          class="text-input"
+          [value]="model.size"
+          (input)="updateField('size', $any($event.target).value)"
+          placeholder="e.g. 8oz"
+        />
+      </div>
+    </div>
+  }
+</article>

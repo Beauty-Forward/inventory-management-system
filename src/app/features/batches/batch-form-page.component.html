@@ -1,0 +1,121 @@
+<div class="page">
+  <div class="page-head">
+    <a routerLink="/batches" class="back-link">← Batches</a>
+    <h1 class="page-title">New Outgoing Batch</h1>
+  </div>
+
+  @if (loading()) {
+    <p class="empty-state">Loading shelters…</p>
+  } @else if (!selectedShelter()) {
+    <section class="shelter-picker">
+      <h2 class="section-title">Choose a shelter</h2>
+      @if (activeShelters().length === 0) {
+        <p class="empty-state">
+          No active shelters. <a routerLink="/shelters/new">Add one first.</a>
+        </p>
+      } @else {
+        <div class="shelter-grid">
+          @for (s of activeShelters(); track s.id) {
+            <button type="button" class="shelter-option" (click)="selectShelter(s)">
+              <span class="name">{{ s.name }}</span>
+              <span class="loc">{{ s.city }}, {{ s.state }}</span>
+              @if (s.acceptedTypes?.length) {
+                <span class="types">Accepts {{ s.acceptedTypes?.length ?? 0 }} type(s)</span>
+              }
+            </button>
+          }
+        </div>
+      }
+    </section>
+  } @else {
+    <section class="builder-head">
+      <div>
+        <h2 class="shelter-name">{{ selectedShelter()?.name }}</h2>
+        <p class="shelter-meta">{{ selectedShelter()?.city }}, {{ selectedShelter()?.state }}</p>
+      </div>
+      <button type="button" class="btn-secondary small" (click)="resetShelter()">
+        Change shelter
+      </button>
+    </section>
+
+    <div class="builder">
+      <section class="pane pane-left">
+        <h2 class="section-title">Available inventory</h2>
+        <p class="section-help">
+          Filtered to this shelter's accepted product types. Tap to add.
+        </p>
+
+        @if (loadingProducts()) {
+          <p class="empty-state">Loading…</p>
+        } @else if (available().length === 0) {
+          <p class="empty-state">
+            No in-stock products match this shelter's accepted types.
+          </p>
+        } @else {
+          <div class="product-list">
+            @for (p of available(); track p.id) {
+              <button
+                type="button"
+                class="product-row"
+                [class.selected]="isSelected(p.id)"
+                (click)="toggleSelected(p.id)"
+              >
+                <div class="row-main">
+                  <span class="product-name">{{ p.name }}</span>
+                  <span class="product-meta">
+                    {{ p.brand }} · {{ typeLabel(p.type) }} · Qty {{ p.quantity }}
+                  </span>
+                  @if (p.expirationDate) {
+                    <span class="product-expiry">
+                      Expires {{ p.expirationDate | date:'MMM yyyy' }}
+                    </span>
+                  }
+                </div>
+                <span class="check">
+                  @if (isSelected(p.id)) { ✓ } @else { + }
+                </span>
+              </button>
+            }
+          </div>
+        }
+      </section>
+
+      <aside class="pane pane-right">
+        <h2 class="section-title">This batch</h2>
+        <p class="section-help">{{ selectedCount() }} product(s) selected.</p>
+
+        @if (typeSummary().length > 0) {
+          <div class="summary-pills">
+            @for (s of typeSummary(); track s.type) {
+              <span class="summary-pill">{{ s.label }}: {{ s.count }}</span>
+            }
+          </div>
+        }
+
+        <div class="form-field">
+          <label>Notes (optional)</label>
+          <textarea
+            class="text-input textarea"
+            rows="3"
+            [value]="notes()"
+            (input)="notes.set($any($event.target).value)"
+            placeholder="Delivery instructions, special requests, etc."
+          ></textarea>
+        </div>
+
+        @if (error()) {
+          <div class="error-banner">{{ error() }}</div>
+        }
+
+        <button
+          type="button"
+          class="btn-primary create-btn"
+          [disabled]="creating()"
+          (click)="createBatch()"
+        >
+          {{ creating() ? 'Creating…' : 'Create Batch' }}
+        </button>
+      </aside>
+    </div>
+  }
+</div>

@@ -1,0 +1,664 @@
+extend type Mutation {
+  """
+  ✨ Insert a single `Batch` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  batch_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: Batch_Data!
+  ): Batch_KeyOutput! @fdc_generated(from: "Batch", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert a single `Donation` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  donation_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: Donation_Data!
+  ): Donation_KeyOutput! @fdc_generated(from: "Donation", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert a single `Donor` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  donor_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: Donor_Data!
+  ): Donor_KeyOutput! @fdc_generated(from: "Donor", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert a single `Product` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  product_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: Product_Data!
+  ): Product_KeyOutput! @fdc_generated(from: "Product", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert a single `ProductCatalog` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  productCatalog_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: ProductCatalog_Data!
+  ): ProductCatalog_KeyOutput! @fdc_generated(from: "ProductCatalog", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert a single `Shelter` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  shelter_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: Shelter_Data!
+  ): Shelter_KeyOutput! @fdc_generated(from: "Shelter", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert `Batch` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  batch_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [Batch_Data!]!
+  ): [Batch_KeyOutput!]! @fdc_generated(from: "Batch", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert `Donation` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  donation_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [Donation_Data!]!
+  ): [Donation_KeyOutput!]! @fdc_generated(from: "Donation", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert `Donor` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  donor_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [Donor_Data!]!
+  ): [Donor_KeyOutput!]! @fdc_generated(from: "Donor", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert `Product` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  product_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [Product_Data!]!
+  ): [Product_KeyOutput!]! @fdc_generated(from: "Product", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert `ProductCatalog` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  productCatalog_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [ProductCatalog_Data!]!
+  ): [ProductCatalog_KeyOutput!]! @fdc_generated(from: "ProductCatalog", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert `Shelter` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  shelter_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [Shelter_Data!]!
+  ): [Shelter_KeyOutput!]! @fdc_generated(from: "Shelter", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert or update a single `Batch` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Batch`.
+  """
+  batch_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: Batch_Data!
+  ): Batch_KeyOutput! @fdc_generated(from: "Batch", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update a single `Donation` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Donation`.
+  """
+  donation_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: Donation_Data!
+  ): Donation_KeyOutput! @fdc_generated(from: "Donation", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update a single `Donor` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Donor`.
+  """
+  donor_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: Donor_Data!
+  ): Donor_KeyOutput! @fdc_generated(from: "Donor", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update a single `Product` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Product`.
+  """
+  product_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: Product_Data!
+  ): Product_KeyOutput! @fdc_generated(from: "Product", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update a single `ProductCatalog` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `ProductCatalog`.
+  """
+  productCatalog_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: ProductCatalog_Data!
+  ): ProductCatalog_KeyOutput! @fdc_generated(from: "ProductCatalog", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update a single `Shelter` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Shelter`.
+  """
+  shelter_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: Shelter_Data!
+  ): Shelter_KeyOutput! @fdc_generated(from: "Shelter", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update `Batch` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Batch`.
+  """
+  batch_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [Batch_Data!]!
+  ): [Batch_KeyOutput!]! @fdc_generated(from: "Batch", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Insert or update `Donation` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Donation`.
+  """
+  donation_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [Donation_Data!]!
+  ): [Donation_KeyOutput!]! @fdc_generated(from: "Donation", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Insert or update `Donor` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Donor`.
+  """
+  donor_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [Donor_Data!]!
+  ): [Donor_KeyOutput!]! @fdc_generated(from: "Donor", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Insert or update `Product` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Product`.
+  """
+  product_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [Product_Data!]!
+  ): [Product_KeyOutput!]! @fdc_generated(from: "Product", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Insert or update `ProductCatalog` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `ProductCatalog`.
+  """
+  productCatalog_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [ProductCatalog_Data!]!
+  ): [ProductCatalog_KeyOutput!]! @fdc_generated(from: "ProductCatalog", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Insert or update `Shelter` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Shelter`.
+  """
+  shelter_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [Shelter_Data!]!
+  ): [Shelter_KeyOutput!]! @fdc_generated(from: "Shelter", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Update a single `Batch` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `Batch` or `null` if not found.
+  """
+  batch_update(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Batch_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Batch_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: Batch_Data!
+  ): Batch_KeyOutput @fdc_generated(from: "Batch", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update a single `Donation` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `Donation` or `null` if not found.
+  """
+  donation_update(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Donation_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Donation_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: Donation_Data!
+  ): Donation_KeyOutput @fdc_generated(from: "Donation", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update a single `Donor` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `Donor` or `null` if not found.
+  """
+  donor_update(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Donor_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Donor_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: Donor_Data!
+  ): Donor_KeyOutput @fdc_generated(from: "Donor", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update a single `Product` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `Product` or `null` if not found.
+  """
+  product_update(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Product_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Product_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: Product_Data!
+  ): Product_KeyOutput @fdc_generated(from: "Product", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update a single `ProductCatalog` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `ProductCatalog` or `null` if not found.
+  """
+  productCatalog_update(
+    """
+    The key used to identify the object.
+    """
+    key: ProductCatalog_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: ProductCatalog_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: ProductCatalog_Data!
+  ): ProductCatalog_KeyOutput @fdc_generated(from: "ProductCatalog", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update a single `Shelter` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `Shelter` or `null` if not found.
+  """
+  shelter_update(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Shelter_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Shelter_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: Shelter_Data!
+  ): Shelter_KeyOutput @fdc_generated(from: "Shelter", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update `Batch` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  batch_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: Batch_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: Batch_Data!
+  ): Int! @fdc_generated(from: "Batch", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Update `Donation` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  donation_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: Donation_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: Donation_Data!
+  ): Int! @fdc_generated(from: "Donation", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Update `Donor` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  donor_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: Donor_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: Donor_Data!
+  ): Int! @fdc_generated(from: "Donor", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Update `Product` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  product_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: Product_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: Product_Data!
+  ): Int! @fdc_generated(from: "Product", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Update `ProductCatalog` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  productCatalog_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: ProductCatalog_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: ProductCatalog_Data!
+  ): Int! @fdc_generated(from: "ProductCatalog", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Update `Shelter` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  shelter_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: Shelter_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: Shelter_Data!
+  ): Int! @fdc_generated(from: "Shelter", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Delete a single `Batch` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  batch_delete(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Batch_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Batch_FirstRow
+  ): Batch_KeyOutput @fdc_generated(from: "Batch", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete a single `Donation` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  donation_delete(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Donation_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Donation_FirstRow
+  ): Donation_KeyOutput @fdc_generated(from: "Donation", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete a single `Donor` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  donor_delete(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Donor_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Donor_FirstRow
+  ): Donor_KeyOutput @fdc_generated(from: "Donor", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete a single `Product` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  product_delete(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Product_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Product_FirstRow
+  ): Product_KeyOutput @fdc_generated(from: "Product", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete a single `ProductCatalog` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  productCatalog_delete(
+    """
+    The key used to identify the object.
+    """
+    key: ProductCatalog_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: ProductCatalog_FirstRow
+  ): ProductCatalog_KeyOutput @fdc_generated(from: "ProductCatalog", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete a single `Shelter` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  shelter_delete(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Shelter_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Shelter_FirstRow
+  ): Shelter_KeyOutput @fdc_generated(from: "Shelter", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete `Batch` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  batch_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: Batch_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "Batch", purpose: DELETE_MULTIPLE)
+  """
+  ✨ Delete `Donation` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  donation_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: Donation_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "Donation", purpose: DELETE_MULTIPLE)
+  """
+  ✨ Delete `Donor` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  donor_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: Donor_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "Donor", purpose: DELETE_MULTIPLE)
+  """
+  ✨ Delete `Product` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  product_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: Product_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "Product", purpose: DELETE_MULTIPLE)
+  """
+  ✨ Delete `ProductCatalog` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  productCatalog_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: ProductCatalog_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "ProductCatalog", purpose: DELETE_MULTIPLE)
+  """
+  ✨ Delete `Shelter` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  shelter_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: Shelter_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "Shelter", purpose: DELETE_MULTIPLE)
+}

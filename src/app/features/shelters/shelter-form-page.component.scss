@@ -1,0 +1,178 @@
+@use '../../styles-shared' as *;
+
+.page {
+  padding: 32px;
+  max-width: 900px;
+  margin: 0 auto;
+  @media (max-width: $mobile-breakpoint) {
+    padding: 20px 16px 100px;
+  }
+}
+
+.page-header {
+  margin-bottom: 24px;
+}
+
+.back-link {
+  @include subtitle;
+  color: $muted-text;
+  text-decoration: none;
+  display: inline-block;
+  margin-bottom: 8px;
+  &:hover { color: $double-espresso; text-decoration: none; }
+}
+
+.page-title {
+  @include h3;
+  margin: 0;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-section {
+  @include card;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.section-title {
+  @include h4;
+  margin: 0 0 4px;
+}
+
+.section-help {
+  @include p3;
+  color: $muted-text;
+  margin: 0 0 8px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  label {
+    @include subtitle;
+    color: $double-espresso;
+  }
+}
+
+.field-hint {
+  color: $muted-text;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.text-input {
+  @include form-input;
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  .flex-1 { flex: 1; min-width: 140px; }
+  .flex-2 { flex: 2; min-width: 180px; }
+}
+
+.field-error {
+  @include p3;
+  color: $crimson;
+  margin: 0;
+  font-size: 14px;
+}
+
+.error-banner {
+  @include p3;
+  background: rgba($crimson, 0.1);
+  color: $crimson;
+  padding: 16px;
+  border-radius: 8px;
+}
+
+// --- Product type preferences grid ---
+
+.category-block {
+  margin-bottom: 16px;
+}
+
+.category-label {
+  @include subtitle;
+  color: $hunter-green;
+  margin: 0 0 8px;
+}
+
+.type-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 8px;
+}
+
+.type-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid $card-border;
+  border-radius: 8px;
+  background: $porcelain;
+}
+
+.type-name {
+  @include p3;
+  font-size: 15px;
+}
+
+.type-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.tag-btn {
+  @include subtitle;
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  border: 1px solid $border-color;
+  background: transparent;
+  color: $muted-text;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover { border-color: $double-espresso; color: $double-espresso; }
+
+  &.accepted {
+    background: $eucalyptus;
+    border-color: $eucalyptus;
+    color: $double-espresso;
+  }
+
+  &.rejected {
+    background: $crimson;
+    border-color: $crimson;
+    color: $white;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+
+  @media (max-width: $mobile-breakpoint) {
+    .btn-primary, .btn-secondary { flex: 1; }
+  }
+}

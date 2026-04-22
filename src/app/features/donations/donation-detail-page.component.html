@@ -1,0 +1,67 @@
+<div class="page">
+  <a routerLink="/donations" class="back-link">← Donations</a>
+
+  @if (loading()) {
+    <p class="empty-state">Loading…</p>
+  } @else if (error()) {
+    <div class="error-banner">{{ error() }}</div>
+  } @else if (donation(); as d) {
+    <header class="header">
+      <h1 class="donation-title">Donation from {{ d.donor.fullName }}</h1>
+      <p class="donation-sub">
+        {{ d.createdAt | date:'mediumDate' }}
+        · <span class="method-pill">{{ d.method }}</span>
+        · {{ productCount() }} product(s)
+      </p>
+    </header>
+
+    <div class="card-grid">
+      <section class="info-card">
+        <h2 class="section-title">Donor</h2>
+        <dl class="info-list">
+          <dt>Name</dt><dd>{{ d.donor.fullName }}</dd>
+          <dt>Email</dt><dd>{{ d.donor.email }}</dd>
+          <dt>Phone</dt><dd>{{ d.donor.phone }}</dd>
+          @if (d.donor.city) {
+            <dt>City</dt><dd>{{ d.donor.city }}, {{ d.donor.state }}</dd>
+          }
+        </dl>
+      </section>
+
+      <section class="info-card">
+        <h2 class="section-title">Details</h2>
+        <dl class="info-list">
+          <dt>Date</dt><dd>{{ d.date }}</dd>
+          <dt>Method</dt><dd>{{ d.method }}</dd>
+          <dt>Reference</dt>
+          <dd class="mono">{{ d.warehouseReference }}</dd>
+          @if (d.donationRequestId) {
+            <dt>Delivery ID</dt>
+            <dd class="mono small">{{ d.donationRequestId }}</dd>
+          }
+          <dt>Processed by</dt><dd>{{ d.processedBy }}</dd>
+        </dl>
+        @if (d.notes) {
+          <p class="notes">{{ d.notes }}</p>
+        }
+      </section>
+    </div>
+
+    <h2 class="section-title products-title">Products</h2>
+    <div class="product-list">
+      @for (p of d.products; track p.id) {
+        <a [routerLink]="['/inventory', p.id]" class="product-row">
+          <div class="row-main">
+            <span class="product-name">{{ p.name }}</span>
+            <span class="product-meta">
+              {{ p.brand }} · {{ typeLabel(p.type) }} · Qty {{ p.quantity }}
+            </span>
+          </div>
+          <div class="row-end">
+            <span [class]="statusClass(p.status)">{{ p.status }}</span>
+          </div>
+        </a>
+      }
+    </div>
+  }
+</div>

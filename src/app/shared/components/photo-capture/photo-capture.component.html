@@ -1,0 +1,42 @@
+<div class="overlay" role="dialog" aria-label="Capture product photo">
+  <div class="viewport">
+    <header class="head">
+      <span class="title">Photo ID</span>
+      <button type="button" class="close-btn" (click)="onCancel()" aria-label="Close">×</button>
+    </header>
+
+    <div class="stage">
+      @if (status() === 'preview' && previewUrl()) {
+        <img [src]="previewUrl()" alt="Captured photo" class="preview" />
+      } @else {
+        <video #videoEl playsinline muted></video>
+        <div class="aim-frame"></div>
+      }
+      <canvas #canvasEl hidden></canvas>
+    </div>
+
+    <div class="status">
+      @switch (status()) {
+        @case ('starting') { <p>Starting camera…</p> }
+        @case ('ready') { <p>Frame the product label, then tap the shutter</p> }
+        @case ('preview') { <p>Keep this photo or retake?</p> }
+        @case ('error') { <p class="err">{{ errorMessage() }}</p> }
+      }
+    </div>
+
+    <div class="controls">
+      @if (status() === 'ready') {
+        <button type="button" class="shutter" (click)="capture()">
+          <span class="shutter-inner"></span>
+        </button>
+      } @else if (status() === 'preview') {
+        <button type="button" class="action-btn secondary" (click)="retake()">
+          Retake
+        </button>
+        <button type="button" class="action-btn primary" (click)="confirm()">
+          Use photo
+        </button>
+      }
+    </div>
+  </div>
+</div>

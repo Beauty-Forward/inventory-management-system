@@ -1,0 +1,5 @@
+connectorId: "bf-ims"
+generate:
+  javascriptSdk:
+    outputDir: "../../src/app/core/dataconnect"
+    package: "@bf-ims/dataconnect"
