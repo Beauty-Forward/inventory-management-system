@@ -1,7 +1,11 @@
 <div class="login-wrapper">
   <div class="login-card">
-    <h1 class="login-title">beauty f<span class="oo">oo</span>rward</h1>
-    <p class="login-subtitle">INVENTORY MANAGEMENT</p>
+    <div class="brand">
+      <span class="brand-name">beauty<br />forward</span>
+      <span class="brand-by">by beauty access</span>
+    </div>
+    <h1 class="login-title">welcome back</h1>
+    <p class="login-eyebrow">inventory management</p>
 
     <form (ngSubmit)="onSubmit()" class="login-form">
       @if (error()) {
@@ -9,10 +13,11 @@
       }
 
       <div class="field">
-        <label for="email">Email</label>
+        <label for="email">email</label>
         <input
           id="email"
           type="email"
+          class="inp"
           [(ngModel)]="email"
           name="email"
           placeholder="you@beautyforward.org"
@@ -21,19 +26,20 @@
       </div>
 
       <div class="field">
-        <label for="password">Password</label>
+        <label for="password">password</label>
         <input
           id="password"
           type="password"
+          class="inp"
           [(ngModel)]="password"
           name="password"
-          placeholder="Enter password"
+          placeholder="enter password"
           required
         />
       </div>
 
-      <button type="submit" class="btn-primary login-btn" [disabled]="submitting()">
-        {{ submitting() ? 'Signing in...' : 'Sign In' }}
+      <button type="submit" class="btn primary login-btn" [disabled]="submitting()">
+        {{ submitting() ? 'signing in…' : 'sign in →' }}
       </button>
     </form>
   </div>

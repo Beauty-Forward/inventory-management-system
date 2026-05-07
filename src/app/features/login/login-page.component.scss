@@ -6,63 +6,97 @@
   align-items: center;
   justify-content: center;
   padding: 24px;
+  background: $porcelain;
 }
 
 .login-card {
-  @include card;
+  background: $white;
+  border: 1px solid $panel-border;
+  border-radius: 18px;
+  padding: 32px 28px;
   width: 100%;
-  max-width: 420px;
-  text-align: center;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid $divider;
+}
+
+.brand-name {
+  font-family: $font-heading;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: $double-espresso;
+}
+
+.brand-by {
+  font-family: $font-heading;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  color: $muted-ink;
 }
 
 .login-title {
-  font-family: $font-heading;
-  font-weight: 700;
-  font-size: 32px;
-  letter-spacing: -0.02em;
-  color: $double-espresso;
-  margin: 0 0 4px;
-
-  .oo {
-    display: inline-block;
-    letter-spacing: -0.06em;
-  }
+  @include h1-page;
+  font-size: 26px;
+  margin: 0;
 }
 
-.login-subtitle {
-  @include subtitle;
-  margin: 0 0 32px;
+.login-eyebrow {
+  @include subtitle-eyebrow;
+  margin: -10px 0 0;
 }
 
 .login-form {
-  text-align: left;
-}
-
-.login-error {
-  @include p3;
-  color: $crimson;
-  background: rgba($crimson, 0.08);
-  padding: 10px 14px;
-  border-radius: 8px;
-  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 4px;
 }
 
 .field {
-  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 
   label {
-    @include p3;
-    display: block;
-    margin-bottom: 6px;
-    font-weight: 500;
+    @include field-label;
   }
+}
 
-  input {
-    @include form-input;
-  }
+.inp {
+  @include form-input-sm;
+  font-size: 13px;
+  padding: 12px 14px;
+}
+
+.login-error {
+  @include body-sm;
+  background: rgba($crimson, 0.1);
+  color: $crimson-deep;
+  padding: 10px 12px;
+  border-radius: 10px;
+}
+
+.btn {
+  @include pill-button-sm('ghost');
+
+  &.primary { @include pill-button-sm('primary'); }
 }
 
 .login-btn {
   width: 100%;
-  margin-top: 8px;
+  padding: 12px 18px;
+  font-size: 13px;
+  margin-top: 4px;
 }

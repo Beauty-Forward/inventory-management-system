@@ -6,11 +6,17 @@ import {
   DonationDetail,
   DonationService,
 } from '../../core/services/donation.service';
+import { CrumbComponent, CrumbItem } from '../../shared/components/crumb/crumb.component';
+import {
+  StatusPillComponent,
+  StatusPillVariant,
+} from '../../shared/components/status-pill/status-pill.component';
+import { SwatchVariant } from '../../shared/components/swatch-card/swatch-card.component';
 
 @Component({
   selector: 'app-donation-detail-page',
   standalone: true,
-  imports: [RouterLink, DatePipe],
+  imports: [RouterLink, DatePipe, CrumbComponent, StatusPillComponent],
   templateUrl: './donation-detail-page.component.html',
   styleUrl: './donation-detail-page.component.scss',
 })
@@ -25,6 +31,45 @@ export class DonationDetailPageComponent implements OnInit {
   readonly productCount = computed(
     () => this.donation()?.products.length ?? 0,
   );
+
+  readonly totalUnits = computed(() =>
+    (this.donation()?.products ?? []).reduce((acc, p) => acc + (p.quantity ?? 0), 0),
+  );
+
+  readonly methodVariant = computed<StatusPillVariant>(() => {
+    const d = this.donation();
+    if (!d) return 'soft';
+    if (d.method === 'walk-in') return 'walk';
+    if (d.method === 'pickup') return 'route';
+    return 'intake';
+  });
+
+  readonly swatch = computed<SwatchVariant>(() => {
+    const d = this.donation();
+    if (!d) return 'rose';
+    const cycle: SwatchVariant[] = ['rose', 'dust', 'butter', 'eucalyptus', 'apricot', 'cobalt'];
+    const hash = (d.donor.fullName + d.id).split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+    return cycle[hash % cycle.length];
+  });
+
+  readonly initials = computed(() => {
+    const d = this.donation();
+    if (!d) return '';
+    return d.donor.fullName
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((p) => p[0]!.toUpperCase())
+      .join('');
+  });
+
+  readonly crumbs = computed<CrumbItem[]>(() => {
+    const d = this.donation();
+    return [
+      { label: 'donations', link: '/donations' },
+      { label: d?.donor.fullName ?? '...' },
+    ];
+  });
 
   async ngOnInit(): Promise<void> {
     const id = this.route.snapshot.paramMap.get('id');
@@ -52,7 +97,13 @@ export class DonationDetailPageComponent implements OnInit {
     return ALL_PRODUCT_TYPES.find((t) => t.value === value)?.label ?? value;
   }
 
-  statusClass(status: string): string {
-    return `badge-${status.toLowerCase().replace('_', '-')}`;
+  productVariant(status: string): StatusPillVariant {
+    const s = status.toUpperCase();
+    if (s === 'IN_STOCK') return 'ready';
+    if (s === 'ALLOCATED') return 'route';
+    if (s === 'EXPIRED') return 'expiring-strong';
+    if (s === 'SHIPPED') return 'shipped';
+    if (s === 'DELIVERED') return 'delivered';
+    return 'soft';
   }
 }

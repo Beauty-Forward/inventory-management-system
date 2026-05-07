@@ -1,67 +1,113 @@
-<div class="page">
-  <a routerLink="/donations" class="back-link">← Donations</a>
+<section class="page">
+  <app-crumb [items]="crumbs()" />
 
   @if (loading()) {
     <p class="empty-state">Loading…</p>
   } @else if (error()) {
     <div class="error-banner">{{ error() }}</div>
   } @else if (donation(); as d) {
-    <header class="header">
-      <h1 class="donation-title">Donation from {{ d.donor.fullName }}</h1>
-      <p class="donation-sub">
-        {{ d.createdAt | date:'mediumDate' }}
-        · <span class="method-pill">{{ d.method }}</span>
-        · {{ productCount() }} product(s)
-      </p>
-    </header>
-
-    <div class="card-grid">
-      <section class="info-card">
-        <h2 class="section-title">Donor</h2>
-        <dl class="info-list">
-          <dt>Name</dt><dd>{{ d.donor.fullName }}</dd>
-          <dt>Email</dt><dd>{{ d.donor.email }}</dd>
-          <dt>Phone</dt><dd>{{ d.donor.phone }}</dd>
-          @if (d.donor.city) {
-            <dt>City</dt><dd>{{ d.donor.city }}, {{ d.donor.state }}</dd>
-          }
-        </dl>
-      </section>
-
-      <section class="info-card">
-        <h2 class="section-title">Details</h2>
-        <dl class="info-list">
-          <dt>Date</dt><dd>{{ d.date }}</dd>
-          <dt>Method</dt><dd>{{ d.method }}</dd>
-          <dt>Reference</dt>
-          <dd class="mono">{{ d.warehouseReference }}</dd>
-          @if (d.donationRequestId) {
-            <dt>Delivery ID</dt>
-            <dd class="mono small">{{ d.donationRequestId }}</dd>
-          }
-          <dt>Processed by</dt><dd>{{ d.processedBy }}</dd>
-        </dl>
-        @if (d.notes) {
-          <p class="notes">{{ d.notes }}</p>
-        }
-      </section>
+    <div class="hero">
+      <div class="hero-swatch" [attr.data-swatch]="swatch()">
+        <span class="swatch-tag">donation</span>
+        <div class="swatch-foot">{{ initials() }}</div>
+      </div>
+      <div class="hero-info">
+        <h1 class="title">{{ d.donor.fullName }}</h1>
+        <div class="brand-line">
+          {{ d.donor.email }}
+          @if (d.donor.phone) { · {{ d.donor.phone }} }
+        </div>
+        <div class="status-row">
+          <app-status-pill [variant]="methodVariant()">{{ d.method }}</app-status-pill>
+          <app-status-pill variant="soft">{{ d.createdAt | date: 'MMM d, h:mm a' }}</app-status-pill>
+        </div>
+        <div class="facts">
+          <div class="fact">
+            <div class="fact-label">products</div>
+            <div class="fact-value">{{ productCount() }}</div>
+          </div>
+          <div class="fact">
+            <div class="fact-label">total units</div>
+            <div class="fact-value">{{ totalUnits() }}</div>
+          </div>
+          <div class="fact">
+            <div class="fact-label">date</div>
+            <div class="fact-value">{{ d.date }}</div>
+          </div>
+          <div class="fact">
+            <div class="fact-label">method</div>
+            <div class="fact-value">{{ d.method }}</div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <h2 class="section-title products-title">Products</h2>
-    <div class="product-list">
-      @for (p of d.products; track p.id) {
-        <a [routerLink]="['/inventory', p.id]" class="product-row">
-          <div class="row-main">
-            <span class="product-name">{{ p.name }}</span>
-            <span class="product-meta">
-              {{ p.brand }} · {{ typeLabel(p.type) }} · Qty {{ p.quantity }}
-            </span>
+    <div class="cols">
+      <div class="panel">
+        <div class="panel-title">donor info</div>
+        <div class="meta-row">
+          <span class="k">name</span>
+          <span class="v">{{ d.donor.fullName }}</span>
+        </div>
+        <div class="meta-row">
+          <span class="k">email</span>
+          <span class="v">{{ d.donor.email }}</span>
+        </div>
+        @if (d.donor.phone) {
+          <div class="meta-row">
+            <span class="k">phone</span>
+            <span class="v">{{ d.donor.phone }}</span>
           </div>
-          <div class="row-end">
-            <span [class]="statusClass(p.status)">{{ p.status }}</span>
+        }
+        @if (d.donor.city) {
+          <div class="meta-row">
+            <span class="k">location</span>
+            <span class="v">{{ d.donor.city }}, {{ d.donor.state }}</span>
           </div>
-        </a>
+        }
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">intake details</div>
+        <div class="meta-row">
+          <span class="k">reference</span>
+          <span class="v mono">{{ d.warehouseReference }}</span>
+        </div>
+        @if (d.donationRequestId) {
+          <div class="meta-row">
+            <span class="k">delivery id</span>
+            <span class="v mono">{{ d.donationRequestId }}</span>
+          </div>
+        }
+        <div class="meta-row">
+          <span class="k">processed by</span>
+          <span class="v">{{ d.processedBy }}</span>
+        </div>
+        @if (d.notes) {
+          <div class="notes">{{ d.notes }}</div>
+        }
+      </div>
+    </div>
+
+    <div class="panel products-panel">
+      <div class="panel-title">products in donation</div>
+      @if (d.products.length === 0) {
+        <p class="empty-state">No products in this donation.</p>
+      } @else {
+        @for (p of d.products; track p.id) {
+          <a class="product-row" [routerLink]="['/inventory', p.id]">
+            <div class="row-main">
+              <div class="prod-name">{{ p.name }}</div>
+              <div class="prod-meta">
+                {{ p.brand }} · {{ typeLabel(p.type) }} · qty {{ p.quantity }}
+              </div>
+            </div>
+            <app-status-pill [variant]="productVariant(p.status)">
+              {{ p.status.toLowerCase().replace('_', ' ') }}
+            </app-status-pill>
+          </a>
+        }
       }
     </div>
   }
-</div>
+</section>
