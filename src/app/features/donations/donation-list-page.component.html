@@ -1,29 +1,77 @@
-<div class="page">
-  <div class="page-header">
-    <h1 class="page-title">Donations</h1>
-    <a routerLink="/donations/new" class="btn-primary">Process Donation</a>
+<section class="page">
+  <app-page-header eyebrow="incoming" title="donations">
+    <button class="cta" (click)="startNew()">+ process donation</button>
+  </app-page-header>
+
+  <div class="week-strip">
+    <app-stat-tile
+      variant="butter"
+      size="sm"
+      label="this week"
+      [value]="thisWeekCount()"
+      detail="drop-offs"
+    />
+    <app-stat-tile
+      variant="eucalyptus"
+      size="sm"
+      label="total"
+      [value]="donations().length"
+      detail="all time recent"
+    />
+    <app-stat-tile
+      variant="dust"
+      size="sm"
+      label="new donors"
+      [value]="newDonorCount()"
+      detail="first-timers"
+    />
   </div>
 
+  <app-pill-toolbar
+    searchPlaceholder="search donor, reference, method"
+    [searchValue]="searchQuery()"
+    (searchChange)="searchQuery.set($event)"
+    [filters]="filters"
+    [activeKey]="activeFilter()"
+    (filterChange)="activeFilter.set($event)"
+  />
+
   @if (loading()) {
-    <p class="empty-state">Loading…</p>
+    <p class="empty-state">Loading donations…</p>
   } @else if (error()) {
     <div class="error-banner">{{ error() }}</div>
-  } @else if (donations().length === 0) {
-    <p class="empty-state">No donations processed yet.</p>
+  } @else if (filtered().length === 0) {
+    <p class="empty-state">
+      @if (donations().length === 0) { No donations yet. }
+      @else { No donations match your filters. }
+    </p>
   } @else {
-    <div class="donation-list">
-      @for (d of donations(); track d.id) {
-        <a [routerLink]="['/donations', d.id]" class="donation-row">
-          <div class="row-main">
-            <span class="donor-name">{{ d.donor.fullName }}</span>
-            <span class="donor-email">{{ d.donor.email }}</span>
+    @for (bucket of buckets(); track bucket.key) {
+      <div class="day-head">
+        <b>{{ bucket.label }}</b>
+        <span>{{ bucket.donations.length }} drop-off{{ bucket.donations.length === 1 ? '' : 's' }}</span>
+      </div>
+      @for (d of bucket.donations; track d.id) {
+        <a class="don" [routerLink]="['/donations', d.id]">
+          <div class="avatar" [attr.data-swatch]="swatch(d)">
+            {{ initials(d.donor.fullName) }}
           </div>
-          <div class="row-meta">
-            <span class="method-pill">{{ d.method }}</span>
-            <span class="date">{{ d.createdAt | date:'mediumDate' }}</span>
+          <div class="who">
+            <div class="who-name">{{ d.donor.fullName }}</div>
+            <div class="who-meta">{{ meta(d) }}</div>
           </div>
+          <div class="items">
+            @if (d.notes) {
+              <b>{{ d.notes }}</b>
+            } @else {
+              <b>{{ d.method }} drop-off</b>
+            }
+            <span class="count">{{ d.date | date: 'MMM d' }}</span>
+          </div>
+          <div class="ref">{{ shortRef(d) }}</div>
+          <app-status-pill [variant]="variant(d)">{{ d.method }}</app-status-pill>
         </a>
       }
-    </div>
+    }
   }
-</div>
+</section>

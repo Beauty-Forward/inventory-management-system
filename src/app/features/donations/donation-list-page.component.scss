@@ -1,101 +1,158 @@
 @use '../../styles-shared' as *;
 
 .page {
-  padding: 32px;
-  @media (max-width: $mobile-breakpoint) { padding: 20px 16px 80px; }
+  padding: 20px 22px;
+  max-width: 1400px;
+
+  @media (max-width: $mobile-breakpoint) {
+    padding: 20px 16px 80px;
+  }
 }
 
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-  gap: 12px;
+.cta {
+  @include pill-button-sm('cta');
 }
 
-.page-title { @include h3; margin: 0; }
+.week-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+
+  @media (max-width: $mobile-breakpoint) {
+    grid-template-columns: 1fr;
+  }
+}
 
 .empty-state {
-  @include p3;
-  color: $muted-text;
+  @include body-sm;
+  color: $muted-ink;
   text-align: center;
-  padding: 48px 0;
+  padding: 40px 0;
+  margin: 0;
 }
 
 .error-banner {
-  @include p3;
+  @include body-sm;
   background: rgba($crimson, 0.1);
-  color: $crimson;
-  padding: 16px;
-  border-radius: 8px;
+  color: $crimson-deep;
+  padding: 12px 14px;
+  border-radius: 12px;
+  margin: 14px 0;
 }
 
-.donation-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.donation-row {
-  @include card;
-  padding: 16px 20px;
+.day-head {
+  font-family: $font-body;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: $muted-ink;
+  font-weight: 500;
+  margin: 18px 0 8px;
   display: flex;
   justify-content: space-between;
+
+  b {
+    font-weight: 500;
+    color: $double-espresso;
+    letter-spacing: -0.01em;
+    text-transform: lowercase;
+  }
+}
+
+.don {
+  background: $white;
+  border: 1px solid $panel-border;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 6px;
+  display: grid;
+  grid-template-columns: 28px 1.5fr 1.3fr 1fr auto;
+  gap: 12px;
   align-items: center;
-  gap: 16px;
   text-decoration: none;
   color: inherit;
+  transition: border-color 0.15s ease;
 
   &:hover {
-    border-color: $hunter-green;
     text-decoration: none;
+    border-color: rgba(26, 26, 26, 0.35);
   }
 
   @media (max-width: $mobile-breakpoint) {
-    flex-direction: column;
-    align-items: flex-start;
+    grid-template-columns: 28px 1fr auto;
+    grid-template-areas:
+      'a w s'
+      'a i i'
+      'a r r';
+    column-gap: 12px;
+    row-gap: 4px;
+
+    .avatar { grid-area: a; }
+    .who { grid-area: w; }
+    .items { grid-area: i; }
+    .ref { grid-area: r; }
+    app-status-pill { grid-area: s; }
   }
 }
 
-.row-main {
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.donor-name {
-  @include p3;
-  font-weight: 600;
-  font-size: 16px;
-}
-
-.donor-email {
-  @include subtitle;
-  color: $muted-text;
-  text-transform: none;
-  letter-spacing: 0;
-  font-weight: 400;
-  font-size: 13px;
-}
-
-.row-meta {
-  display: flex;
-  gap: 12px;
   align-items: center;
+  justify-content: center;
+  font-family: $font-heading;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  flex-shrink: 0;
+
+  &[data-swatch='rose'] { background: $rosewater; color: $crimson-deep; }
+  &[data-swatch='butter'] { background: $buttercup; color: $double-espresso; }
+  &[data-swatch='dust'] { background: $dusty-blue; color: $cobalt-deep; }
+  &[data-swatch='eucalyptus'] { background: $eucalyptus; color: $hunter-green-deep; }
+  &[data-swatch='apricot'] { background: $apricot; color: $porcelain; }
+  &[data-swatch='cobalt'] { background: $cobalt; color: $porcelain; }
 }
 
-.method-pill {
-  @include subtitle;
+.who-name {
+  @include body-sm;
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.who-meta {
+  @include meta;
+  margin-top: 1px;
+}
+
+.items {
+  @include body-sm;
   font-size: 11px;
-  padding: 4px 12px;
-  border-radius: 12px;
-  background: rgba($dusty-blue, 0.2);
-  color: $cobalt;
+  line-height: 1.3;
+
+  b { font-weight: 500; }
+
+  .count {
+    color: $muted-ink;
+    font-size: 10px;
+    display: block;
+    margin-top: 1px;
+  }
 }
 
-.date {
-  @include p3;
-  font-size: 14px;
-  color: $muted-text;
+.ref {
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 10px;
+  color: $muted-ink;
+  letter-spacing: 0.02em;
+  background: $panel-bg;
+  padding: 3px 8px;
+  border-radius: 6px;
+  display: inline-block;
+  width: fit-content;
 }
