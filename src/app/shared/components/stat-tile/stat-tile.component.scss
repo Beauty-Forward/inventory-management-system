@@ -1,0 +1,17 @@
+@use '../../../styles-shared' as *;
+
+.stat-tile {
+  &[data-variant='butter'] { @include stat-tile('butter'); }
+  &[data-variant='eucalyptus'] { @include stat-tile('eucalyptus'); }
+  &[data-variant='dust'] { @include stat-tile('dust'); }
+  &[data-variant='rose'] { @include stat-tile('rose'); }
+  &[data-variant='apricot'] { @include stat-tile('apricot'); }
+  &[data-variant='hunter'] { @include stat-tile('hunter'); }
+  &[data-variant='cobalt'] { @include stat-tile('cobalt'); }
+
+  &[data-size='sm'] {
+    padding: 10px 12px;
+    .tile-value { font-size: 22px; }
+    .tile-detail { display: none; }
+  }
+}

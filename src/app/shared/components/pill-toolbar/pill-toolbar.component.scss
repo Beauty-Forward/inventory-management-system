@@ -1,0 +1,19 @@
+@use '../../../styles-shared' as *;
+
+.pill-toolbar {
+  @include pill-toolbar;
+}
+
+.search-field {
+  @include search-field;
+}
+
+.filter-chip {
+  @include filter-chip;
+}
+
+.chip-count {
+  font-size: 9px;
+  opacity: 0.6;
+  margin-left: 4px;
+}

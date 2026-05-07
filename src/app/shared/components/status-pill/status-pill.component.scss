@@ -1,0 +1,16 @@
+@use '../../../styles-shared' as *;
+
+.status-pill {
+  &[data-variant='ready'] { @include status-pill('ready'); }
+  &[data-variant='ready-strong'] { @include status-pill('ready-strong'); }
+  &[data-variant='draft'] { @include status-pill('draft'); }
+  &[data-variant='route'] { @include status-pill('route'); }
+  &[data-variant='expiring'] { @include status-pill('expiring'); }
+  &[data-variant='expiring-strong'] { @include status-pill('expiring-strong'); }
+  &[data-variant='intake'] { @include status-pill('intake'); }
+  &[data-variant='walk'] { @include status-pill('walk'); }
+  &[data-variant='shipped'] { @include status-pill('shipped'); }
+  &[data-variant='delivered'] { @include status-pill('delivered'); }
+  &[data-variant='flagged'] { @include status-pill('flagged'); }
+  &[data-variant='soft'] { @include status-pill('soft'); }
+}

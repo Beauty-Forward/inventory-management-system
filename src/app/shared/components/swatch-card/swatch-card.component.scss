@@ -1,0 +1,46 @@
+@use '../../../styles-shared' as *;
+
+.swatch-card {
+  background: $white;
+  border: 1px solid $panel-border;
+  border-radius: 14px;
+  overflow: hidden;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+  display: flex;
+  flex-direction: column;
+
+  &.interactive {
+    cursor: pointer;
+    &:hover {
+      border-color: rgba(26, 26, 26, 0.35);
+      transform: translateY(-1px);
+    }
+  }
+}
+
+.swatch-top {
+  height: 72px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 8px 10px;
+  flex-shrink: 0;
+
+  .swatch-card[data-swatch='rose'] & { @include swatch-bg('rose'); }
+  .swatch-card[data-swatch='butter'] & { @include swatch-bg('butter'); }
+  .swatch-card[data-swatch='dust'] & { @include swatch-bg('dust'); }
+  .swatch-card[data-swatch='eucalyptus'] & { @include swatch-bg('eucalyptus'); }
+  .swatch-card[data-swatch='apricot'] & { @include swatch-bg('apricot'); }
+  .swatch-card[data-swatch='cobalt'] & { @include swatch-bg('cobalt'); }
+  .swatch-card[data-swatch='crimson'] & { @include swatch-bg('crimson'); }
+  .swatch-card[data-swatch='hunter'] & { @include swatch-bg('hunter'); }
+  .swatch-card[data-swatch='porcelain'] & { @include swatch-bg('porcelain'); }
+}
+
+.swatch-body {
+  padding: 10px 12px 12px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
