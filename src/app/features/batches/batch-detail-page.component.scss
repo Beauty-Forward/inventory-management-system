@@ -1,202 +1,294 @@
 @use '../../styles-shared' as *;
 
 .page {
-  padding: 32px;
-  max-width: 1100px;
-  margin: 0 auto;
-  @media (max-width: $mobile-breakpoint) { padding: 20px 16px 100px; }
-}
-
-.back-link {
-  @include subtitle;
-  color: $muted-text;
-  text-decoration: none;
-  display: inline-block;
-  margin-bottom: 16px;
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 16px;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-}
-
-.batch-title { @include h3; margin: 0 0 4px; }
-.batch-sub { @include p3; color: $muted-text; margin: 0; }
-
-.timeline {
-  @include card;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  margin-bottom: 16px;
+  padding: 18px 22px;
+  max-width: 1200px;
 
   @media (max-width: $mobile-breakpoint) {
-    grid-template-columns: repeat(2, 1fr);
+    padding: 18px 16px 80px;
   }
 }
 
-.timeline-step {
+.empty-state,
+.error-banner {
+  @include body-sm;
+  margin: 16px 0;
+}
+
+.error-banner {
+  background: rgba($crimson, 0.1);
+  color: $crimson-deep;
+  padding: 12px 14px;
+  border-radius: 12px;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 16px;
+  margin-bottom: 18px;
+
+  @media (max-width: $mobile-breakpoint) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.hero-swatch {
+  border-radius: 16px;
+  aspect-ratio: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 8px;
-  opacity: 0.4;
+  justify-content: space-between;
+  padding: 14px;
 
-  &.done { opacity: 1; }
+  &[data-swatch='rose'] { @include swatch-bg('rose'); color: $crimson-deep; }
+  &[data-swatch='butter'] { @include swatch-bg('butter'); color: $double-espresso; }
+  &[data-swatch='dust'] { @include swatch-bg('dust'); color: $cobalt-deep; }
+  &[data-swatch='eucalyptus'] { @include swatch-bg('eucalyptus'); color: $hunter-green-deep; }
+  &[data-swatch='apricot'] { @include swatch-bg('apricot'); color: $porcelain; }
+  &[data-swatch='cobalt'] { @include swatch-bg('cobalt'); color: $porcelain; }
+  &[data-swatch='hunter'] { @include swatch-bg('hunter'); color: $porcelain; }
+
+  @media (max-width: $mobile-breakpoint) {
+    aspect-ratio: 4 / 1;
+    flex-direction: row;
+    align-items: center;
+  }
 }
 
-.dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: $border-color;
-
-  .timeline-step.done & { background: $hunter-green; }
+.swatch-tag {
+  align-self: flex-start;
+  font-family: $font-heading;
+  font-weight: 700;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(252, 250, 247, 0.95);
+  color: inherit;
 }
 
-.label { @include subtitle; font-size: 11px; }
-.date { @include p3; color: $muted-text; font-size: 13px; }
+.swatch-foot {
+  font-family: $font-heading;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: inherit;
+  align-self: flex-end;
+}
 
-.status-actions {
+.hero-info {
   display: flex;
-  gap: 8px;
-  margin-bottom: 24px;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title {
+  @include h1-page;
+  font-size: 28px;
+  margin: 0 0 4px;
+}
+
+.brand-line {
+  @include body-sm;
+  color: rgba(26, 16, 0, 0.65);
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.status-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
   flex-wrap: wrap;
 }
 
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-.info-card {
-  @include card;
+.actions {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
-.section-title {
-  @include h4;
-  margin: 0;
-  &.products-heading { margin: 24px 0 12px; }
+.btn {
+  @include pill-button-sm('ghost');
+
+  &.primary { @include pill-button-sm('primary'); }
+  &.ghost { @include pill-button-sm('ghost'); text-decoration: none; }
 }
 
-.info-list {
-  margin: 0;
+.cols {
   display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 8px 16px;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
 
-  dt { @include subtitle; color: $muted-text; margin: 0; }
-  dd { @include p3; margin: 0; }
+  @media (max-width: $mobile-breakpoint) {
+    grid-template-columns: 1fr;
+  }
 }
 
-.link {
-  @include subtitle;
-  color: $hunter-green;
-  margin-top: 4px;
+.panel {
+  @include panel;
 }
 
-.summary-pills { display: flex; flex-wrap: wrap; gap: 6px; }
-.summary-pill {
-  @include subtitle;
-  padding: 6px 12px;
-  border-radius: 14px;
-  background: rgba($eucalyptus, 0.3);
-  color: $hunter-green;
-  font-size: 12px;
+.panel-title {
+  @include subtitle-eyebrow;
+  margin-bottom: 10px;
+}
+
+.timeline {
+  position: relative;
+  padding-left: 16px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 6px;
+    bottom: 6px;
+    width: 1px;
+    background: rgba(26, 26, 26, 0.15);
+  }
+}
+
+.tl-item {
+  position: relative;
+  padding: 6px 0;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: -14px;
+    top: 10px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: $white;
+    border: 1.5px solid $double-espresso;
+  }
+
+  &.on::before {
+    background: $hunter-green;
+    border-color: $hunter-green;
+  }
+}
+
+.tl-t {
+  @include body-sm;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.tl-m {
+  @include meta;
+  margin-top: 1px;
+}
+
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(26, 26, 26, 0.06);
+  font-family: $font-body;
+  font-size: 11px;
+  gap: 12px;
+
+  &:last-of-type { border-bottom: none; }
+
+  .k { color: $muted-ink; flex-shrink: 0; }
+  .v { font-weight: 500; text-align: right; overflow-wrap: anywhere; }
 }
 
 .notes {
-  @include p3;
-  white-space: pre-wrap;
-  margin: 0;
+  @include body-sm;
+  background: $panel-bg;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-top: 8px;
+  line-height: 1.45;
 }
 
-.product-list {
+.type-panel {
+  margin-bottom: 12px;
+}
+
+.type-pills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.type-pill {
+  font-family: $font-body;
+  font-size: 11px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: $panel-bg;
+  color: $double-espresso;
+
+  b {
+    font-family: $font-heading;
+    font-weight: 700;
+    margin-right: 4px;
+  }
+}
+
+.products-panel {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 0;
 }
 
 .product-row {
-  @include card;
-  padding: 12px 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid $divider;
   gap: 12px;
-  background: $white;
-  box-shadow: none;
-  border: 1px solid $card-border;
 
-  &:hover { border-color: $hunter-green; }
+  &:last-child { border-bottom: none; }
 }
 
 .row-main {
   flex: 1;
+  text-decoration: none;
+  color: inherit;
   display: flex;
   flex-direction: column;
   gap: 2px;
   min-width: 0;
-  text-decoration: none;
-  color: inherit;
-  &:hover { text-decoration: none; }
+
+  &:hover { text-decoration: none; opacity: 0.85; }
 }
 
-.product-name {
-  @include p3;
-  font-weight: 600;
-  font-size: 15px;
+.prod-name {
+  @include body-sm;
+  font-weight: 500;
 }
 
-.product-meta {
-  @include subtitle;
-  font-size: 11px;
-  color: $muted-text;
-  text-transform: none;
-  letter-spacing: 0;
-  font-weight: 400;
+.prod-meta {
+  @include meta;
 }
 
 .remove-btn {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  border: 1px solid $border-color;
+  border: 1px solid $panel-border;
   background: $white;
-  color: $muted-text;
-  font-size: 18px;
+  color: $muted-ink;
+  font-size: 16px;
   line-height: 1;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
 
   &:hover {
-    border-color: $crimson;
-    color: $crimson;
+    border-color: $crimson-deep;
+    color: $crimson-deep;
   }
-
-  &:disabled { opacity: 0.4; cursor: not-allowed; }
-}
-
-.error-banner {
-  @include p3;
-  background: rgba($crimson, 0.1);
-  color: $crimson;
-  padding: 16px;
-  border-radius: 8px;
-}
-
-.empty-state {
-  @include p3;
-  color: $muted-text;
-  text-align: center;
-  padding: 32px 0;
 }

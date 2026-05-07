@@ -1,8 +1,6 @@
 <div class="page">
-  <div class="page-head">
-    <a routerLink="/batches" class="back-link">← Batches</a>
-    <h1 class="page-title">New Outgoing Batch</h1>
-  </div>
+  <app-crumb [items]="[{ label: 'batches', link: '/batches' }, { label: 'new' }]" />
+  <h1 class="page-title">new outgoing batch</h1>
 
   @if (loading()) {
     <p class="empty-state">Loading shelters…</p>
