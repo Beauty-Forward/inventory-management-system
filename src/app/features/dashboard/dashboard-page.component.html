@@ -1,86 +1,103 @@
-<div class="page">
-  <h1 class="page-title">Dashboard</h1>
+<section class="page">
+  <app-page-header eyebrow="overview" [title]="title()">
+    <div class="date-block">
+      <b>{{ today | date: 'EEE, MMM d' }}</b>
+      <span>week {{ weekNumber() }} · {{ season() }}</span>
+    </div>
+  </app-page-header>
 
   @if (error()) {
     <div class="error-banner">{{ error() }}</div>
   }
 
-  <div class="stats-grid">
-    <div class="stat-card accent-eucalyptus">
-      <span class="stat-label">In Stock</span>
-      <span class="stat-value">
-        @if (loading()) { — } @else { {{ inStockCount() }} }
-      </span>
-    </div>
-    <div class="stat-card accent-buttercup">
-      <span class="stat-label">Received This Week</span>
-      <span class="stat-value">
-        @if (loading()) { — } @else { {{ receivedThisWeek() }} }
-      </span>
-    </div>
-    <div class="stat-card accent-cobalt">
-      <span class="stat-label">Shipped This Week</span>
-      <span class="stat-value">
-        @if (loading()) { — } @else { {{ shippedThisWeek() }} }
-      </span>
-    </div>
-    <div class="stat-card accent-crimson">
-      <span class="stat-label">Expiring Soon</span>
-      <span class="stat-value">
-        @if (loading()) { — } @else { {{ expiringSoonCount() }} }
-      </span>
-    </div>
+  <div class="stats">
+    <app-stat-tile
+      variant="butter"
+      label="on hand"
+      [value]="loading() ? '—' : inStockCount()"
+      [detail]="receivedThisWeek() ? receivedThisWeek() + ' new this week' : ''"
+    />
+    <app-stat-tile
+      variant="eucalyptus"
+      label="received"
+      [value]="loading() ? '—' : receivedThisWeek()"
+      [detail]="recentDonations().length + ' donor drop-offs'"
+    />
+    <app-stat-tile
+      variant="dust"
+      label="shipped"
+      [value]="loading() ? '—' : shippedThisWeek()"
+      detail="this week · roadie"
+    />
+    <app-stat-tile
+      variant="rose"
+      label="expiring < 30d"
+      [value]="loading() ? '—' : expiringSoonCount()"
+      detail="route or discard"
+    />
   </div>
 
-  <div class="tables-grid">
-    <div class="table-section">
-      <div class="section-head">
-        <h2 class="section-title">Recent Donations</h2>
-        <a routerLink="/donations" class="section-link">View all →</a>
+  <div class="panels">
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-head-left">
+          <span class="panel-title">recent donations</span>
+          <span class="panel-count">{{ recentDonations().length }} recent</span>
+        </div>
+        <a routerLink="/donations" class="panel-link">view all</a>
       </div>
+
       @if (recentDonations().length === 0) {
         <p class="empty-state">
           @if (loading()) { Loading… } @else { No donations yet. }
         </p>
       } @else {
-        <ul class="simple-list">
-          @for (d of recentDonations(); track d.id) {
-            <li>
-              <a [routerLink]="['/donations', d.id]">
-                <span class="main">{{ d.donor.fullName }}</span>
-                <span class="meta">
-                  <span class="method-pill">{{ d.method }}</span>
-                  {{ d.createdAt | date:'MMM d' }}
-                </span>
-              </a>
-            </li>
-          }
-        </ul>
+        @for (d of recentDonations(); track d.id) {
+          <a class="row" [routerLink]="['/donations', d.id]">
+            <div class="chip-sq" [attr.data-swatch]="donorSwatch(d)">
+              {{ initials(d.donor.fullName) }}
+            </div>
+            <div class="row-grow">
+              <div class="row-name">{{ d.donor.fullName }}</div>
+              <div class="row-meta">{{ donationMeta(d) }}</div>
+            </div>
+            <app-status-pill [variant]="donationVariant(d)">
+              {{ d.method }}
+            </app-status-pill>
+          </a>
+        }
       }
     </div>
-    <div class="table-section">
-      <div class="section-head">
-        <h2 class="section-title">Pending Batches</h2>
-        <a routerLink="/batches" class="section-link">View all →</a>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-head-left">
+          <span class="panel-title">pending batches</span>
+          <span class="panel-count">{{ pendingBatches().length }} open</span>
+        </div>
+        <a routerLink="/batches" class="panel-link">view all</a>
       </div>
+
       @if (pendingBatches().length === 0) {
         <p class="empty-state">
           @if (loading()) { Loading… } @else { No pending batches. }
         </p>
       } @else {
-        <ul class="simple-list">
-          @for (b of pendingBatches(); track b.id) {
-            <li>
-              <a [routerLink]="['/batches', b.id]">
-                <span class="main">{{ b.shelter.name }}</span>
-                <span class="meta">
-                  <span [class]="statusClass(b.status)">{{ b.status }}</span>
-                </span>
-              </a>
-            </li>
-          }
-        </ul>
+        @for (b of pendingBatches(); track b.id) {
+          <a class="row" [routerLink]="['/batches', b.id]">
+            <div class="chip-sq" [attr.data-swatch]="shelterSwatch(b)">
+              {{ initials(b.shelter.name) }}
+            </div>
+            <div class="row-grow">
+              <div class="row-name">{{ b.shelter.name }}</div>
+              <div class="row-meta">{{ b.shelter.city }}, {{ b.shelter.state }}</div>
+            </div>
+            <app-status-pill [variant]="batchVariant(b)">
+              {{ batchLabel(b) }}
+            </app-status-pill>
+          </a>
+        }
       }
     </div>
   </div>
-</div>
+</section>
