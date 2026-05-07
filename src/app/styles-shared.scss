@@ -20,6 +20,21 @@ $card-border: #E8E2DA;
 $muted-text: #7A7268;
 $input-placeholder: #A69E94;
 
+// --- Redesign tokens (alongside brand-guide hexes) ---
+
+$panel-bg: #F1EFE8;                       // chip / pill backgrounds on light surfaces
+$panel-border: rgba(26, 26, 26, 0.12);    // hairline card borders
+$divider: rgba(26, 26, 26, 0.08);         // row dividers inside panels
+$muted-ink: rgba(26, 26, 26, 0.55);       // secondary text (replaces $muted-text in dense layouts)
+$soft-ink: rgba(26, 26, 26, 0.7);         // body-light variant
+$crimson-deep: #7A2419;                   // high-contrast expiring labels
+$hunter-green-deep: #2F5429;              // status badge text
+$cobalt-deep: #2A4A78;                    // shipped status text
+$ink-on-rose: #6E1A14;                    // text on rosewater
+$ink-on-butter: #1A1A1A;                  // text on buttercup
+$ink-on-eucalyptus: #2F5429;              // text on eucalyptus
+$ink-on-dust: #2A4A78;                    // text on dusty-blue
+
 // --- Font Stacks ---
 
 $font-heading: 'Alte Haas Grotesk', sans-serif;
@@ -29,7 +44,7 @@ $font-body: 'Open Sauce Sans', sans-serif;
 
 $mobile-breakpoint: 768px;
 
-// --- Typography Mixins ---
+// --- Typography Mixins (original brand ramp — for marketing-style surfaces) ---
 
 @mixin h1 {
   font-family: $font-heading;
@@ -114,6 +129,72 @@ $mobile-breakpoint: 768px;
   line-height: 1;
 }
 
+// --- Redesign typography ramp (denser, in-app pages) ---
+
+@mixin h1-page {
+  font-family: $font-heading;
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: $double-espresso;
+  margin: 0;
+  @media (max-width: $mobile-breakpoint) { font-size: 26px; }
+}
+
+@mixin subtitle-eyebrow {
+  font-family: $font-heading;
+  font-weight: 700;
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: $muted-ink;
+}
+
+@mixin panel-title {
+  font-family: $font-heading;
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: $double-espresso;
+}
+
+@mixin body-sm {
+  font-family: $font-body;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 1.4;
+  color: $double-espresso;
+  letter-spacing: -0.01em;
+}
+
+@mixin meta {
+  font-family: $font-body;
+  font-weight: 400;
+  font-size: 10px;
+  line-height: 1.3;
+  color: $muted-ink;
+}
+
+@mixin meta-mid {
+  font-family: $font-body;
+  font-weight: 400;
+  font-size: 11px;
+  line-height: 1.3;
+  color: $muted-ink;
+}
+
+@mixin stat-value {
+  font-family: $font-heading;
+  font-weight: 700;
+  font-size: 26px;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: inherit;
+}
+
 // --- Component Mixins ---
 
 @mixin card {
@@ -123,6 +204,13 @@ $mobile-breakpoint: 768px;
   box-shadow: 0 1px 3px rgba(26, 26, 26, 0.06);
   padding: 24px;
   @media (max-width: $mobile-breakpoint) { padding: 16px; }
+}
+
+@mixin panel {
+  background: $white;
+  border: 1px solid $panel-border;
+  border-radius: 14px;
+  padding: 14px 16px;
 }
 
 @mixin pill-button($variant: 'primary') {
@@ -154,6 +242,40 @@ $mobile-breakpoint: 768px;
   }
 }
 
+@mixin pill-button-sm($variant: 'primary') {
+  font-family: $font-heading;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  border-radius: 999px;
+  padding: 10px 18px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+  &:hover:not(:disabled) { transform: scale(0.98); }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  @if $variant == 'primary' {
+    background: $double-espresso;
+    color: $porcelain;
+  } @else if $variant == 'cta' {
+    background: $hunter-green;
+    color: $white;
+  } @else if $variant == 'ghost' {
+    background: transparent;
+    color: $double-espresso;
+    border-color: $double-espresso;
+  } @else if $variant == 'destructive' {
+    background: $crimson;
+    color: $white;
+  }
+}
+
 @mixin status-badge($color) {
   display: inline-flex;
   align-items: center;
@@ -167,6 +289,247 @@ $mobile-breakpoint: 768px;
   border-radius: 12px;
   background: rgba($color, 0.15);
   color: $color;
+}
+
+// Status pill — denser variant used in redesign
+@mixin status-pill($variant: 'ready') {
+  display: inline-flex;
+  align-items: center;
+  font-family: $font-heading;
+  font-weight: 700;
+  font-size: 9px;
+  line-height: 1;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+
+  @if $variant == 'ready' {
+    background: $eucalyptus;
+    color: $hunter-green-deep;
+  } @else if $variant == 'ready-strong' {
+    background: $hunter-green;
+    color: $porcelain;
+  } @else if $variant == 'draft' {
+    background: $buttercup;
+    color: $double-espresso;
+  } @else if $variant == 'route' {
+    background: $cobalt;
+    color: $porcelain;
+  } @else if $variant == 'expiring' {
+    background: $rosewater;
+    color: $crimson-deep;
+  } @else if $variant == 'expiring-strong' {
+    background: $crimson-deep;
+    color: $porcelain;
+  } @else if $variant == 'intake' {
+    background: $buttercup;
+    color: $double-espresso;
+  } @else if $variant == 'walk' {
+    background: $panel-bg;
+    color: $double-espresso;
+  } @else if $variant == 'shipped' {
+    background: $cobalt;
+    color: $porcelain;
+  } @else if $variant == 'delivered' {
+    background: $hunter-green;
+    color: $porcelain;
+  } @else if $variant == 'flagged' {
+    background: $crimson-deep;
+    color: $porcelain;
+  } @else if $variant == 'soft' {
+    background: $panel-bg;
+    color: $double-espresso;
+  }
+}
+
+@mixin filter-chip {
+  font-family: $font-heading;
+  font-weight: 700;
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: $double-espresso;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+  &:hover { background: $panel-bg; }
+
+  &.on {
+    background: $double-espresso;
+    color: $porcelain;
+  }
+  &.warn {
+    color: $crimson-deep;
+    border-color: $crimson-deep;
+    &.on { background: $crimson-deep; color: $porcelain; }
+  }
+}
+
+@mixin pill-toolbar {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 6px;
+  border: 1px solid $panel-border;
+  border-radius: 999px;
+  background: $white;
+}
+
+@mixin search-field {
+  flex: 1;
+  min-width: 180px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+
+  svg { width: 12px; height: 12px; opacity: 0.5; flex-shrink: 0; }
+  input {
+    border: none;
+    background: transparent;
+    outline: none;
+    font-family: $font-body;
+    font-size: 12px;
+    color: $double-espresso;
+    width: 100%;
+    &::placeholder { color: rgba(26, 26, 26, 0.45); }
+  }
+}
+
+@mixin stat-tile($variant: 'butter') {
+  padding: 14px 14px;
+  border-radius: 14px;
+  position: relative;
+  overflow: hidden;
+
+  @if $variant == 'butter' {
+    background: $buttercup;
+    color: $double-espresso;
+  } @else if $variant == 'eucalyptus' {
+    background: $eucalyptus;
+    color: $hunter-green-deep;
+  } @else if $variant == 'dust' {
+    background: $dusty-blue;
+    color: $cobalt-deep;
+  } @else if $variant == 'rose' {
+    background: $rosewater;
+    color: $crimson-deep;
+  } @else if $variant == 'apricot' {
+    background: $apricot;
+    color: $porcelain;
+  } @else if $variant == 'hunter' {
+    background: $hunter-green;
+    color: $porcelain;
+  } @else if $variant == 'cobalt' {
+    background: $cobalt;
+    color: $porcelain;
+  }
+
+  .tile-label {
+    font-family: $font-heading;
+    font-weight: 700;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    opacity: 0.75;
+    margin-bottom: 4px;
+  }
+  .tile-value {
+    @include stat-value;
+  }
+  .tile-detail {
+    font-family: $font-body;
+    font-size: 10px;
+    margin-top: 6px;
+    opacity: 0.75;
+    line-height: 1.3;
+  }
+}
+
+@mixin swatch-bg($variant: 'rose') {
+  @if $variant == 'rose' { background: $rosewater; }
+  @else if $variant == 'butter' { background: $buttercup; }
+  @else if $variant == 'dust' { background: $dusty-blue; }
+  @else if $variant == 'eucalyptus' { background: $eucalyptus; }
+  @else if $variant == 'apricot' { background: $apricot; }
+  @else if $variant == 'cobalt' { background: $cobalt; }
+  @else if $variant == 'crimson' { background: $crimson-deep; }
+  @else if $variant == 'hunter' { background: $hunter-green; }
+  @else if $variant == 'porcelain' { background: $panel-bg; }
+}
+
+@mixin breadcrumb {
+  font-family: $font-body;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: $muted-ink;
+
+  a {
+    color: $double-espresso;
+    text-decoration: none;
+    border-bottom: 1px solid $double-espresso;
+    padding-bottom: 1px;
+  }
+}
+
+@mixin step-indicator {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  max-width: 480px;
+
+  .step {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .step-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: $font-heading;
+    font-size: 9px;
+    font-weight: 700;
+    flex-shrink: 0;
+    background: $panel-bg;
+    color: rgba(26, 26, 26, 0.5);
+    border: 1px solid rgba(26, 26, 26, 0.15);
+  }
+  .step.on .step-dot {
+    background: $double-espresso;
+    color: $porcelain;
+    border-color: $double-espresso;
+  }
+  .step.done .step-dot {
+    background: $hunter-green;
+    color: $porcelain;
+    border-color: $hunter-green;
+  }
+  .step-label {
+    font-family: $font-body;
+    font-size: 10px;
+    letter-spacing: -0.01em;
+    color: $muted-ink;
+  }
+  .step.on .step-label {
+    color: $double-espresso;
+    font-weight: 500;
+  }
+  .step-bar {
+    flex: 1;
+    height: 1px;
+    background: rgba(26, 26, 26, 0.15);
+  }
 }
 
 @mixin form-input {
@@ -187,4 +550,34 @@ $mobile-breakpoint: 768px;
     box-shadow: 0 0 0 2px rgba($hunter-green, 0.2);
   }
   @media (max-width: $mobile-breakpoint) { font-size: 16px; }
+}
+
+@mixin form-input-sm {
+  font-family: $font-body;
+  font-size: 13px;
+  line-height: 1.4;
+  color: $double-espresso;
+  background: $white;
+  border: 1px solid rgba(26, 26, 26, 0.2);
+  border-radius: 10px;
+  padding: 10px 14px;
+  width: 100%;
+  letter-spacing: -0.01em;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  outline: none;
+  &::placeholder { color: rgba(26, 26, 26, 0.35); }
+  &:focus {
+    border-color: $double-espresso;
+    box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.08);
+  }
+}
+
+@mixin field-label {
+  font-family: $font-heading;
+  font-weight: 700;
+  font-size: 9px;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: $muted-ink;
 }
