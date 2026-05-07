@@ -1,244 +1,453 @@
 @use '../../styles-shared' as *;
 
 .page {
-  padding: 24px;
-  max-width: 900px;
-  margin: 0 auto;
-  padding-bottom: 120px;
+  padding: 20px 22px;
+  max-width: 980px;
 
   @media (max-width: $mobile-breakpoint) {
-    padding: 16px 12px 140px;
+    padding: 20px 16px 80px;
   }
 }
 
-.page-head {
-  margin-bottom: 24px;
+.title {
+  @include h1-page;
+  margin: 0 0 16px;
 }
 
-.back-link {
-  @include subtitle;
-  color: $muted-text;
-  text-decoration: none;
-  display: inline-block;
-  margin-bottom: 8px;
-  &:hover { color: $double-espresso; text-decoration: none; }
+app-stepper {
+  display: block;
+  margin-bottom: 20px;
 }
 
-.page-title {
-  @include h3;
-  margin: 0;
+// --- Step 1: lookup vs walk-in ---
+
+.lookup-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  max-width: 720px;
+
+  @media (max-width: $mobile-breakpoint) {
+    grid-template-columns: 1fr;
+  }
 }
 
-.step-card {
-  @include card;
-  margin-bottom: 24px;
+.lookup-card {
+  background: $white;
+  border: 1px solid $panel-border;
+  border-radius: 16px;
+  padding: 18px 18px 16px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  min-height: 240px;
+
+  &.featured {
+    background: $buttercup;
+    border-color: rgba(26, 26, 26, 0.08);
+  }
 }
 
-.step-title {
-  @include h4;
-  margin: 0;
+.card-tag {
+  font-family: $font-heading;
+  font-weight: 700;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: $muted-ink;
+  margin-bottom: 6px;
 }
 
-.step-help {
-  @include p3;
-  color: $muted-text;
-  margin: 0;
+.card-title {
+  @include panel-title;
+  font-size: 18px;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin-bottom: 4px;
+}
+
+.card-help {
+  font-family: $font-body;
+  font-size: 11px;
+  color: rgba(26, 26, 26, 0.65);
+  line-height: 1.45;
+  margin-bottom: 14px;
 
   code {
-    font-family: monospace;
-    background: $porcelain;
-    padding: 2px 6px;
+    background: rgba(26, 26, 26, 0.08);
+    padding: 1px 6px;
     border-radius: 4px;
-    font-size: 14px;
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 10px;
+    letter-spacing: 0.02em;
   }
 }
 
-.inline-form {
+.inp-wrap {
   display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
 
-  .text-input { flex: 1; min-width: 200px; }
-  .btn-primary { flex-shrink: 0; }
-}
-
-.text-input {
-  @include form-input;
-}
-
-.textarea {
-  resize: vertical;
-  min-height: 60px;
-}
-
-.divider {
-  position: relative;
-  text-align: center;
-  margin: 8px 0;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 0; right: 0;
-    height: 1px;
-    background: $card-border;
-  }
-
-  span {
-    @include subtitle;
-    position: relative;
-    background: $white;
-    padding: 0 12px;
-    color: $muted-text;
+  @media (max-width: 520px) {
+    flex-direction: column;
   }
 }
 
-.field-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 12px;
+.inp {
+  @include form-input-sm;
+
+  &.pill {
+    border-radius: 999px;
+    padding: 10px 14px;
+  }
 }
 
-.form-field {
+.walkthru {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 14px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 
-  &.full { grid-column: 1 / -1; }
-
-  label {
-    @include subtitle;
+  li {
+    font-family: $font-body;
     font-size: 11px;
-    color: $double-espresso;
+    color: rgba(26, 26, 26, 0.7);
+    line-height: 1.4;
+    padding-left: 18px;
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 6px;
+      width: 10px;
+      height: 4px;
+      background: $crimson-deep;
+      border-radius: 999px;
+    }
   }
 }
 
-.checkbox-field label {
-  @include p3;
-  text-transform: none;
-  letter-spacing: 0;
-  font-weight: 400;
-  display: flex;
-  gap: 8px;
-  align-items: center;
-
-  input[type="checkbox"] {
-    width: 18px; height: 18px;
-    accent-color: $hunter-green;
-  }
+.tip {
+  font-family: $font-body;
+  font-size: 10px;
+  color: $muted-ink;
+  margin-top: 10px;
+  max-width: 720px;
+  line-height: 1.5;
 }
 
-.summary-card {
-  background: $porcelain;
+// --- Step 2: donor form ---
+
+.form {
+  max-width: 720px;
 }
 
-.summary-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 16px;
-}
-
-.summary-label {
-  @include subtitle;
-  color: $muted-text;
+.explain {
+  background: $buttercup;
+  border-radius: 14px;
+  padding: 12px 16px;
+  font-family: $font-body;
   font-size: 11px;
-  display: block;
-  margin-bottom: 2px;
+  line-height: 1.5;
+  margin-bottom: 16px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  color: $double-espresso;
 }
 
-.summary-value {
-  @include p3;
-  margin: 0;
-  font-size: 15px;
+.explain-ic {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: $double-espresso;
+  color: $porcelain;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: $font-heading;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
 }
 
 .section-title {
-  @include h4;
-  margin: 24px 0 12px;
+  @include subtitle-eyebrow;
+  margin: 14px 0 8px;
+}
+
+.full {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+
+  @media (max-width: 520px) { grid-template-columns: 1fr; }
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+
+  @media (max-width: 520px) { grid-template-columns: 1fr; }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.lbl-s {
+  @include field-label;
+}
+
+.req-mark {
+  color: $crimson-deep;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  font-family: $font-body;
+  font-size: 12px;
+  cursor: pointer;
+
+  input[type='checkbox'] {
+    width: 18px;
+    height: 18px;
+    accent-color: $double-espresso;
+    flex-shrink: 0;
+  }
+}
+
+.cb-label {
+  line-height: 1.4;
+}
+
+// --- Step 3: products ---
+
+.donor-strip {
+  background: $buttercup;
+  border-radius: 12px;
+  padding: 10px 16px;
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  color: $double-espresso;
+
+  @media (max-width: $mobile-breakpoint) {
+    gap: 10px;
+  }
+}
+
+.ds {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  .k {
+    font-family: $font-heading;
+    font-weight: 700;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    opacity: 0.65;
+  }
+  .v {
+    font-family: $font-body;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+
+    &.mono { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 11px; }
+  }
+}
+
+.ds-redo {
+  margin-left: auto;
+  font-family: $font-body;
+  font-size: 11px;
+  color: $double-espresso;
+  border-bottom: 1px solid $double-espresso;
+  padding-bottom: 1px;
+  background: transparent;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  cursor: pointer;
+}
+
+.sec-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.sec-title {
+  @include panel-title;
+}
+
+.sec-count {
+  font-family: $font-body;
+  font-size: 10px;
+  color: $muted-ink;
+  background: $panel-bg;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 500;
+  margin-left: 6px;
+}
+
+.lookup-toast {
+  background: $eucalyptus;
+  color: $hunter-green-deep;
+  font-family: $font-body;
+  font-size: 11px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  margin-bottom: 10px;
 }
 
 .product-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 12px;
+  gap: 10px;
+  margin-bottom: 14px;
 }
 
-.add-product {
+.add-row {
+  border: 1px dashed rgba(26, 26, 26, 0.25);
+  border-radius: 14px;
+  padding: 14px;
+  text-align: center;
+  font-family: $font-body;
+  font-size: 12px;
+  color: $muted-ink;
+  cursor: pointer;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin-bottom: 14px;
+  background: transparent;
   width: 100%;
-  margin-bottom: 16px;
+
+  &:hover { background: $panel-bg; color: $double-espresso; }
 }
 
-.lookup-toast {
-  @include subtitle;
-  text-transform: none;
-  letter-spacing: 0;
-  font-weight: 400;
-  font-size: 14px;
-  padding: 10px 16px;
-  margin-bottom: 12px;
-  background: rgba($buttercup, 0.3);
-  color: $double-espresso;
-  border-radius: 8px;
-  animation: slide-down 0.2s ease;
+.notes {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 14px;
+
+  textarea {
+    @include form-input-sm;
+    resize: vertical;
+    min-height: 56px;
+  }
 }
 
-@keyframes slide-down {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
+.summary {
+  background: $dusty-blue;
+  color: $cobalt-deep;
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: $font-body;
+  font-size: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  b { letter-spacing: -0.02em; font-weight: 700; }
 }
 
-.btn-secondary.small {
-  min-height: 36px;
-  padding: 6px 16px;
+.value-est {
+  opacity: 0.7;
+  font-size: 11px;
+}
+
+.saving-state {
+  @include panel;
+  text-align: center;
+  font-family: $font-body;
   font-size: 13px;
-  align-self: flex-start;
+  color: $muted-ink;
+}
+
+// --- Footer / actions ---
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 18px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.left-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn {
+  @include pill-button-sm('ghost');
+
+  &.primary { @include pill-button-sm('primary'); }
+  &.ghost { @include pill-button-sm('ghost'); }
+  &.cta-green { @include pill-button-sm('cta'); }
+  &.wide { width: 100%; margin-top: auto; }
+}
+
+.saving-pill {
+  font-family: $font-body;
+  font-size: 10px;
+  color: $muted-ink;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+
+  .ping {
+    width: 6px;
+    height: 6px;
+    background: $hunter-green;
+    border-radius: 50%;
+  }
 }
 
 .error-text {
-  @include p3;
-  color: $crimson;
-  margin: 0;
+  font-family: $font-body;
+  font-size: 11px;
+  color: $crimson-deep;
+  margin: 8px 0 0;
 }
 
 .error-banner {
-  @include p3;
+  @include body-sm;
   background: rgba($crimson, 0.1);
-  color: $crimson;
-  padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 8px;
-}
-
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-
-  &.sticky {
-    position: sticky;
-    bottom: 0;
-    background: $porcelain;
-    padding: 16px 0;
-    margin: 0 -24px;
-    padding-left: 24px;
-    padding-right: 24px;
-    border-top: 1px solid $card-border;
-
-    @media (max-width: $mobile-breakpoint) {
-      margin: 0 -12px;
-      padding: 12px;
-      bottom: 64px; // above bottom nav
-      background: rgba($porcelain, 0.98);
-      backdrop-filter: blur(8px);
-    }
-  }
-
-  @media (max-width: $mobile-breakpoint) {
-    .btn-primary, .btn-secondary { flex: 1; }
-  }
+  color: $crimson-deep;
+  padding: 12px 14px;
+  border-radius: 12px;
+  margin: 14px 0;
 }
