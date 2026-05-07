@@ -1,139 +1,134 @@
 @use '../../styles-shared' as *;
 
 .page {
-  padding: 32px;
-  max-width: 900px;
-  margin: 0 auto;
+  padding: 18px 22px;
+  max-width: 760px;
+
   @media (max-width: $mobile-breakpoint) {
-    padding: 20px 16px 100px;
+    padding: 18px 16px 80px;
   }
 }
 
-.page-header {
-  margin-bottom: 24px;
-}
-
-.back-link {
-  @include subtitle;
-  color: $muted-text;
-  text-decoration: none;
-  display: inline-block;
-  margin-bottom: 8px;
-  &:hover { color: $double-espresso; text-decoration: none; }
-}
-
 .page-title {
-  @include h3;
-  margin: 0;
+  @include h1-page;
+  margin: 0 0 20px;
+}
+
+.empty-state {
+  @include body-sm;
+  color: $muted-ink;
+  text-align: center;
+  padding: 40px 0;
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 18px;
 }
 
 .form-section {
-  @include card;
+  @include panel;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
 }
 
 .section-title {
-  @include h4;
+  @include subtitle-eyebrow;
   margin: 0 0 4px;
 }
 
 .section-help {
-  @include p3;
-  color: $muted-text;
-  margin: 0 0 8px;
+  @include meta-mid;
+  margin: 0 0 4px;
+  line-height: 1.5;
+}
+
+.form-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+
+  .form-field { flex: 1 1 0; min-width: 100px; }
+  .flex-1 { flex: 1 1 0; }
+  .flex-2 { flex: 2 1 0; }
 }
 
 .form-field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 
   label {
-    @include subtitle;
-    color: $double-espresso;
+    @include field-label;
   }
 }
 
 .field-hint {
-  color: $muted-text;
+  font-family: $font-body;
   font-weight: 400;
   text-transform: none;
+  font-size: 10px;
+  color: $muted-ink;
   letter-spacing: 0;
+  margin-left: 4px;
 }
 
 .text-input {
-  @include form-input;
-}
+  @include form-input-sm;
 
-.textarea {
-  resize: vertical;
-  min-height: 80px;
-}
-
-.form-row {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-
-  .flex-1 { flex: 1; min-width: 140px; }
-  .flex-2 { flex: 2; min-width: 180px; }
+  &.textarea {
+    resize: vertical;
+    min-height: 60px;
+  }
 }
 
 .field-error {
-  @include p3;
-  color: $crimson;
+  font-family: $font-body;
+  font-size: 10px;
+  color: $crimson-deep;
   margin: 0;
-  font-size: 14px;
 }
-
-.error-banner {
-  @include p3;
-  background: rgba($crimson, 0.1);
-  color: $crimson;
-  padding: 16px;
-  border-radius: 8px;
-}
-
-// --- Product type preferences grid ---
 
 .category-block {
-  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 0;
+  border-top: 1px solid $divider;
+
+  &:first-of-type { border-top: none; padding-top: 0; }
 }
 
 .category-label {
-  @include subtitle;
-  color: $hunter-green;
-  margin: 0 0 8px;
+  font-family: $font-heading;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: $double-espresso;
 }
 
 .type-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px 10px;
+
+  @media (max-width: 520px) { grid-template-columns: 1fr; }
 }
 
 .type-row {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
   gap: 8px;
-  padding: 10px 12px;
-  border: 1px solid $card-border;
-  border-radius: 8px;
-  background: $porcelain;
 }
 
 .type-name {
-  @include p3;
-  font-size: 15px;
+  @include body-sm;
+  font-size: 11px;
 }
 
 .type-actions {
@@ -142,37 +137,49 @@
 }
 
 .tag-btn {
-  @include subtitle;
-  font-size: 11px;
-  padding: 4px 10px;
-  border-radius: 12px;
-  border: 1px solid $border-color;
-  background: transparent;
-  color: $muted-text;
+  font-family: $font-heading;
+  font-weight: 700;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 4px 9px;
+  border-radius: 999px;
+  border: 1px solid $panel-border;
+  background: $white;
+  color: $muted-ink;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: background 0.12s ease;
 
-  &:hover { border-color: $double-espresso; color: $double-espresso; }
+  &:hover { background: $panel-bg; color: $double-espresso; }
 
   &.accepted {
     background: $eucalyptus;
     border-color: $eucalyptus;
-    color: $double-espresso;
+    color: $hunter-green-deep;
   }
 
+  &.reject:hover { color: $crimson-deep; }
+
   &.rejected {
-    background: $crimson;
-    border-color: $crimson;
-    color: $white;
+    background: $rosewater;
+    border-color: $rosewater;
+    color: $crimson-deep;
   }
+}
+
+.error-banner {
+  @include body-sm;
+  background: rgba($crimson, 0.1);
+  color: $crimson-deep;
+  padding: 12px 14px;
+  border-radius: 12px;
 }
 
 .form-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
+  gap: 8px;
 
-  @media (max-width: $mobile-breakpoint) {
-    .btn-primary, .btn-secondary { flex: 1; }
-  }
+  .btn-primary { @include pill-button-sm('primary'); }
+  .btn-secondary { @include pill-button-sm('ghost'); text-decoration: none; }
 }

@@ -1,0 +1,11 @@
+<div class="stepper">
+  @for (s of steps; track s.label; let i = $index) {
+    <div class="step" [class.on]="state(i) === 'on'" [class.done]="state(i) === 'done'">
+      <span class="step-dot">{{ state(i) === 'done' ? '✓' : (i + 1) }}</span>
+      <span class="step-label">{{ s.label }}</span>
+    </div>
+    @if (i < steps.length - 1) {
+      <div class="step-bar"></div>
+    }
+  }
+</div>

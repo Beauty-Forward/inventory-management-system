@@ -1,28 +1,18 @@
-<div class="page">
-  <div class="page-header">
-    <h1 class="page-title">Shelters</h1>
-    <a routerLink="/shelters/new" class="btn-primary">Add Shelter</a>
-  </div>
+<section class="page">
+  <app-page-header eyebrow="partners" title="shelters">
+    <button class="cta" (click)="startNew()">+ add shelter</button>
+  </app-page-header>
 
-  <div class="filter-chips">
-    <button
-      type="button"
-      class="chip"
-      [class.active]="filter() === 'active'"
-      (click)="setFilter('active')"
-    >Active</button>
-    <button
-      type="button"
-      class="chip"
-      [class.active]="filter() === 'inactive'"
-      (click)="setFilter('inactive')"
-    >Inactive</button>
-    <button
-      type="button"
-      class="chip"
-      [class.active]="filter() === 'all'"
-      (click)="setFilter('all')"
-    >All</button>
+  <div class="tabs">
+    <button class="tab" [class.on]="filter() === 'active'" (click)="setFilter('active')">
+      active<span class="tab-n">{{ activeCount() }}</span>
+    </button>
+    <button class="tab" [class.on]="filter() === 'inactive'" (click)="setFilter('inactive')">
+      inactive<span class="tab-n">{{ inactiveCount() }}</span>
+    </button>
+    <button class="tab" [class.on]="filter() === 'all'" (click)="setFilter('all')">
+      all<span class="tab-n">{{ shelters().length }}</span>
+    </button>
   </div>
 
   @if (loading()) {
@@ -32,24 +22,36 @@
   } @else if (filtered().length === 0) {
     <p class="empty-state">No shelter partners yet.</p>
   } @else {
-    <div class="shelter-grid">
+    <div class="grid">
       @for (s of filtered(); track s.id) {
-        <a [routerLink]="['/shelters', s.id]" class="shelter-card">
-          <div class="card-header">
-            <h3 class="shelter-name">{{ s.name }}</h3>
-            @if (!s.isActive) {
-              <span class="badge-expired">Inactive</span>
+        <a class="shelter" [routerLink]="['/shelters', s.id]">
+          <div class="banner" [attr.data-swatch]="banner(s)" [class.inverted]="invertedBanner(s)">
+            <span class="initials">{{ initials(s.name) }}</span>
+            <span class="active-dot" [class.on]="s.isActive" [class.off]="!s.isActive">
+              <span class="dot"></span>{{ s.isActive ? 'active' : 'inactive' }}
+            </span>
+          </div>
+          <div class="sh-body">
+            <div class="sh-name">{{ s.name }}</div>
+            <div class="sh-loc">{{ s.city }}, {{ s.state }}</div>
+            @if (s.acceptedTypes && s.acceptedTypes.length) {
+              <div class="tag-row">
+                <span class="tag">{{ s.acceptedTypes.length }} accepted types</span>
+              </div>
+            }
+            <div class="contact-row">
+              <span class="k">contact</span>
+              <span class="v">{{ s.contactName || '—' }}</span>
+            </div>
+            @if (s.contactEmail) {
+              <div class="contact-row">
+                <span class="k">email</span>
+                <span class="v">{{ s.contactEmail }}</span>
+              </div>
             }
           </div>
-          <p class="shelter-location">{{ s.city }}, {{ s.state }}</p>
-          <p class="shelter-contact">{{ s.contactName }}</p>
-          @if (s.acceptedTypes?.length) {
-            <p class="shelter-types">
-              Accepts {{ s.acceptedTypes?.length ?? 0 }} product type(s)
-            </p>
-          }
         </a>
       }
     </div>
   }
-</div>
+</section>

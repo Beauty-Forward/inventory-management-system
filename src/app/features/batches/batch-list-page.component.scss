@@ -1,111 +1,131 @@
 @use '../../styles-shared' as *;
 
 .page {
-  padding: 32px;
-  @media (max-width: $mobile-breakpoint) { padding: 20px 16px 80px; }
-}
+  padding: 20px 22px;
+  max-width: 1400px;
 
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.page-title { @include h3; margin: 0; }
-
-.filter-chips {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-}
-
-.chip {
-  @include subtitle;
-  padding: 8px 16px;
-  border-radius: 20px;
-  border: 1px solid $border-color;
-  background: transparent;
-  cursor: pointer;
-  color: $muted-text;
-  transition: all 0.15s ease;
-
-  &.active {
-    background: $buttercup;
-    border-color: $buttercup;
-    color: $double-espresso;
+  @media (max-width: $mobile-breakpoint) {
+    padding: 20px 16px 80px;
   }
+}
 
-  &:hover:not(.active) {
-    border-color: $double-espresso;
-    color: $double-espresso;
+.cta {
+  @include pill-button-sm('cta');
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+
+  @media (max-width: $mobile-breakpoint) {
+    grid-template-columns: 1fr;
   }
 }
 
 .empty-state {
-  @include p3;
-  color: $muted-text;
+  @include body-sm;
+  color: $muted-ink;
   text-align: center;
-  padding: 48px 0;
+  padding: 40px 0;
+  margin: 0;
 }
 
 .error-banner {
-  @include p3;
+  @include body-sm;
   background: rgba($crimson, 0.1);
-  color: $crimson;
-  padding: 16px;
-  border-radius: 8px;
+  color: $crimson-deep;
+  padding: 12px 14px;
+  border-radius: 12px;
+  margin: 14px 0;
 }
 
 .batch-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 12px;
-}
-
-.batch-card {
-  @include card;
-  text-decoration: none;
-  color: inherit;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 16px 20px;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.batch-row {
+  background: $white;
+  border: 1px solid $panel-border;
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: grid;
+  grid-template-columns: 32px 1.5fr 1.5fr auto;
+  gap: 12px;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s ease;
 
   &:hover {
-    border-color: $hunter-green;
     text-decoration: none;
+    border-color: rgba(26, 26, 26, 0.35);
+  }
+
+  @media (max-width: $mobile-breakpoint) {
+    grid-template-columns: 32px 1fr auto;
+    grid-template-areas:
+      'a w s'
+      'a d d';
+    column-gap: 12px;
+    row-gap: 4px;
+
+    .avatar { grid-area: a; }
+    .who { grid-area: w; }
+    .dates { grid-area: d; }
+    app-status-pill { grid-area: s; }
   }
 }
 
-.top-row {
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 8px;
-}
-
-.shelter-name {
-  @include h4;
-  font-size: 17px;
-}
-
-.shelter-loc {
-  @include p3;
-  color: $muted-text;
-  margin: 0;
-  font-size: 14px;
-}
-
-.meta {
-  @include subtitle;
+  align-items: center;
+  justify-content: center;
+  font-family: $font-heading;
   font-size: 11px;
-  color: $muted-text;
-  text-transform: none;
-  letter-spacing: 0;
-  font-weight: 400;
-  margin: 0;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  flex-shrink: 0;
+
+  &[data-swatch='rose'] { background: $rosewater; color: $crimson-deep; }
+  &[data-swatch='butter'] { background: $buttercup; color: $double-espresso; }
+  &[data-swatch='dust'] { background: $dusty-blue; color: $cobalt-deep; }
+  &[data-swatch='eucalyptus'] { background: $eucalyptus; color: $hunter-green-deep; }
+  &[data-swatch='apricot'] { background: $apricot; color: $porcelain; }
+  &[data-swatch='cobalt'] { background: $cobalt; color: $porcelain; }
+}
+
+.who-name {
+  @include body-sm;
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.who-meta {
+  @include meta;
+  margin-top: 1px;
+}
+
+.dates {
+  @include body-sm;
+  font-size: 11px;
+  line-height: 1.3;
+
+  b { font-weight: 500; display: block; }
+
+  .d {
+    color: $muted-ink;
+    font-size: 10px;
+    display: block;
+    margin-top: 1px;
+  }
 }

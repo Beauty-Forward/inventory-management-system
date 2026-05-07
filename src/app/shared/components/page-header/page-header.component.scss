@@ -1,0 +1,39 @@
+@use '../../../styles-shared' as *;
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 18px;
+
+  @media (max-width: $mobile-breakpoint) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+}
+
+.page-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.page-header-eyebrow {
+  @include subtitle-eyebrow;
+}
+
+.page-header-title {
+  @include h1-page;
+}
+
+.page-header-aside {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+
+  &:empty { display: none; }
+}

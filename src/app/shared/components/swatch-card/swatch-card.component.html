@@ -1,0 +1,8 @@
+<article class="swatch-card" [attr.data-swatch]="swatch" [class.interactive]="interactive">
+  <div class="swatch-top">
+    <ng-content select="[swatch-top]"></ng-content>
+  </div>
+  <div class="swatch-body">
+    <ng-content></ng-content>
+  </div>
+</article>

@@ -1,84 +1,144 @@
-<div class="page">
-  <a routerLink="/inventory" class="back-link">← Inventory</a>
+<section class="page">
+  <app-crumb [items]="crumbs()" />
 
   @if (loading()) {
     <p class="empty-state">Loading…</p>
   } @else if (error()) {
     <div class="error-banner">{{ error() }}</div>
   } @else if (product(); as p) {
-    <header class="header">
-      <div>
-        <h1 class="product-name">{{ p.name }}</h1>
-        <p class="product-sub">{{ p.brand }} · {{ typeLabel(p.type) }}</p>
+    <div class="hero">
+      <div class="hero-swatch" [attr.data-swatch]="swatch()">
+        <span class="swatch-tag">lot #{{ shortLot(p.id) }}</span>
+        <div class="swatch-foot">received {{ p.donation.date | date: 'MMM d' }}</div>
       </div>
-      <div class="header-actions">
-        <span [class]="statusClass(p.status)">{{ p.status }}</span>
-        @if (p.status === 'IN_STOCK') {
-          <button type="button" class="btn-secondary" [disabled]="mutating()" (click)="markExpired()">
-            Mark expired
-          </button>
-          <button type="button" class="btn-destructive" [disabled]="mutating()" (click)="markDiscarded()">
-            Discard
-          </button>
+      <div class="hero-info">
+        <h1 class="title">{{ p.name }}</h1>
+        <div class="brand-line">
+          {{ p.brand }}
+          @if (volumeText()) { · {{ volumeText() }} }
+        </div>
+        <div class="status-row">
+          <app-status-pill [variant]="statusVariant()">{{ statusLabel() }}</app-status-pill>
+          <app-status-pill variant="soft">QA passed</app-status-pill>
+          @if (p.expirationDate) {
+            <app-status-pill variant="soft">
+              exp {{ p.expirationDate | date: 'MMM yyyy' }}
+            </app-status-pill>
+          }
+        </div>
+        <div class="facts">
+          <div class="fact">
+            <div class="fact-label">quantity</div>
+            <div class="fact-value">
+              {{ p.quantity }}<span class="fact-unit">{{ unitLabel(p) }}</span>
+            </div>
+          </div>
+          <div class="fact">
+            <div class="fact-label">value</div>
+            <div class="fact-value">
+              @if (retailValue() !== null) {
+                ${{ retailValue() | number }}
+              } @else { — }
+            </div>
+          </div>
+          <div class="fact">
+            <div class="fact-label">on hand</div>
+            <div class="fact-value">
+              {{ daysOnHand() }}<span class="fact-unit">days</span>
+            </div>
+          </div>
+          <div class="fact">
+            <div class="fact-label">expires in</div>
+            <div class="fact-value">
+              @if (daysToExpiry() !== null) {
+                {{ daysToExpiry() }}<span class="fact-unit">days</span>
+              } @else { — }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn primary" (click)="goToBatch()">
+        @if (p.batch) { view batch → } @else { assign to batch → }
+      </button>
+      <button class="btn ghost" (click)="goToDonation()">view donation</button>
+      <button class="btn ghost" (click)="markExpired()" [disabled]="mutating()">mark expired</button>
+      <button class="btn ghost" (click)="markDiscarded()" [disabled]="mutating()">mark discarded</button>
+    </div>
+
+    <div class="cols">
+      <div class="panel">
+        <div class="panel-title">lot timeline</div>
+        <div class="timeline">
+          <div class="tl-item on">
+            <div class="tl-t">received at warehouse</div>
+            <div class="tl-m">{{ p.createdAt | date: 'MMM d, h:mm a' }}</div>
+          </div>
+          <div class="tl-item on">
+            <div class="tl-t">moved to in-stock</div>
+            <div class="tl-m">{{ p.createdAt | date: 'MMM d, h:mm a' }} · auto</div>
+          </div>
+          @if (p.batch) {
+            <div class="tl-item on">
+              <div class="tl-t">assigned to batch</div>
+              <div class="tl-m">{{ p.batch.shelter.name }}</div>
+            </div>
+          } @else {
+            <div class="tl-item">
+              <div class="tl-t">awaiting batch assignment</div>
+              <div class="tl-m">pending · no batch yet</div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">donor &amp; intake</div>
+        <div class="meta-row">
+          <span class="k">donor</span>
+          <span class="v">{{ p.donation.donor.fullName }}</span>
+        </div>
+        <div class="meta-row">
+          <span class="k">contact</span>
+          <span class="v">{{ p.donation.donor.email }}</span>
+        </div>
+        <div class="meta-row">
+          <span class="k">method</span>
+          <span class="v">{{ p.donation.method }}</span>
+        </div>
+        @if (p.barcode) {
+          <div class="meta-row">
+            <span class="k">barcode</span>
+            <span class="v mono">{{ p.barcode }}</span>
+          </div>
+        }
+        @if (p.expirationDate) {
+          <div class="meta-row">
+            <span class="k">expires</span>
+            <span class="v">{{ p.expirationDate | date: 'MMM d, yyyy' }}</span>
+          </div>
+        }
+        @if (p.color) {
+          <div class="meta-row">
+            <span class="k">color</span>
+            <span class="v">{{ p.color }}</span>
+          </div>
+        }
+        @if (p.keyIngredients) {
+          <div class="meta-row stack">
+            <span class="k">key ingredients</span>
+            <span class="v">{{ p.keyIngredients }}</span>
+          </div>
+        }
+        @if (p.price) {
+          <div class="meta-row">
+            <span class="k">unit cost (retail)</span>
+            <span class="v">${{ p.price }}</span>
+          </div>
         }
       </div>
-    </header>
-
-    <div class="card-grid">
-      <section class="info-card">
-        <h2 class="section-title">Product details</h2>
-        <dl class="info-list">
-          <dt>Quantity</dt><dd>{{ p.quantity }}</dd>
-          @if (p.price) {<dt>Price</dt><dd>{{ p.price }}</dd>}
-          @if (p.color) {<dt>Color</dt><dd>{{ p.color }}</dd>}
-          @if (p.colorCategory) {<dt>Color category</dt><dd>{{ p.colorCategory }}</dd>}
-          @if (p.expirationDate) {
-            <dt>Expires</dt><dd>{{ p.expirationDate | date:'mediumDate' }}</dd>
-          }
-          @if (p.barcode) {
-            <dt>Barcode</dt><dd class="mono">{{ p.barcode }}</dd>
-          }
-          @if (p.keyIngredients) {
-            <dt>Key ingredients</dt><dd>{{ p.keyIngredients }}</dd>
-          }
-          @for (key of detailsKeys(p.details); track key) {
-            <dt>{{ detailLabel(key) }}</dt>
-            <dd>{{ detailValue(p.details, key) }}</dd>
-          }
-        </dl>
-      </section>
-
-      <section class="info-card">
-        <h2 class="section-title">Source</h2>
-        <dl class="info-list">
-          <dt>Donation date</dt>
-          <dd>{{ p.donation.date }}</dd>
-          <dt>Method</dt>
-          <dd>{{ p.donation.method }}</dd>
-          <dt>Donor</dt>
-          <dd>{{ p.donation.donor.fullName }}</dd>
-          <dt>Received</dt>
-          <dd>{{ p.createdAt | date:'mediumDate' }}</dd>
-        </dl>
-        <a [routerLink]="['/donations', p.donation.id]" class="link">
-          View full donation →
-        </a>
-      </section>
-
-      @if (p.batch) {
-        <section class="info-card">
-          <h2 class="section-title">Batch</h2>
-          <dl class="info-list">
-            <dt>Status</dt>
-            <dd><span [class]="statusClass(p.batch.status)">{{ p.batch.status }}</span></dd>
-            <dt>Shelter</dt>
-            <dd>{{ p.batch.shelter.name }}</dd>
-          </dl>
-          <a [routerLink]="['/batches', p.batch.id]" class="link">
-            View batch →
-          </a>
-        </section>
-      }
     </div>
   }
-</div>
+</section>

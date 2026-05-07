@@ -1,16 +1,40 @@
-<div class="page">
-  <div class="page-header">
-    <h1 class="page-title">Outgoing Batches</h1>
-    <a routerLink="/batches/new" class="btn-primary">Create Batch</a>
+<section class="page">
+  <app-page-header eyebrow="outgoing" title="batches">
+    <button class="cta" (click)="startNew()">+ new batch</button>
+  </app-page-header>
+
+  <div class="stats">
+    <app-stat-tile
+      variant="butter"
+      size="sm"
+      label="draft"
+      [value]="draftCount()"
+      detail="awaiting prep"
+    />
+    <app-stat-tile
+      variant="dust"
+      size="sm"
+      label="en route"
+      [value]="enrouteCount()"
+      detail="finalized + shipped"
+    />
+    <app-stat-tile
+      variant="eucalyptus"
+      size="sm"
+      label="delivered"
+      [value]="deliveredCount()"
+      detail="this all-time"
+    />
   </div>
 
-  <div class="filter-chips">
-    <button type="button" class="chip" [class.active]="statusFilter() === 'all'" (click)="setFilter('all')">All</button>
-    <button type="button" class="chip" [class.active]="statusFilter() === 'DRAFT'" (click)="setFilter('DRAFT')">Draft</button>
-    <button type="button" class="chip" [class.active]="statusFilter() === 'FINALIZED'" (click)="setFilter('FINALIZED')">Finalized</button>
-    <button type="button" class="chip" [class.active]="statusFilter() === 'SHIPPED'" (click)="setFilter('SHIPPED')">Shipped</button>
-    <button type="button" class="chip" [class.active]="statusFilter() === 'DELIVERED'" (click)="setFilter('DELIVERED')">Delivered</button>
-  </div>
+  <app-pill-toolbar
+    searchPlaceholder="search shelter, city"
+    [searchValue]="searchQuery()"
+    (searchChange)="searchQuery.set($event)"
+    [filters]="filters"
+    [activeKey]="statusFilter()"
+    (filterChange)="statusFilter.set($event)"
+  />
 
   @if (loading()) {
     <p class="empty-state">Loading batches…</p>
@@ -21,19 +45,29 @@
   } @else {
     <div class="batch-list">
       @for (b of filtered(); track b.id) {
-        <a [routerLink]="['/batches', b.id]" class="batch-card">
-          <div class="top-row">
-            <span class="shelter-name">{{ b.shelter.name }}</span>
-            <span [class]="statusClass(b.status)">{{ b.status }}</span>
+        <a class="batch-row" [routerLink]="['/batches', b.id]">
+          <div class="avatar" [attr.data-swatch]="shelterSwatch(b)">
+            {{ initials(b.shelter.name) }}
           </div>
-          <p class="shelter-loc">{{ b.shelter.city }}, {{ b.shelter.state }}</p>
-          <p class="meta">
-            Created {{ b.createdAt | date:'mediumDate' }}
-            @if (b.shippedAt) { · Shipped {{ b.shippedAt | date:'mediumDate' }} }
-            @if (b.deliveredAt) { · Delivered {{ b.deliveredAt | date:'mediumDate' }} }
-          </p>
+          <div class="who">
+            <div class="who-name">{{ b.shelter.name }}</div>
+            <div class="who-meta">
+              {{ b.shelter.city }}, {{ b.shelter.state }} · #{{ b.id.slice(0, 6).toUpperCase() }}
+            </div>
+          </div>
+          <div class="dates">
+            <b>created {{ b.createdAt | date: 'MMM d' }}</b>
+            @if (b.shippedAt) {
+              <span class="d">shipped {{ b.shippedAt | date: 'MMM d' }}</span>
+            } @else if (b.finalizedAt) {
+              <span class="d">finalized {{ b.finalizedAt | date: 'MMM d' }}</span>
+            } @else {
+              <span class="d">no ship date yet</span>
+            }
+          </div>
+          <app-status-pill [variant]="variant(b)">{{ b.status.toLowerCase() }}</app-status-pill>
         </a>
       }
     </div>
   }
-</div>
+</section>

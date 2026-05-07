@@ -1,0 +1,28 @@
+<div class="pill-toolbar">
+  <div class="search-field">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <circle cx="11" cy="11" r="7" />
+      <path d="M21 21l-4.3-4.3" />
+    </svg>
+    <input
+      type="text"
+      [placeholder]="searchPlaceholder"
+      [ngModel]="searchValue"
+      (ngModelChange)="onSearchInput($event)"
+    />
+  </div>
+  @for (f of filters; track f.key) {
+    <button
+      type="button"
+      class="filter-chip"
+      [class.on]="activeKey === f.key"
+      [class.warn]="f.variant === 'warn'"
+      (click)="onFilterClick(f.key)"
+    >
+      {{ f.label }}
+      @if (f.count !== undefined) {
+        <span class="chip-count">{{ f.count }}</span>
+      }
+    </button>
+  }
+</div>

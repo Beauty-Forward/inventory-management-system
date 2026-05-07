@@ -1,175 +1,217 @@
-<div class="page">
-  <div class="page-head">
-    <a routerLink="/donations" class="back-link">← Donations</a>
-    <h1 class="page-title">Process Donation</h1>
-  </div>
+<section class="page">
+  <app-crumb [items]="[{ label: 'donations', link: '/donations' }, { label: 'new' }]" />
 
-  <!-- Step: lookup -->
+  <h1 class="title">
+    @if (step() === 'lookup') { process a donation }
+    @else if (step() === 'donor') { who's dropping off? }
+    @else if (step() === 'products') { what did they drop off? }
+    @else { saving… }
+  </h1>
+
+  <app-stepper [steps]="stepperSteps" [currentStep]="currentStepNum()" />
+
+  <!-- Step 1: lookup or walk-in -->
   @if (step() === 'lookup') {
-    <section class="step-card">
-      <h2 class="step-title">Reference code</h2>
-      <p class="step-help">
-        Enter the drop-off reference on the package (e.g. <code>BFD-20260422-ABC12345</code>)
-        to pull donor info from the delivery app.
-      </p>
-      <div class="inline-form">
-        <input
-          type="text"
-          class="text-input"
-          [value]="referenceCode()"
-          (input)="referenceCode.set($any($event.target).value)"
-          placeholder="BFD-…"
-          autofocus
-        />
-        <button
-          type="button"
-          class="btn-primary"
-          (click)="lookupReference()"
-          [disabled]="lookupLoading()"
-        >
-          {{ lookupLoading() ? 'Looking up…' : 'Look up' }}
+    <div class="lookup-cols">
+      <div class="lookup-card featured">
+        <div class="card-tag">fastest path</div>
+        <div class="card-title">scheduled drop-off</div>
+        <div class="card-help">
+          Enter the reference code on the package (e.g.
+          <code>BFD-20260422-ABC12345</code>) to auto-pull donor info.
+        </div>
+        <div class="inp-wrap">
+          <input
+            type="text"
+            class="inp pill"
+            [value]="referenceCode()"
+            (input)="referenceCode.set($any($event.target).value)"
+            placeholder="BFD-…"
+            autofocus
+          />
+          <button
+            type="button"
+            class="btn primary"
+            (click)="lookupReference()"
+            [disabled]="lookupLoading()"
+          >
+            {{ lookupLoading() ? 'looking up…' : 'look up →' }}
+          </button>
+        </div>
+        @if (lookupError()) {
+          <p class="error-text">{{ lookupError() }}</p>
+        }
+      </div>
+
+      <div class="lookup-card">
+        <div class="card-tag">no reference</div>
+        <div class="card-title">walk-in donation</div>
+        <ul class="walkthru">
+          <li>donor hands over products in person</li>
+          <li>we create a record so the delivery app has the truth</li>
+          <li>you'll enter donor info on the next step</li>
+        </ul>
+        <button type="button" class="btn ghost wide" (click)="skipLookup()">
+          register walk-in →
         </button>
       </div>
-      @if (lookupError()) {
-        <p class="error-text">{{ lookupError() }}</p>
-      }
-
-      <div class="divider"><span>or</span></div>
-
-      <button type="button" class="btn-secondary" (click)="skipLookup()">
-        Register walk-in donation
-      </button>
-    </section>
+    </div>
+    <p class="tip">
+      Tip: most drop-offs come through the delivery app, so scan or paste the
+      reference first when you can.
+    </p>
   }
 
-  <!-- Step: walk-in donor entry -->
+  <!-- Step 2: donor info -->
   @if (step() === 'donor') {
-    <section class="step-card">
-      <h2 class="step-title">Donor info</h2>
-      <p class="step-help">
-        Walk-in donations create a new record in the delivery app so every donation has a
-        single source of truth.
-      </p>
-
-      <div class="field-grid">
-        <div class="form-field full">
-          <label>Full name</label>
-          <input
-            type="text"
-            class="text-input"
-            [value]="donor().fullName"
-            (input)="updateDonor('fullName', $any($event.target).value)"
-          />
-        </div>
-        <div class="form-field">
-          <label>Email</label>
-          <input
-            type="email"
-            class="text-input"
-            [value]="donor().email"
-            (input)="updateDonor('email', $any($event.target).value)"
-          />
-        </div>
-        <div class="form-field">
-          <label>Phone</label>
-          <input
-            type="tel"
-            class="text-input"
-            [value]="donor().phone"
-            (input)="updateDonor('phone', $any($event.target).value)"
-          />
-        </div>
-        <div class="form-field">
-          <label>City</label>
-          <input
-            type="text"
-            class="text-input"
-            [value]="donor().city"
-            (input)="updateDonor('city', $any($event.target).value)"
-          />
-        </div>
-        <div class="form-field">
-          <label>State</label>
-          <input
-            type="text"
-            maxlength="2"
-            class="text-input"
-            [value]="donor().state"
-            (input)="updateDonor('state', $any($event.target).value.toUpperCase())"
-          />
-        </div>
-        <div class="form-field">
-          <label>Instagram handle (optional)</label>
-          <input
-            type="text"
-            class="text-input"
-            [value]="donor().instagramHandle"
-            (input)="updateDonor('instagramHandle', $any($event.target).value)"
-            placeholder="@username"
-          />
-        </div>
-        <div class="form-field checkbox-field full">
-          <label>
-            <input
-              type="checkbox"
-              [checked]="donor().smsOptIn"
-              (change)="updateDonor('smsOptIn', $any($event.target).checked)"
-            />
-            Donor opted in to SMS updates
-          </label>
+    <div class="form">
+      <div class="explain">
+        <div class="explain-ic">i</div>
+        <div>
+          Walk-in donations create a matching record so every donation has a
+          single source of truth. We'll use the email to send a thank-you and
+          tax receipt.
         </div>
       </div>
+
+      <div class="section-title">basics</div>
+      <div class="full field">
+        <span class="lbl-s">full name <span class="req-mark">*</span></span>
+        <input
+          type="text"
+          class="inp"
+          [value]="donor().fullName"
+          (input)="updateDonor('fullName', $any($event.target).value)"
+          placeholder="Mary Imevbore"
+        />
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <span class="lbl-s">email <span class="req-mark">*</span></span>
+          <input
+            type="email"
+            class="inp"
+            [value]="donor().email"
+            (input)="updateDonor('email', $any($event.target).value)"
+            placeholder="donor@example.com"
+          />
+        </div>
+        <div class="field">
+          <span class="lbl-s">phone <span class="req-mark">*</span></span>
+          <input
+            type="tel"
+            class="inp"
+            [value]="donor().phone"
+            (input)="updateDonor('phone', $any($event.target).value)"
+            placeholder="(347) 555-0104"
+          />
+        </div>
+      </div>
+
+      <div class="section-title">location</div>
+      <div class="grid-3">
+        <div class="field">
+          <span class="lbl-s">city</span>
+          <input
+            type="text"
+            class="inp"
+            [value]="donor().city"
+            (input)="updateDonor('city', $any($event.target).value)"
+            placeholder="Brooklyn"
+          />
+        </div>
+        <div class="field">
+          <span class="lbl-s">state</span>
+          <input
+            type="text"
+            class="inp"
+            maxlength="2"
+            [value]="donor().state"
+            (input)="updateDonor('state', $any($event.target).value.toUpperCase())"
+            placeholder="NY"
+          />
+        </div>
+      </div>
+
+      <div class="section-title">optional</div>
+      <div class="field">
+        <span class="lbl-s">instagram</span>
+        <input
+          type="text"
+          class="inp"
+          [value]="donor().instagramHandle"
+          (input)="updateDonor('instagramHandle', $any($event.target).value)"
+          placeholder="@handle — so we can tag you in thank-yous"
+        />
+      </div>
+
+      <label class="checkbox-row">
+        <input
+          type="checkbox"
+          [checked]="donor().smsOptIn"
+          (change)="updateDonor('smsOptIn', $any($event.target).checked)"
+        />
+        <span class="cb-label">
+          Donor opted in to SMS updates about where their items go
+        </span>
+      </label>
 
       @if (fieldErrors()['donor']) {
         <p class="error-text">{{ fieldErrors()['donor'] }}</p>
       }
-      @if (savingError()) {
-        <div class="error-banner">{{ savingError() }}</div>
-      }
 
-      <div class="form-actions">
-        <button type="button" class="btn-secondary" (click)="goBackToLookup()">Back</button>
+      <div class="footer">
+        <div class="left-group">
+          <button type="button" class="btn ghost" (click)="goBackToLookup()">← back</button>
+          <span class="saving-pill">
+            <span class="ping"></span>draft saved
+          </span>
+        </div>
         <button
           type="button"
-          class="btn-primary"
+          class="btn primary"
           (click)="continueFromDonor()"
           [disabled]="saving()"
         >
-          {{ saving() ? 'Registering…' : 'Continue to products' }}
+          continue to products →
         </button>
       </div>
-    </section>
+    </div>
   }
 
-  <!-- Step: products -->
+  <!-- Step 3: products -->
   @if (step() === 'products') {
-    <section class="step-card summary-card">
-      <div class="summary-row">
-        <div>
-          <span class="summary-label">Donor</span>
-          <p class="summary-value">{{ donor().fullName }} — {{ donor().email }}</p>
-        </div>
-        <div>
-          <span class="summary-label">Reference</span>
-          <p class="summary-value">{{ referenceCode() || 'walk-in' }}</p>
-        </div>
-        <div>
-          <span class="summary-label">Method</span>
-          <p class="summary-value">{{ donationMethod() }}</p>
-        </div>
-        <div>
-          <span class="summary-label">Date</span>
-          <p class="summary-value">{{ donationDate() }}</p>
-        </div>
+    <div class="donor-strip">
+      <div class="ds">
+        <span class="k">donor</span>
+        <span class="v">{{ donor().fullName || '—' }}</span>
       </div>
-      <button type="button" class="btn-secondary small" (click)="goBackToLookup()">
-        Start over
-      </button>
-    </section>
+      <div class="ds">
+        <span class="k">email</span>
+        <span class="v">{{ donor().email || '—' }}</span>
+      </div>
+      <div class="ds">
+        <span class="k">method</span>
+        <span class="v">{{ donationMethod() }}</span>
+      </div>
+      <div class="ds">
+        <span class="k">reference</span>
+        <span class="v mono">{{ warehouseReference() || referenceCode() || '—' }}</span>
+      </div>
+      <button type="button" class="ds-redo" (click)="goBackToLookup()">start over</button>
+    </div>
 
-    <h2 class="section-title">
-      Products ({{ productCount() }})
-    </h2>
+    <div class="sec-row">
+      <div>
+        <span class="sec-title">products</span>
+        <span class="sec-count">
+          {{ productCount() }} item{{ productCount() === 1 ? '' : 's' }} · {{ totalUnits() }} units
+        </span>
+      </div>
+      <span class="saving-pill">
+        <span class="ping"></span>autosaved
+      </span>
+    </div>
 
     @if (lookupMessage()) {
       <div class="lookup-toast">{{ lookupMessage() }}</div>
@@ -190,42 +232,57 @@
       }
     </div>
 
-    <button type="button" class="btn-secondary add-product" (click)="addProduct()">
-      + Add another product
+    <button type="button" class="add-row" (click)="addProduct()">
+      + add another product
     </button>
 
-    <div class="form-field">
-      <label>Donation notes (optional)</label>
+    <div class="notes">
+      <span class="lbl-s">donation notes (optional)</span>
       <textarea
-        class="text-input textarea"
+        class="inp"
         rows="2"
         [value]="donationNotes()"
         (input)="donationNotes.set($any($event.target).value)"
-        placeholder="Anything we should know about this batch"
+        placeholder="anything we should know about this batch"
       ></textarea>
+    </div>
+
+    <div class="summary">
+      <div>
+        <b>
+          {{ productCount() }} product{{ productCount() === 1 ? '' : 's' }} ·
+          {{ totalUnits() }} unit{{ totalUnits() === 1 ? '' : 's' }}
+        </b>
+        ready to be logged
+      </div>
+      @if (estimatedValue() > 0) {
+        <div class="value-est">Estimated retail value · ${{ estimatedValue() }}</div>
+      }
     </div>
 
     @if (savingError()) {
       <div class="error-banner">{{ savingError() }}</div>
     }
 
-    <div class="form-actions sticky">
-      <button type="button" class="btn-secondary" (click)="goBackToLookup()">Cancel</button>
+    <div class="footer">
+      <div class="left-group">
+        <button type="button" class="btn ghost" (click)="goBackToLookup()">← cancel</button>
+      </div>
       <button
         type="button"
-        class="btn-primary"
+        class="btn primary cta-green"
         (click)="completeDonation()"
         [disabled]="saving()"
       >
-        {{ saving() ? 'Saving…' : 'Complete Donation' }}
+        {{ saving() ? 'saving…' : 'complete donation →' }}
       </button>
     </div>
   }
 
   @if (step() === 'saving') {
-    <section class="step-card">
-      <p class="step-help">Saving {{ productCount() }} product(s) to inventory…</p>
-    </section>
+    <div class="saving-state">
+      Saving {{ productCount() }} product(s) to inventory…
+    </div>
   }
 
   @if (scannerOpen()) {
@@ -241,4 +298,4 @@
       (cancelled)="closePhotoCapture()"
     />
   }
-</div>
+</section>

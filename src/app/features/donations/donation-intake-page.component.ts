@@ -1,5 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import {
   ProductFormCardComponent,
   ProductFormCardModel,
@@ -11,6 +11,8 @@ import {
   CapturedPhoto,
   PhotoCaptureComponent,
 } from '../../shared/components/photo-capture/photo-capture.component';
+import { CrumbComponent } from '../../shared/components/crumb/crumb.component';
+import { StepperComponent, StepperStep } from '../../shared/components/stepper/stepper.component';
 import { AuthService } from '../../core/services/auth.service';
 import { BarcodeLookupService } from '../../core/services/barcode.service';
 import { DonationService } from '../../core/services/donation.service';
@@ -61,10 +63,11 @@ const TODAY = (): string => {
   selector: 'app-donation-intake-page',
   standalone: true,
   imports: [
-    RouterLink,
     ProductFormCardComponent,
     CameraScannerComponent,
     PhotoCaptureComponent,
+    CrumbComponent,
+    StepperComponent,
   ],
   templateUrl: './donation-intake-page.component.html',
   styleUrl: './donation-intake-page.component.scss',
@@ -106,6 +109,35 @@ export class DonationIntakePageComponent {
   readonly fieldErrors = signal<Record<string, string>>({});
 
   readonly productCount = computed(() => this.products().length);
+
+  readonly stepperSteps: StepperStep[] = [
+    { label: 'start' },
+    { label: 'donor' },
+    { label: 'products' },
+  ];
+
+  readonly currentStepNum = computed(() => {
+    const s = this.step();
+    if (s === 'lookup') return 1;
+    if (s === 'donor') return 2;
+    return 3;
+  });
+
+  readonly totalUnits = computed(() =>
+    this.products().reduce((acc, p) => {
+      const q = parseInt(String(p.quantity ?? 0), 10);
+      return acc + (isNaN(q) ? 0 : q);
+    }, 0),
+  );
+
+  readonly estimatedValue = computed(() =>
+    this.products().reduce((acc, p) => {
+      const q = parseInt(String(p.quantity ?? 0), 10);
+      const price = parseFloat(String(p.price ?? 0));
+      if (isNaN(q) || isNaN(price)) return acc;
+      return acc + q * price;
+    }, 0),
+  );
 
   // --- Step 1: reference code lookup ---
 

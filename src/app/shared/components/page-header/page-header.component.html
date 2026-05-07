@@ -1,0 +1,13 @@
+<header class="page-header">
+  <div class="page-header-text">
+    @if (eyebrow) {
+      <div class="page-header-eyebrow">{{ eyebrow }}</div>
+    }
+    @if (title) {
+      <h1 class="page-header-title">{{ title }}</h1>
+    }
+  </div>
+  <div class="page-header-aside">
+    <ng-content></ng-content>
+  </div>
+</header>

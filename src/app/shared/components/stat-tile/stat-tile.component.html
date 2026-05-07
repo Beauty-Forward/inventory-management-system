@@ -1,0 +1,7 @@
+<div class="stat-tile" [attr.data-variant]="variant" [attr.data-size]="size">
+  <div class="tile-label">{{ label }}</div>
+  <div class="tile-value">{{ value }}</div>
+  @if (detail) {
+    <div class="tile-detail">{{ detail }}</div>
+  }
+</div>

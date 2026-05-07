@@ -12,11 +12,12 @@ import {
   ShelterListRow,
   ShelterService,
 } from '../../core/services/shelter.service';
+import { CrumbComponent } from '../../shared/components/crumb/crumb.component';
 
 @Component({
   selector: 'app-batch-form-page',
   standalone: true,
-  imports: [RouterLink, DatePipe],
+  imports: [RouterLink, DatePipe, CrumbComponent],
   templateUrl: './batch-form-page.component.html',
   styleUrl: './batch-form-page.component.scss',
 })

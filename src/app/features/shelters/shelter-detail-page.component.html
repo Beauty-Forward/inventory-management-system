@@ -1,53 +1,69 @@
-<div class="page">
-  <a routerLink="/shelters" class="back-link">← Shelters</a>
+<section class="page">
+  <app-crumb [items]="crumbs()" />
 
   @if (loading()) {
     <p class="empty-state">Loading…</p>
   } @else if (error()) {
     <div class="error-banner">{{ error() }}</div>
   } @else if (shelter(); as s) {
-    <div class="header">
-      <div>
-        <h1 class="shelter-name">{{ s.name }}</h1>
-        <p class="shelter-location">
+    <div class="hero">
+      <div class="hero-banner" [attr.data-swatch]="swatch()" [class.inverted]="invertedSwatch()">
+        <span class="initials-pill">{{ initials() }}</span>
+        <span class="active-pill" [class.on]="s.isActive" [class.off]="!s.isActive">
+          <span class="dot"></span>{{ s.isActive ? 'active' : 'inactive' }}
+        </span>
+      </div>
+      <div class="hero-info">
+        <h1 class="title">{{ s.name }}</h1>
+        <div class="address">
           {{ s.addressLine1 }}@if (s.addressLine2) {, {{ s.addressLine2 }}}<br />
           {{ s.city }}, {{ s.state }} {{ s.postalCode }}
-        </p>
-      </div>
-      <div class="header-actions">
-        @if (!s.isActive) {
-          <span class="badge-expired">Inactive</span>
-        }
-        <a [routerLink]="['/shelters', s.id, 'edit']" class="btn-secondary">Edit</a>
-        <button
-          type="button"
-          class="btn-secondary"
-          [disabled]="mutating()"
-          (click)="toggleActive()"
-        >
-          {{ s.isActive ? 'Deactivate' : 'Reactivate' }}
-        </button>
+        </div>
+        <div class="actions">
+          <a class="btn ghost" [routerLink]="['/shelters', s.id, 'edit']">edit details</a>
+          <button class="btn ghost" [disabled]="mutating()" (click)="toggleActive()">
+            {{ s.isActive ? 'deactivate' : 'reactivate' }}
+          </button>
+          <a class="btn primary" routerLink="/batches/new">+ new batch →</a>
+        </div>
       </div>
     </div>
 
-    <div class="card-grid">
-      <section class="info-card">
-        <h2 class="section-title">Contact</h2>
-        <dl class="info-list">
-          <dt>Name</dt><dd>{{ s.contactName }}</dd>
-          @if (s.contactEmail) {
-            <dt>Email</dt><dd>{{ s.contactEmail }}</dd>
-          }
-          @if (s.contactPhone) {
-            <dt>Phone</dt><dd>{{ s.contactPhone }}</dd>
-          }
-        </dl>
-      </section>
+    <div class="cols">
+      <div class="panel">
+        <div class="panel-title">contact</div>
+        <div class="meta-row">
+          <span class="k">name</span>
+          <span class="v">{{ s.contactName }}</span>
+        </div>
+        @if (s.contactEmail) {
+          <div class="meta-row">
+            <span class="k">email</span>
+            <span class="v">{{ s.contactEmail }}</span>
+          </div>
+        }
+        @if (s.contactPhone) {
+          <div class="meta-row">
+            <span class="k">phone</span>
+            <span class="v">{{ s.contactPhone }}</span>
+          </div>
+        }
+        @if (s.capacityPerBatch) {
+          <div class="meta-row">
+            <span class="k">capacity</span>
+            <span class="v">{{ s.capacityPerBatch }} per batch</span>
+          </div>
+        }
+        @if (s.notes) {
+          <div class="notes">{{ s.notes }}</div>
+        }
+      </div>
 
-      <section class="info-card">
-        <h2 class="section-title">Preferences</h2>
+      <div class="panel">
+        <div class="panel-title">preferences</div>
+
         <div class="pref-group">
-          <h3 class="pref-label">Accepts</h3>
+          <div class="pref-label">accepts</div>
           @if (acceptedLabels().length) {
             <div class="pill-row">
               @for (label of acceptedLabels(); track label) {
@@ -58,9 +74,10 @@
             <p class="pref-empty">No preferences set.</p>
           }
         </div>
+
         @if (rejectedLabels().length) {
           <div class="pref-group">
-            <h3 class="pref-label">Rejects</h3>
+            <div class="pref-label">rejects</div>
             <div class="pill-row">
               @for (label of rejectedLabels(); track label) {
                 <span class="pref-pill reject">{{ label }}</span>
@@ -68,9 +85,10 @@
             </div>
           </div>
         }
+
         @if (s.preferredBrands?.length) {
           <div class="pref-group">
-            <h3 class="pref-label">Preferred brands</h3>
+            <div class="pref-label">preferred brands</div>
             <div class="pill-row">
               @for (brand of s.preferredBrands ?? []; track brand) {
                 <span class="pref-pill">{{ brand }}</span>
@@ -78,37 +96,26 @@
             </div>
           </div>
         }
-      </section>
+      </div>
+    </div>
 
-      @if (s.notes || s.capacityPerBatch) {
-        <section class="info-card">
-          <h2 class="section-title">Details</h2>
-          @if (s.capacityPerBatch) {
-            <p><strong>Capacity per batch:</strong> {{ s.capacityPerBatch }} products</p>
-          }
-          @if (s.notes) {
-            <p class="notes">{{ s.notes }}</p>
-          }
-        </section>
-      }
-
-      <section class="info-card">
-        <h2 class="section-title">Recent batches</h2>
-        @if (s.batches.length === 0) {
-          <p class="pref-empty">No batches yet.</p>
-        } @else {
-          <ul class="batch-list">
-            @for (b of s.batches; track b.id) {
-              <li class="batch-item">
-                <a [routerLink]="['/batches', b.id]" class="batch-link">
-                  <span [class]="batchStatusClass(b.status)">{{ b.status }}</span>
-                  <span class="batch-date">{{ b.createdAt | date:'mediumDate' }}</span>
-                </a>
-              </li>
-            }
-          </ul>
+    <div class="panel batches-panel">
+      <div class="panel-title">recent batches</div>
+      @if (s.batches.length === 0) {
+        <p class="pref-empty">No batches yet.</p>
+      } @else {
+        @for (b of s.batches; track b.id) {
+          <a class="batch-row" [routerLink]="['/batches', b.id]">
+            <div class="batch-info">
+              <div class="batch-id">batch #{{ b.id.slice(0, 6).toUpperCase() }}</div>
+              <div class="batch-date">{{ b.createdAt | date: 'MMM d, yyyy' }}</div>
+            </div>
+            <app-status-pill [variant]="batchVariant(b.status)">
+              {{ b.status.toLowerCase() }}
+            </app-status-pill>
+          </a>
         }
-      </section>
+      }
     </div>
   }
-</div>
+</section>
