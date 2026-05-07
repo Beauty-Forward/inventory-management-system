@@ -1,10 +1,11 @@
 @use '../../../styles-shared' as *;
 
 .card {
-  @include card;
+  @include panel;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
+  padding: 14px 16px;
 }
 
 .card-head {
@@ -12,107 +13,122 @@
   justify-content: space-between;
   align-items: center;
   gap: 8px;
+  margin-bottom: 4px;
 }
 
 .index-label {
-  @include subtitle;
-  color: $hunter-green;
+  font-family: $font-heading;
+  font-weight: 700;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: $muted-ink;
 }
 
 .head-actions {
   display: flex;
-  gap: 6px;
+  gap: 5px;
 }
 
 .scan-btn,
 .photo-btn {
-  @include subtitle;
-  font-size: 12px;
-  padding: 6px 12px;
-  border-radius: 14px;
-  border: 1px solid $buttercup;
-  background: $buttercup;
-  color: $double-espresso;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-family: $font-heading;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.02em;
   cursor: pointer;
-  transition: opacity 0.15s ease;
-  &:hover { opacity: 0.88; }
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: background 0.12s ease;
+}
+
+.scan-btn {
+  background: $eucalyptus;
+  border: 1px solid transparent;
+  color: $hunter-green-deep;
+  &:hover { background: darken($eucalyptus, 4%); }
 }
 
 .photo-btn {
-  background: rgba($dusty-blue, 0.3);
-  border-color: $dusty-blue;
+  background: transparent;
+  border: 1px solid rgba(26, 26, 26, 0.15);
+  color: $double-espresso;
+  &:hover { background: $panel-bg; }
 }
 
 .remove-btn {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  border: 1px solid $border-color;
+  border: 1px solid $panel-border;
   background: $white;
-  color: $muted-text;
-  font-size: 18px;
+  color: $muted-ink;
+  font-size: 16px;
   line-height: 1;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0;
 
   &:hover {
-    border-color: $crimson;
-    color: $crimson;
+    border-color: $crimson-deep;
+    color: $crimson-deep;
   }
 }
 
 .field-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 8px 12px;
+  gap: 8px 10px;
 }
 
 .form-field {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
 
   &.full { grid-column: 1 / -1; }
 
   label {
-    @include subtitle;
-    font-size: 11px;
-    color: $double-espresso;
+    @include field-label;
+    color: $muted-ink;
   }
 }
 
 .text-input {
-  @include form-input;
-  padding: 8px 12px;
-  font-size: 15px;
-
-  @media (max-width: $mobile-breakpoint) {
-    font-size: 15px;
-  }
+  @include form-input-sm;
+  padding: 9px 12px;
+  font-size: 12px;
 }
 
 select.text-input {
   appearance: none;
-  padding-right: 32px;
+  padding-right: 28px;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%231A1A1A' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 12px center;
+  background-position: right 10px center;
 }
 
 .field-error {
-  @include p3;
-  font-size: 13px;
-  color: $crimson;
+  font-family: $font-body;
+  font-size: 10px;
+  color: $crimson-deep;
   margin: 0;
 }
 
 .expand-btn {
-  @include subtitle;
+  font-family: $font-body;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: $muted-ink;
   background: transparent;
   border: none;
-  color: $muted-text;
   cursor: pointer;
   align-self: flex-start;
   padding: 4px 0;
