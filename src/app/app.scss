@@ -2,7 +2,7 @@ main {
   min-height: 100vh;
 
   &.has-sidebar {
-    margin-left: 240px;
+    margin-left: 160px;
 
     @media (max-width: 768px) {
       margin-left: 0;
