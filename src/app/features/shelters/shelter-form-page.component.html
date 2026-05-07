@@ -1,8 +1,6 @@
 <div class="page">
-  <div class="page-header">
-    <a routerLink="/shelters" class="back-link">← Shelters</a>
-    <h1 class="page-title">{{ pageTitle() }}</h1>
-  </div>
+  <app-crumb [items]="crumbs()" />
+  <h1 class="page-title">{{ pageTitle() }}</h1>
 
   @if (loading()) {
     <p class="empty-state">Loading…</p>

@@ -3,11 +3,17 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ALL_PRODUCT_TYPES } from '../../core/models/product-types';
 import { ShelterService, ShelterDetail } from '../../core/services/shelter.service';
+import { CrumbComponent, CrumbItem } from '../../shared/components/crumb/crumb.component';
+import {
+  StatusPillComponent,
+  StatusPillVariant,
+} from '../../shared/components/status-pill/status-pill.component';
+import { SwatchVariant } from '../../shared/components/swatch-card/swatch-card.component';
 
 @Component({
   selector: 'app-shelter-detail-page',
   standalone: true,
-  imports: [RouterLink, DatePipe],
+  imports: [RouterLink, DatePipe, CrumbComponent, StatusPillComponent],
   templateUrl: './shelter-detail-page.component.html',
   styleUrl: './shelter-detail-page.component.scss',
 })
@@ -29,6 +35,37 @@ export class ShelterDetailPageComponent implements OnInit {
   readonly rejectedLabels = computed(() => {
     const rejected = this.shelter()?.rejectedTypes ?? [];
     return rejected.map((v) => this.labelFor(v)).filter(Boolean);
+  });
+
+  readonly swatch = computed<SwatchVariant>(() => {
+    const s = this.shelter();
+    if (!s) return 'rose';
+    const cycle: SwatchVariant[] = ['rose', 'eucalyptus', 'dust', 'butter', 'apricot', 'hunter'];
+    const hash = s.name.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+    return cycle[hash % cycle.length];
+  });
+
+  readonly invertedSwatch = computed(
+    () => this.swatch() === 'hunter' || this.swatch() === 'apricot',
+  );
+
+  readonly initials = computed(() => {
+    const s = this.shelter();
+    if (!s) return '';
+    return s.name
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((p) => p[0]!.toUpperCase())
+      .join('');
+  });
+
+  readonly crumbs = computed<CrumbItem[]>(() => {
+    const s = this.shelter();
+    return [
+      { label: 'shelters', link: '/shelters' },
+      { label: s?.name ?? '...' },
+    ];
   });
 
   async ngOnInit(): Promise<void> {
@@ -81,7 +118,12 @@ export class ShelterDetailPageComponent implements OnInit {
     }
   }
 
-  batchStatusClass(status: string): string {
-    return `badge-${status.toLowerCase()}`;
+  batchVariant(status: string): StatusPillVariant {
+    const s = status.toUpperCase();
+    if (s === 'DRAFT') return 'draft';
+    if (s === 'FINALIZED') return 'route';
+    if (s === 'SHIPPED') return 'shipped';
+    if (s === 'DELIVERED') return 'delivered';
+    return 'soft';
   }
 }

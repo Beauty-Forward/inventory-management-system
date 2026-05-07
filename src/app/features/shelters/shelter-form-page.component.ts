@@ -7,6 +7,7 @@ import {
   shelterFormSchema,
   type ShelterFormInput,
 } from '../../core/validators/shelter.validators';
+import { CrumbComponent, CrumbItem } from '../../shared/components/crumb/crumb.component';
 
 type FormState = {
   name: string;
@@ -45,7 +46,7 @@ const EMPTY_FORM = (): FormState => ({
 @Component({
   selector: 'app-shelter-form-page',
   standalone: true,
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, CrumbComponent],
   templateUrl: './shelter-form-page.component.html',
   styleUrl: './shelter-form-page.component.scss',
 })
@@ -64,8 +65,12 @@ export class ShelterFormPageComponent implements OnInit {
 
   readonly isEditMode = computed(() => this.shelterId() !== null);
   readonly pageTitle = computed(() =>
-    this.isEditMode() ? 'Edit Shelter' : 'New Shelter',
+    this.isEditMode() ? 'edit shelter' : 'new shelter',
   );
+  readonly crumbs = computed<CrumbItem[]>(() => [
+    { label: 'shelters', link: '/shelters' },
+    { label: this.isEditMode() ? 'edit' : 'new' },
+  ]);
 
   async ngOnInit(): Promise<void> {
     const id = this.route.snapshot.paramMap.get('id');
