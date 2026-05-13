@@ -89,3 +89,17 @@
   p { @include p3; margin: 0; color: $porcelain; }
   .err { color: $apricot; }
 }
+
+// DEBUG: remove once scanner is fixed.
+.debug {
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.5);
+  color: $porcelain;
+  font: 10px / 1.3 monospace;
+
+  p {
+    margin: 0;
+    word-break: break-all;
+  }
+  b { color: $buttercup; }
+}
