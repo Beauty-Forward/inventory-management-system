@@ -367,13 +367,18 @@ export class DonationIntakePageComponent {
     });
 
     if (result.found) {
-      const sourceLabel =
-        result.source === 'catalog'
-          ? 'from catalog'
-          : result.source === 'open_beauty_facts'
-            ? 'from Open Beauty Facts'
-            : 'from Open Food Facts';
-      this.lookupMessage.set(`Pre-populated ${sourceLabel}.`);
+      const sourceLabel = {
+        catalog: 'from catalog',
+        open_beauty_facts: 'from Open Beauty Facts',
+        open_food_facts: 'from Open Food Facts',
+        upcitemdb: 'from UPCitemdb',
+        gemini_text: 'from AI (please verify)',
+      }[result.source ?? 'catalog'];
+      const verifyHint =
+        result.source === 'gemini_text' || result.confidence === 'low'
+          ? ' Double-check the product before saving.'
+          : '';
+      this.lookupMessage.set(`Pre-populated ${sourceLabel}.${verifyHint}`);
     } else {
       this.lookupMessage.set(
         `No match found — barcode ${barcode} saved, fill in the rest manually.`,

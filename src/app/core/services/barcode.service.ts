@@ -8,6 +8,13 @@ import {
 } from '../dataconnect';
 import { FirebaseClientService } from './firebase-client.service';
 
+export type BarcodeLookupSource =
+  | 'catalog'
+  | 'open_beauty_facts'
+  | 'open_food_facts'
+  | 'upcitemdb'
+  | 'gemini_text';
+
 export interface BarcodeLookupResult {
   found: boolean;
   barcode: string;
@@ -17,18 +24,21 @@ export interface BarcodeLookupResult {
   price?: string;
   color?: string;
   keyIngredients?: string;
-  source?: 'catalog' | 'open_food_facts' | 'open_beauty_facts';
+  confidence?: 'high' | 'medium' | 'low';
+  source?: BarcodeLookupSource;
 }
 
-interface OpenFactsResult {
+interface RemoteLookupResult {
   found: boolean;
   barcode: string;
   name?: string;
   brand?: string;
+  type?: string;
   ingredients?: string;
   categories?: string;
   imageUrl?: string | null;
-  source?: 'open_beauty_facts' | 'open_food_facts';
+  confidence?: 'high' | 'medium' | 'low';
+  source?: Exclude<BarcodeLookupSource, 'catalog'>;
 }
 
 type CatalogRow = NonNullable<GetCatalogByBarcodeData['productCatalog']>;
@@ -66,9 +76,9 @@ export class BarcodeLookupService {
       };
     }
 
-    // Tier 2: Open Food/Beauty Facts via Cloud Function
+    // Tier 2+: remote lookup cascade (OBF → OFF → UPCitemdb → Gemini text)
     try {
-      const fn = httpsCallable<{ barcode: string }, OpenFactsResult>(
+      const fn = httpsCallable<{ barcode: string }, RemoteLookupResult>(
         this.firebase.functions,
         'lookupProductByBarcode',
       );
@@ -79,7 +89,9 @@ export class BarcodeLookupService {
           barcode: normalized,
           name: data.name,
           brand: data.brand,
+          type: data.type,
           keyIngredients: data.ingredients,
+          confidence: data.confidence,
           source: data.source,
         };
       }
