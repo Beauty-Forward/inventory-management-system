@@ -20,5 +20,18 @@
         }
       }
     </div>
+
+    <!-- DEBUG: remove once scanner is fixed. Diagnostic readout for iOS troubleshooting. -->
+    <div class="debug">
+      <p>path: <b>{{ debugPath() }}</b></p>
+      <p>attempts: <b>{{ debugAttempts() }}</b></p>
+      <p>video: <b>{{ debugVideoState() || '—' }}</b></p>
+      @if (debugSupportedFormats()) {
+        <p>fmts: <b>{{ debugSupportedFormats() }}</b></p>
+      }
+      @if (debugLastError()) {
+        <p>last err: <b>{{ debugLastError() }}</b></p>
+      }
+    </div>
   </div>
 </div>

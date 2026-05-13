@@ -38,6 +38,13 @@ export class CameraScannerComponent implements AfterViewInit, OnDestroy {
   readonly status = signal<'starting' | 'scanning' | 'error'>('starting');
   readonly errorMessage = signal<string>('');
 
+  // DEBUG: on-screen diagnostics for troubleshooting iOS WebKit. Remove once fixed.
+  readonly debugPath = signal<'native' | 'fallback' | 'none'>('none');
+  readonly debugAttempts = signal(0);
+  readonly debugLastError = signal<string>('');
+  readonly debugSupportedFormats = signal<string>('');
+  readonly debugVideoState = signal<string>('');
+
   private mediaStream: MediaStream | null = null;
   private detectInterval: number | null = null;
   private html5Qrcode: Html5Qrcode | null = null;
@@ -55,6 +62,8 @@ export class CameraScannerComponent implements AfterViewInit, OnDestroy {
     const video = this.videoElRef?.nativeElement;
     if (!video) return;
 
+    this.debugPath.set('native');
+
     try {
       this.mediaStream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: { ideal: 'environment' } },
@@ -62,6 +71,15 @@ export class CameraScannerComponent implements AfterViewInit, OnDestroy {
       video.srcObject = this.mediaStream;
       await video.play();
       this.status.set('scanning');
+
+      // DEBUG: report supported formats so we know whether our list is valid.
+      try {
+        const w = window as unknown as { BarcodeDetector?: { getSupportedFormats?: () => Promise<string[]> } };
+        const fmts = (await w.BarcodeDetector?.getSupportedFormats?.()) ?? [];
+        this.debugSupportedFormats.set(fmts.join(','));
+      } catch (e) {
+        this.debugSupportedFormats.set(`fmt-error: ${String(e).slice(0, 40)}`);
+      }
 
       const detector = new Ctor({
         formats: [
@@ -75,24 +93,32 @@ export class CameraScannerComponent implements AfterViewInit, OnDestroy {
       });
 
       this.detectInterval = window.setInterval(async () => {
+        this.debugAttempts.update((n) => n + 1);
+        this.debugVideoState.set(`${video.videoWidth}x${video.videoHeight} rs=${video.readyState}`);
         try {
           const results = await detector.detect(video);
           if (results.length > 0 && results[0]?.rawValue) {
             this.emitResult(results[0].rawValue);
           }
-        } catch {
-          // Ignore transient detect errors
+        } catch (e) {
+          this.debugLastError.set(String(e).slice(0, 80));
         }
       }, 250);
     } catch (err) {
       console.error('Native scanner failed, trying fallback', err);
+      this.debugLastError.set(`native-init: ${String(err).slice(0, 60)}`);
       await this.startFallback();
     }
   }
 
   private async startFallback(): Promise<void> {
     const region = this.qrRegionRef?.nativeElement;
-    if (!region) return;
+    if (!region) {
+      this.debugLastError.set('no qr-region element');
+      return;
+    }
+
+    this.debugPath.set('fallback');
 
     try {
       this.html5Qrcode = new Html5Qrcode(region.id);
@@ -102,14 +128,25 @@ export class CameraScannerComponent implements AfterViewInit, OnDestroy {
           fps: 10,
           qrbox: { width: 280, height: 180 },
         },
-        (decoded) => this.emitResult(decoded),
-        () => {
-          // suppress per-frame decode errors
+        (decoded) => {
+          this.debugAttempts.update((n) => n + 1);
+          this.emitResult(decoded);
+        },
+        (errMsg) => {
+          this.debugAttempts.update((n) => n + 1);
+          // Capture only the most recent non-empty message to avoid spam.
+          if (errMsg) this.debugLastError.set(String(errMsg).slice(0, 80));
+          // Inject video state once we have a video element.
+          const v = region.querySelector('video') as HTMLVideoElement | null;
+          if (v) {
+            this.debugVideoState.set(`${v.videoWidth}x${v.videoHeight} rs=${v.readyState}`);
+          }
         },
       );
       this.status.set('scanning');
     } catch (err) {
       console.error('Fallback scanner failed', err);
+      this.debugLastError.set(`fallback-init: ${String(err).slice(0, 60)}`);
       this.status.set('error');
       this.errorMessage.set(
         'Could not access camera. Check browser permissions.',
