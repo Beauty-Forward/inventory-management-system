@@ -1,0 +1,23 @@
+{
+  "name": "beauty-forward-ims-functions",
+  "private": true,
+  "main": "lib/index.js",
+  "engines": {
+    "node": "20"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "deploy": "firebase deploy --only functions:ims",
+    "logs": "firebase functions:log"
+  },
+  "dependencies": {
+    "@google-cloud/vertexai": "^1.12.0",
+    "firebase-admin": "^13.0.0",
+    "firebase-functions": "^6.0.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.2"
+  }
+}
