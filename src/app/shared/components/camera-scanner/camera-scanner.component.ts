@@ -8,7 +8,7 @@ import {
   ViewChild,
   signal,
 } from '@angular/core';
-import { Html5Qrcode } from 'html5-qrcode';
+import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode';
 
 type BarcodeDetectorCtor = new (config?: {
   formats?: string[];
@@ -121,7 +121,22 @@ export class CameraScannerComponent implements AfterViewInit, OnDestroy {
     this.debugPath.set('fallback');
 
     try {
-      this.html5Qrcode = new Html5Qrcode(region.id);
+      // Explicitly list barcode formats. Without this, html5-qrcode relies
+      // on ZXing-JS's dynamic format discovery which doesn't reliably resolve
+      // on iOS WebKit — every decode attempt then throws "no MultiFormatReader"
+      // and silently fails. Listing formats up-front forces the right readers
+      // to bundle and load synchronously.
+      this.html5Qrcode = new Html5Qrcode(region.id, {
+        formatsToSupport: [
+          Html5QrcodeSupportedFormats.EAN_13,
+          Html5QrcodeSupportedFormats.EAN_8,
+          Html5QrcodeSupportedFormats.UPC_A,
+          Html5QrcodeSupportedFormats.UPC_E,
+          Html5QrcodeSupportedFormats.CODE_128,
+          Html5QrcodeSupportedFormats.CODE_39,
+        ],
+        verbose: false,
+      });
       await this.html5Qrcode.start(
         { facingMode: 'environment' },
         {
