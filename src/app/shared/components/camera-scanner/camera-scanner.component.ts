@@ -8,7 +8,8 @@ import {
   ViewChild,
   signal,
 } from '@angular/core';
-import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode';
+import { BrowserMultiFormatReader, IScannerControls } from '@zxing/browser';
+import { BarcodeFormat, DecodeHintType, NotFoundException } from '@zxing/library';
 
 type BarcodeDetectorCtor = new (config?: {
   formats?: string[];
@@ -16,7 +17,8 @@ type BarcodeDetectorCtor = new (config?: {
   detect: (source: HTMLVideoElement) => Promise<Array<{ rawValue: string }>>;
 };
 
-// Native BarcodeDetector is available in Chromium browsers.
+// Native BarcodeDetector is available in Chromium browsers (Android Chrome).
+// iOS WebKit (including Chrome on iPhone) lacks it — we fall back to @zxing/browser.
 function getNativeDetector(): BarcodeDetectorCtor | null {
   const w = window as unknown as { BarcodeDetector?: BarcodeDetectorCtor };
   return w.BarcodeDetector ?? null;
@@ -30,7 +32,6 @@ function getNativeDetector(): BarcodeDetectorCtor | null {
 })
 export class CameraScannerComponent implements AfterViewInit, OnDestroy {
   @ViewChild('videoEl') videoElRef?: ElementRef<HTMLVideoElement>;
-  @ViewChild('qrRegion') qrRegionRef?: ElementRef<HTMLDivElement>;
 
   @Output() scanned = new EventEmitter<string>();
   @Output() cancelled = new EventEmitter<void>();
@@ -47,7 +48,7 @@ export class CameraScannerComponent implements AfterViewInit, OnDestroy {
 
   private mediaStream: MediaStream | null = null;
   private detectInterval: number | null = null;
-  private html5Qrcode: Html5Qrcode | null = null;
+  private zxingControls: IScannerControls | null = null;
 
   async ngAfterViewInit(): Promise<void> {
     const NativeDetector = getNativeDetector();
@@ -112,49 +113,51 @@ export class CameraScannerComponent implements AfterViewInit, OnDestroy {
   }
 
   private async startFallback(): Promise<void> {
-    const region = this.qrRegionRef?.nativeElement;
-    if (!region) {
-      this.debugLastError.set('no qr-region element');
+    const video = this.videoElRef?.nativeElement;
+    if (!video) {
+      this.debugLastError.set('no video element');
       return;
     }
 
     this.debugPath.set('fallback');
 
     try {
-      // Explicitly list barcode formats. Without this, html5-qrcode relies
-      // on ZXing-JS's dynamic format discovery which doesn't reliably resolve
-      // on iOS WebKit — every decode attempt then throws "no MultiFormatReader"
-      // and silently fails. Listing formats up-front forces the right readers
-      // to bundle and load synchronously.
-      this.html5Qrcode = new Html5Qrcode(region.id, {
-        formatsToSupport: [
-          Html5QrcodeSupportedFormats.EAN_13,
-          Html5QrcodeSupportedFormats.EAN_8,
-          Html5QrcodeSupportedFormats.UPC_A,
-          Html5QrcodeSupportedFormats.UPC_E,
-          Html5QrcodeSupportedFormats.CODE_128,
-          Html5QrcodeSupportedFormats.CODE_39,
-        ],
-        verbose: false,
-      });
-      await this.html5Qrcode.start(
-        { facingMode: 'environment' },
-        {
-          fps: 10,
-          qrbox: { width: 280, height: 180 },
-        },
-        (decoded) => {
+      // Pass format hints directly to ZXing-JS. Unlike html5-qrcode's
+      // formatsToSupport (which doesn't reliably bundle the right readers
+      // on iOS WebKit), @zxing/browser hints construct the MultiFormatReader
+      // synchronously with the exact reader set we ask for.
+      const hints = new Map<DecodeHintType, unknown>();
+      hints.set(DecodeHintType.POSSIBLE_FORMATS, [
+        BarcodeFormat.EAN_13,
+        BarcodeFormat.EAN_8,
+        BarcodeFormat.UPC_A,
+        BarcodeFormat.UPC_E,
+        BarcodeFormat.CODE_128,
+        BarcodeFormat.CODE_39,
+      ]);
+      hints.set(DecodeHintType.TRY_HARDER, true);
+
+      const reader = new BrowserMultiFormatReader(hints);
+
+      this.zxingControls = await reader.decodeFromConstraints(
+        { video: { facingMode: { ideal: 'environment' } } },
+        video,
+        (result, err) => {
           this.debugAttempts.update((n) => n + 1);
-          this.emitResult(decoded);
-        },
-        (errMsg) => {
-          this.debugAttempts.update((n) => n + 1);
-          // Capture only the most recent non-empty message to avoid spam.
-          if (errMsg) this.debugLastError.set(String(errMsg).slice(0, 80));
-          // Inject video state once we have a video element.
-          const v = region.querySelector('video') as HTMLVideoElement | null;
-          if (v) {
-            this.debugVideoState.set(`${v.videoWidth}x${v.videoHeight} rs=${v.readyState}`);
+          this.debugVideoState.set(
+            `${video.videoWidth}x${video.videoHeight} rs=${video.readyState}`,
+          );
+          if (result) {
+            this.emitResult(result.getText());
+            return;
+          }
+          // NotFoundException fires every frame that simply contained no
+          // detectable code — it's the normal "keep scanning" signal, not
+          // an error. Only capture other errors.
+          if (err && !(err instanceof NotFoundException)) {
+            this.debugLastError.set(
+              (err.message ?? String(err)).slice(0, 80),
+            );
           }
         },
       );
@@ -190,18 +193,13 @@ export class CameraScannerComponent implements AfterViewInit, OnDestroy {
       this.mediaStream.getTracks().forEach((t) => t.stop());
       this.mediaStream = null;
     }
-    if (this.html5Qrcode) {
+    if (this.zxingControls) {
       try {
-        await this.html5Qrcode.stop();
+        this.zxingControls.stop();
       } catch {
         // ignore
       }
-      try {
-        await this.html5Qrcode.clear();
-      } catch {
-        // ignore
-      }
-      this.html5Qrcode = null;
+      this.zxingControls = null;
     }
   }
 
