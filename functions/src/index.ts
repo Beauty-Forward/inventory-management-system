@@ -40,9 +40,14 @@ function getVertex(): VertexAI {
   return _vertex;
 }
 
-// Proxies the Open Food Facts public API for barcode lookup.
-// Called when a scanned barcode isn't in the local product_catalog cache.
-// Open Food Facts covers beauty/personal care products under "obf" (Open Beauty Facts).
+// Multi-tier barcode lookup. Cascade order is empirical: UPCitemdb has the best
+// US-retail beauty coverage in practice, so it runs first. OBF/OFF are
+// crowdsourced and uneven; they backstop for international products. Gemini is
+// a last resort because its accuracy is low.
+//
+// Each tier emits a structured log line so we can trace exactly which tier
+// hit/missed/errored for a given scan. Filter in Cloud Logging by:
+//   jsonPayload.fn = "lookupProductByBarcode" AND jsonPayload.barcode = "..."
 export const lookupProductByBarcode = onCall(
   { region: 'us-central1' },
   async (request) => {
@@ -55,50 +60,27 @@ export const lookupProductByBarcode = onCall(
       throw new HttpsError('invalid-argument', 'barcode is required');
     }
 
-    // Tier 1: Open Beauty Facts (beauty-specific crowdsourced DB)
-    // Tier 2: Open Food Facts (food DB, occasionally has beauty items)
-    const openFactsEndpoints = [
-      `https://world.openbeautyfacts.org/api/v2/product/${encodeURIComponent(barcode)}.json`,
-      `https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(barcode)}.json`,
-    ];
-
-    for (const url of openFactsEndpoints) {
-      try {
-        const res = await fetch(url, {
-          headers: { 'User-Agent': 'BeautyForwardIMS/1.0' },
-        });
-        if (!res.ok) continue;
-        const body = (await res.json()) as {
-          status?: number;
-          product?: Record<string, unknown>;
-        };
-        if (body.status !== 1 || !body.product) continue;
-
-        const p = body.product;
-        const name =
-          (p['product_name'] as string) || (p['generic_name'] as string) || '';
-        if (!name) continue;
-
-        return {
-          found: true,
+    const log = (
+      tier: string,
+      outcome: 'hit' | 'miss' | 'error',
+      extras: Record<string, unknown> = {},
+    ) => {
+      console.log(
+        JSON.stringify({
+          fn: 'lookupProductByBarcode',
           barcode,
-          name,
-          brand: (p['brands'] as string)?.split(',')[0]?.trim() ?? '',
-          ingredients: (p['ingredients_text'] as string) ?? '',
-          categories: (p['categories'] as string) ?? '',
-          imageUrl: (p['image_url'] as string) ?? null,
-          source: url.includes('openbeautyfacts')
-            ? 'open_beauty_facts'
-            : 'open_food_facts',
-        };
-      } catch (err) {
-        console.warn(`Open Facts lookup failed for ${url}`, err);
-      }
-    }
+          tier,
+          outcome,
+          ...extras,
+        }),
+      );
+    };
 
-    // Tier 3: UPCitemdb — broader US retail coverage than OBF/OFF.
-    // Trial endpoint is free at ~100 lookups/day, no key. Set
-    // UPCITEMDB_API_KEY to use the paid tier with higher limits.
+    // Tier 1: UPCitemdb — best US retail coverage for beauty products in
+    // practice. Trial endpoint is ~100 lookups/day shared (no key required).
+    // Set UPCITEMDB_API_KEY env var to use the paid endpoint with higher
+    // rate limits — the trial endpoint commonly returns 429 / empty results
+    // under modest production usage.
     try {
       const apiKey = process.env['UPCITEMDB_API_KEY'];
       const upcItemDbUrl = apiKey
@@ -110,9 +92,19 @@ export const lookupProductByBarcode = onCall(
       if (apiKey) headers['user_key'] = apiKey;
 
       const res = await fetch(upcItemDbUrl, { headers });
-      if (res.ok) {
+      if (!res.ok) {
+        log('upcitemdb', 'miss', {
+          httpStatus: res.status,
+          httpStatusText: res.statusText,
+          hasApiKey: !!apiKey,
+          note: res.status === 429
+            ? 'rate limited — trial endpoint shared quota exhausted; set UPCITEMDB_API_KEY'
+            : undefined,
+        });
+      } else {
         const body = (await res.json()) as {
           code?: string;
+          message?: string;
           items?: Array<{
             title?: string;
             brand?: string;
@@ -122,6 +114,10 @@ export const lookupProductByBarcode = onCall(
         };
         const item = body.items?.[0];
         if (body.code === 'OK' && item?.title) {
+          log('upcitemdb', 'hit', {
+            title: item.title.slice(0, 80),
+            brand: item.brand,
+          });
           return {
             found: true,
             barcode,
@@ -133,12 +129,80 @@ export const lookupProductByBarcode = onCall(
             source: 'upcitemdb',
           };
         }
+        log('upcitemdb', 'miss', {
+          bodyCode: body.code,
+          bodyMessage: body.message,
+          itemCount: body.items?.length ?? 0,
+          firstItemTitle: item?.title?.slice(0, 80),
+          hasApiKey: !!apiKey,
+        });
       }
     } catch (err) {
-      console.warn('UPCitemdb lookup failed', err);
+      log('upcitemdb', 'error', { err: String(err).slice(0, 200) });
     }
 
-    // Tier 4: Gemini text fallback — ask the model to identify the product
+    // Tier 2 & 3: Open Beauty Facts → Open Food Facts. Crowdsourced; coverage
+    // varies. OBF is beauty-specific so tried before OFF.
+    const openFactsEndpoints: Array<{
+      url: string;
+      source: 'open_beauty_facts' | 'open_food_facts';
+      tier: 'obf' | 'off';
+    }> = [
+      {
+        url: `https://world.openbeautyfacts.org/api/v2/product/${encodeURIComponent(barcode)}.json`,
+        source: 'open_beauty_facts',
+        tier: 'obf',
+      },
+      {
+        url: `https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(barcode)}.json`,
+        source: 'open_food_facts',
+        tier: 'off',
+      },
+    ];
+
+    for (const { url, source, tier } of openFactsEndpoints) {
+      try {
+        const res = await fetch(url, {
+          headers: { 'User-Agent': 'BeautyForwardIMS/1.0' },
+        });
+        if (!res.ok) {
+          log(tier, 'miss', { httpStatus: res.status });
+          continue;
+        }
+        const body = (await res.json()) as {
+          status?: number;
+          product?: Record<string, unknown>;
+        };
+        if (body.status !== 1 || !body.product) {
+          log(tier, 'miss', { bodyStatus: body.status, hasProduct: !!body.product });
+          continue;
+        }
+
+        const p = body.product;
+        const name =
+          (p['product_name'] as string) || (p['generic_name'] as string) || '';
+        if (!name) {
+          log(tier, 'miss', { reason: 'no name in product' });
+          continue;
+        }
+
+        log(tier, 'hit', { name: name.slice(0, 80) });
+        return {
+          found: true,
+          barcode,
+          name,
+          brand: (p['brands'] as string)?.split(',')[0]?.trim() ?? '',
+          ingredients: (p['ingredients_text'] as string) ?? '',
+          categories: (p['categories'] as string) ?? '',
+          imageUrl: (p['image_url'] as string) ?? null,
+          source,
+        };
+      } catch (err) {
+        log(tier, 'error', { err: String(err).slice(0, 200) });
+      }
+    }
+
+    // Tier 4: Gemini text fallback. Asks the model to identify the product
     // from the UPC/EAN alone. Lower accuracy than the DBs above, so results
     // are flagged low/medium confidence and the UI prompts the volunteer
     // to verify. Only fires for numeric barcodes.
@@ -174,6 +238,10 @@ export const lookupProductByBarcode = onCall(
             confidence?: 'high' | 'medium' | 'low';
           };
           if (parsed.name && parsed.brand && parsed.confidence !== 'low') {
+            log('gemini', 'hit', {
+              confidence: parsed.confidence,
+              name: parsed.name?.slice(0, 80),
+            });
             return {
               found: true,
               barcode,
@@ -187,12 +255,22 @@ export const lookupProductByBarcode = onCall(
               source: 'gemini_text',
             };
           }
+          log('gemini', 'miss', {
+            confidence: parsed.confidence,
+            hasName: !!parsed.name,
+            hasBrand: !!parsed.brand,
+          });
+        } else {
+          log('gemini', 'miss', { reason: 'empty model response' });
         }
       } catch (err) {
-        console.warn('Gemini text lookup failed', err);
+        log('gemini', 'error', { err: String(err).slice(0, 200) });
       }
+    } else {
+      log('gemini', 'miss', { reason: 'barcode not 8-14 digits, skipped' });
     }
 
+    log('cascade', 'miss', { reason: 'all tiers exhausted' });
     return { found: false, barcode };
   }
 );
