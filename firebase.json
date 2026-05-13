@@ -15,7 +15,8 @@
     "source": "dataconnect"
   },
   "functions": {
-    "source": "../donation-delivery-app/functions"
+    "source": "functions",
+    "codebase": "ims"
   },
   "emulators": {
     "auth": {
