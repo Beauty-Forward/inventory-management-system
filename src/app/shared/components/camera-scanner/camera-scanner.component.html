@@ -8,14 +8,25 @@
     <div class="video-wrap">
       <video #videoEl playsinline muted></video>
       <canvas #canvasEl class="capture-canvas"></canvas>
-      <div class="aim-box"></div>
+      @if (status() === 'scanning') {
+        <div class="aim-box"></div>
+      }
+      @if (countdown(); as n) {
+        <div class="countdown-overlay" aria-live="polite">{{ n }}</div>
+      }
     </div>
 
     <div class="status">
       @switch (status()) {
         @case ('starting') { <p>Starting camera…</p> }
         @case ('scanning') { <p>Point at the barcode — we'll take a photo if it doesn't scan</p> }
-        @case ('photo-mode') { <p>No barcode found — using photo to identify…</p> }
+        @case ('photo-mode') {
+          @if (countdown(); as n) {
+            <p>Point at the front of the product — photo in {{ n }}…</p>
+          } @else {
+            <p>Capturing…</p>
+          }
+        }
         @case ('error') {
           <p class="err">{{ errorMessage() }}</p>
         }

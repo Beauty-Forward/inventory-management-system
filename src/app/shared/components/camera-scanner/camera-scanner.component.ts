@@ -47,6 +47,10 @@ export class CameraScannerComponent implements AfterViewInit, OnDestroy {
 
   readonly status = signal<'starting' | 'scanning' | 'photo-mode' | 'error'>('starting');
   readonly errorMessage = signal<string>('');
+  // Seconds remaining before the photo snapshot fires once we enter
+  // photo-mode. Gives the volunteer a moment to reposition the camera
+  // onto the front of the product.
+  readonly countdown = signal<number | null>(null);
 
   // DEBUG: on-screen diagnostics for troubleshooting iOS WebKit. Remove once fixed.
   readonly debugPath = signal<'native' | 'fallback' | 'none'>('none');
@@ -59,6 +63,9 @@ export class CameraScannerComponent implements AfterViewInit, OnDestroy {
   private detectInterval: number | null = null;
   private zxingControls: IScannerControls | null = null;
   private fallbackTimeout: number | null = null;
+  // Set true when stopAll runs (cancel, success, destroy). Lets the
+  // photo-mode countdown loop bail out if the volunteer cancels mid-count.
+  private stopping = false;
 
   async ngAfterViewInit(): Promise<void> {
     const NativeDetector = getNativeDetector();
@@ -208,11 +215,23 @@ export class CameraScannerComponent implements AfterViewInit, OnDestroy {
 
   // Grabs the current video frame as a base64 JPEG and emits captured. Called
   // automatically after FALLBACK_TIMEOUT_MS without a barcode hit, or when the
-  // volunteer clicks "Use photo now."
+  // volunteer clicks Skip barcode. Runs a brief countdown first so the
+  // volunteer has time to point the camera at the product front.
   private async captureFrame(): Promise<void> {
     if (this.status() !== 'scanning') return;
     this.status.set('photo-mode');
     this.clearFallbackTimer();
+
+    for (let i = 3; i > 0; i--) {
+      if (this.stopping) {
+        this.countdown.set(null);
+        return;
+      }
+      this.countdown.set(i);
+      await new Promise((r) => setTimeout(r, 1000));
+    }
+    this.countdown.set(null);
+    if (this.stopping) return;
 
     const video = this.videoElRef?.nativeElement;
     const canvas = this.canvasElRef?.nativeElement;
@@ -249,6 +268,7 @@ export class CameraScannerComponent implements AfterViewInit, OnDestroy {
   }
 
   private async stopAll(): Promise<void> {
+    this.stopping = true;
     this.clearFallbackTimer();
     if (this.detectInterval !== null) {
       clearInterval(this.detectInterval);
