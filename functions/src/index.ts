@@ -12,6 +12,7 @@ const PRODUCT_TYPE_ENUM = [
   'soap', 'body_wash', 'deodorant', 'toothpaste', 'toothbrush', 'feminine_products',
   'nail_polish', 'nail_polish_remover', 'nail_tools',
   'perfume', 'body_spray', 'lotion',
+  'other',
 ] as const;
 
 type ProductType = typeof PRODUCT_TYPE_ENUM[number];

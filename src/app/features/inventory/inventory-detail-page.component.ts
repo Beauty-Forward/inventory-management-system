@@ -20,6 +20,7 @@ const CATEGORY_TYPES: Record<string, string[]> = {
   hygiene: ['soap', 'body_wash', 'lotion', 'deodorant', 'toothpaste', 'toothbrush', 'feminine_products'],
   nail: ['nail_polish', 'nail_polish_remover', 'nail_tools'],
   fragrance: ['perfume', 'body_spray'],
+  other: ['other'],
 };
 
 const SWATCH_BY_CATEGORY: Record<string, SwatchVariant> = {
@@ -29,6 +30,7 @@ const SWATCH_BY_CATEGORY: Record<string, SwatchVariant> = {
   hygiene: 'eucalyptus',
   nail: 'apricot',
   fragrance: 'dust',
+  other: 'cobalt',
 };
 
 @Component({

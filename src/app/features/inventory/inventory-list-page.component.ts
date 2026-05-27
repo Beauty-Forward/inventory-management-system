@@ -26,6 +26,7 @@ type CategoryKey =
   | 'hygiene'
   | 'nail'
   | 'fragrance'
+  | 'other'
   | 'expiring';
 
 const CATEGORY_TYPES: Record<Exclude<CategoryKey, 'all' | 'expiring'>, string[]> = {
@@ -35,6 +36,7 @@ const CATEGORY_TYPES: Record<Exclude<CategoryKey, 'all' | 'expiring'>, string[]>
   hygiene: ['soap', 'body_wash', 'lotion', 'deodorant', 'toothpaste', 'toothbrush', 'feminine_products'],
   nail: ['nail_polish', 'nail_polish_remover', 'nail_tools'],
   fragrance: ['perfume', 'body_spray'],
+  other: ['other'],
 };
 
 const SWATCH_BY_CATEGORY: Record<Exclude<CategoryKey, 'all' | 'expiring'>, SwatchVariant> = {
@@ -44,6 +46,7 @@ const SWATCH_BY_CATEGORY: Record<Exclude<CategoryKey, 'all' | 'expiring'>, Swatc
   hygiene: 'eucalyptus',
   nail: 'apricot',
   fragrance: 'dust',
+  other: 'cobalt',
 };
 
 @Component({
@@ -79,6 +82,7 @@ export class InventoryListPageComponent implements OnInit {
     { key: 'makeup', label: 'color' },
     { key: 'hygiene', label: 'hygiene' },
     { key: 'fragrance', label: 'fragrance' },
+    { key: 'other', label: 'other' },
     { key: 'expiring', label: 'expiring', variant: 'warn' },
   ];
 

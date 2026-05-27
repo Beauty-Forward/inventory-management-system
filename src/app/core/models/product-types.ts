@@ -69,6 +69,10 @@ export const PRODUCT_TYPE_CATEGORIES: ProductTypeCategory[] = [
       { value: 'body_spray', label: 'Body Spray' },
     ],
   },
+  {
+    label: 'Other',
+    types: [{ value: 'other', label: 'Other' }],
+  },
 ];
 
 export const ALL_PRODUCT_TYPES: ProductTypeOption[] =
