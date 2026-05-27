@@ -47,14 +47,21 @@ export class DonationListPageComponent implements OnInit {
   readonly error = signal<string | null>(null);
 
   readonly searchQuery = signal('');
-  readonly activeFilter = signal('all');
+  readonly activeFilter = signal<'incoming' | 'processed' | 'all'>('incoming');
 
   readonly filters: PillFilter[] = [
+    { key: 'incoming', label: 'incoming' },
+    { key: 'processed', label: 'processed' },
     { key: 'all', label: 'all' },
-    { key: 'scheduled', label: 'scheduled' },
-    { key: 'walk-in', label: 'walk-in' },
-    { key: 'shipping', label: 'shipping' },
   ];
+
+  // A donation is "Incoming" if it has no products attached yet — that's
+  // the implicit state signal. Scheduled donations land here via the
+  // delivery-app sync; walk-ins skip Incoming since the manager adds
+  // products in the same intake flow that creates the donation.
+  isIncoming(d: DonationListRow): boolean {
+    return (d.products?.length ?? 0) === 0;
+  }
 
   readonly thisWeekCount = computed(() => {
     const weekAgo = new Date();
@@ -83,7 +90,8 @@ export class DonationListPageComponent implements OnInit {
     const q = this.searchQuery().toLowerCase().trim();
     const f = this.activeFilter();
     return this.donations().filter((d) => {
-      if (f !== 'all' && d.method !== f) return false;
+      if (f === 'incoming' && !this.isIncoming(d)) return false;
+      if (f === 'processed' && this.isIncoming(d)) return false;
       if (q) {
         const hay = `${d.donor.fullName} ${d.donor.email} ${d.id}`.toLowerCase();
         if (!hay.includes(q)) return false;
@@ -91,6 +99,10 @@ export class DonationListPageComponent implements OnInit {
       return true;
     });
   });
+
+  readonly incomingCount = computed(
+    () => this.donations().filter((d) => this.isIncoming(d)).length,
+  );
 
   readonly buckets = computed<DayBucket[]>(() => {
     const today = new Date();

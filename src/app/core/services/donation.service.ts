@@ -1,9 +1,10 @@
 import { Injectable, inject } from '@angular/core';
+import { executeQuery, QueryFetchPolicy } from 'firebase/data-connect';
 import {
   createDonation,
   createProduct,
   getDonation,
-  listRecentDonations,
+  listRecentDonationsRef,
   GetDonationData,
   ListRecentDonationsData,
 } from '../dataconnect';
@@ -29,9 +30,13 @@ export class DonationService {
   private readonly donorService = inject(DonorService);
 
   async listRecent(limit = 20): Promise<DonationListRow[]> {
-    const result = await listRecentDonations(this.firebase.dataConnect, {
-      limit,
-    });
+    // SERVER_ONLY so newly-created donations show up immediately. Same
+    // wrapper-bypass pattern as product.service — the auto-generated
+    // listRecentDonations() drops the fetchPolicy option on the floor.
+    const result = await executeQuery(
+      listRecentDonationsRef(this.firebase.dataConnect, { limit }),
+      { fetchPolicy: QueryFetchPolicy.SERVER_ONLY },
+    );
     return result.data.donations;
   }
 

@@ -1,6 +1,6 @@
 <section class="page">
-  <app-page-header eyebrow="incoming" title="donations">
-    <button class="cta" (click)="startNew()">+ process donation</button>
+  <app-page-header eyebrow="incoming + history" title="donations">
+    <button class="cta" (click)="startNew()">+ register walk-in</button>
   </app-page-header>
 
   <div class="week-strip">
@@ -33,7 +33,7 @@
     (searchChange)="searchQuery.set($event)"
     [filters]="filters"
     [activeKey]="activeFilter()"
-    (filterChange)="activeFilter.set($event)"
+    (filterChange)="activeFilter.set($any($event))"
   />
 
   @if (loading()) {

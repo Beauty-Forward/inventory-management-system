@@ -528,6 +528,9 @@ export interface ListRecentDonationsData {
       fullName: string;
       email: string;
     } & Donor_Key;
+      products: ({
+        id: UUIDString;
+      } & Product_Key)[];
   } & Donation_Key)[];
 }
 
