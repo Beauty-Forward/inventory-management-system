@@ -56,6 +56,41 @@ const TODAY = (): string => {
   return `${yyyy}-${mm}-${dd}`;
 };
 
+function titleCase(value: string): string {
+  return value
+    .toLowerCase()
+    .split(' ')
+    .map((w) => (w ? w[0].toUpperCase() + w.slice(1) : w))
+    .join(' ');
+}
+
+// Brand is a de-dup target: same brand from different lookup sources
+// must converge to one display string, or it shows up as multiple brands
+// in inventory filters / reports / shelter preferences. Always coerce
+// to title-case from lowercased so "CeraVe", "CERAVE", and "cerave" all
+// land as "Cerave". Trade-off: loses internal capitals (CeraVe → Cerave,
+// SuperStay → Superstay). Acceptable cost of consistency.
+function normalizeBrand(value: string | undefined): string | undefined {
+  if (!value) return value;
+  const trimmed = value.trim();
+  if (!trimmed) return trimmed;
+  return titleCase(trimmed);
+}
+
+// Product names are largely unique per donation — de-dup isn't the goal.
+// Only flatten shouty all-caps or all-lowercase strings (which UPCitemdb
+// and OBF often return) for readability. Mixed case is preserved as
+// intentional ("SuperStay Matte Ink Pioneer", "Dr. Bronner's Soap").
+function normalizeName(value: string | undefined): string | undefined {
+  if (!value) return value;
+  const trimmed = value.trim();
+  if (!trimmed) return trimmed;
+  const hasUpper = /[A-Z]/.test(trimmed);
+  const hasLower = /[a-z]/.test(trimmed);
+  if (hasUpper && hasLower) return trimmed;
+  return titleCase(trimmed);
+}
+
 @Component({
   selector: 'app-donation-intake-page',
   standalone: true,
@@ -408,8 +443,8 @@ export class DonationIntakePageComponent {
       next[index] = {
         ...current,
         barcode,
-        name: fill('name', result.name),
-        brand: fill('brand', result.brand),
+        name: fill('name', normalizeName(result.name)),
+        brand: fill('brand', normalizeBrand(result.brand)),
         keyIngredients: fill('keyIngredients', result.keyIngredients),
         price: fill('price', result.price),
         color: fill('color', result.color),
@@ -496,8 +531,8 @@ export class DonationIntakePageComponent {
       };
       next[index] = {
         ...current,
-        name: fill('name', result.name),
-        brand: fill('brand', result.brand),
+        name: fill('name', normalizeName(result.name)),
+        brand: fill('brand', normalizeBrand(result.brand)),
         type: fill('type', result.type) || 'other',
         color: fill('color', result.color),
         colorCategory: fill('colorCategory', result.colorCategory),
