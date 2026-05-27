@@ -12,7 +12,7 @@
   </header>
 
   <div class="field-grid">
-    <div class="form-field full">
+    <div class="form-field full" [class.needs-verify]="lowConfidenceFields.includes('name')">
       <label>Name</label>
       <input
         type="text"
@@ -24,7 +24,7 @@
       @if (errors['name']) {<p class="field-error">{{ errors['name'] }}</p>}
     </div>
 
-    <div class="form-field">
+    <div class="form-field" [class.needs-verify]="lowConfidenceFields.includes('brand')">
       <label>Brand</label>
       <input
         type="text"
@@ -36,7 +36,7 @@
       @if (errors['brand']) {<p class="field-error">{{ errors['brand'] }}</p>}
     </div>
 
-    <div class="form-field">
+    <div class="form-field" [class.needs-verify]="lowConfidenceFields.includes('type')">
       <label>Type</label>
       <select
         class="text-input"
@@ -97,7 +97,7 @@
         />
       </div>
 
-      <div class="form-field">
+      <div class="form-field" [class.needs-verify]="lowConfidenceFields.includes('price')">
         <label>Price</label>
         <input
           type="text"
@@ -108,7 +108,7 @@
         />
       </div>
 
-      <div class="form-field">
+      <div class="form-field" [class.needs-verify]="lowConfidenceFields.includes('color')">
         <label>Color</label>
         <input
           type="text"
@@ -118,7 +118,7 @@
         />
       </div>
 
-      <div class="form-field">
+      <div class="form-field" [class.needs-verify]="lowConfidenceFields.includes('colorCategory')">
         <label>Color Category</label>
         <input
           type="text"
@@ -129,7 +129,7 @@
         />
       </div>
 
-      <div class="form-field full">
+      <div class="form-field full" [class.needs-verify]="lowConfidenceFields.includes('keyIngredients')">
         <label>Key Ingredients</label>
         <input
           type="text"
@@ -178,7 +178,7 @@
         </div>
       }
 
-      <div class="form-field">
+      <div class="form-field" [class.needs-verify]="lowConfidenceFields.includes('size')">
         <label>Size</label>
         <input
           type="text"
