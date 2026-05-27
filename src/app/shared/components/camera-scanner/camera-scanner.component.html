@@ -13,12 +13,6 @@
         <div class="aim-box" [class.wide]="mode() === 'photo'"></div>
       }
 
-      @if (identifyState === 'busy') {
-        <div class="busy-overlay" aria-live="polite">
-          <p class="busy-label">Identifying…</p>
-        </div>
-      }
-
       @if (identifyState === 'failed') {
         <div class="error-overlay" aria-live="assertive">
           <p class="err-headline">Couldn't identify the product</p>

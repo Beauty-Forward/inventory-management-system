@@ -36,11 +36,11 @@ export class CameraScannerComponent implements AfterViewInit, OnDestroy {
   @ViewChild('videoEl') videoElRef?: ElementRef<HTMLVideoElement>;
   @ViewChild('canvasEl') canvasElRef?: ElementRef<HTMLCanvasElement>;
 
-  // Parent-driven identification state. While `identifyState === 'busy'` we
-  // show a centered "Identifying…" overlay on the live video. While
-  // `identifyState === 'failed'` we show an error overlay with a retry CTA
-  // and a hint to switch to barcode mode.
-  @Input() identifyState: 'idle' | 'busy' | 'failed' = 'idle';
+  // Parent-driven identification state. `failed` shows an error overlay
+  // with retry + "scan barcode" buttons. (Parent closes the modal during
+  // the actual Gemini call, so there's no 'busy' state shown here — the
+  // inline message in donation-intake handles that feedback.)
+  @Input() identifyState: 'idle' | 'failed' = 'idle';
   @Input() errorMessage = '';
 
   @Output() scanned = new EventEmitter<string>();

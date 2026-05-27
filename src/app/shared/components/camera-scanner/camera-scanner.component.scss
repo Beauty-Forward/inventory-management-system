@@ -90,26 +90,8 @@
   }
 }
 
-// Centered "Identifying…" overlay shown while the parent runs Gemini.
-.busy-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-}
-
-.busy-label {
-  @include subtitle;
-  color: $porcelain;
-  margin: 0;
-}
-
-// Error overlay shown when Gemini couldn't identify the product. Stays open
-// over the live video so the volunteer can immediately retake or switch to
-// barcode mode without re-opening the modal.
+// Error overlay shown when Gemini couldn't identify the product. The parent
+// re-opens the modal on failure so retake / scan-barcode are one tap away.
 .error-overlay {
   position: absolute;
   inset: 0;

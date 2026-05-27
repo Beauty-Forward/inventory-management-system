@@ -77,10 +77,11 @@ export class DonationIntakePageComponent {
 
   readonly identifyOpen = signal(false);
   readonly identifyTargetIndex = signal<number | null>(null);
-  // Drives the camera-scanner's busy/failed overlays. While Gemini is
-  // analyzing the captured photo this is 'busy'; on failure it stays open
-  // as 'failed' so the volunteer can retry without reopening the modal.
-  readonly identifyState = signal<'idle' | 'busy' | 'failed'>('idle');
+  // 'failed' re-opens the camera modal with the error overlay so the
+  // volunteer can retake or switch to barcode mode without re-tapping
+  // Identify. While Gemini is analyzing, the modal is closed and the
+  // inline lookupMessage handles the feedback.
+  readonly identifyState = signal<'idle' | 'failed'>('idle');
   readonly identifyError = signal<string>('');
   readonly lookupMessage = signal<string | null>(null);
 
@@ -444,33 +445,39 @@ export class DonationIntakePageComponent {
   }
 
   // --- Photo capture: scanner emits `captured` when the volunteer taps the
-  // big capture button. We keep the modal open through the Gemini call so
-  // the volunteer can retry on failure without re-opening it. ---
+  // big capture button. Close the modal immediately so they're not holding
+  // the camera up as if the photo is still being taken; show progress
+  // inline above the form. On failure we re-open the modal in 'failed'
+  // state so retake/scan-barcode are one tap away. ---
 
   async onPhotoCaptured(photo: CapturedPhoto): Promise<void> {
     const index = this.identifyTargetIndex();
     if (index === null) return;
 
-    this.identifyState.set('busy');
+    // Photo's already in flight — let them put the product down.
+    this.identifyOpen.set(false);
+    this.identifyState.set('idle');
     this.identifyError.set('');
+    this.lookupMessage.set('Identifying product from photo…');
+
     const result = await this.barcodeService.identifyFromImage(
       photo.base64,
       photo.mimeType,
     );
 
     if (!result.found) {
-      // Keep the modal open so the volunteer can retake or switch to
-      // barcode mode without re-opening Identify.
+      // Re-open the camera modal with the error overlay so retake / scan
+      // barcode are one tap away.
+      this.lookupMessage.set(null);
       this.identifyState.set('failed');
       this.identifyError.set(
         'Try a clearer shot of the front, or scan the barcode if there is one.',
       );
+      this.identifyOpen.set(true);
       return;
     }
 
-    // Success — close the modal and apply the populate.
-    this.identifyOpen.set(false);
-    this.identifyState.set('idle');
+    // Success — modal stays closed, message goes inline.
 
     const isLowConf =
       result.confidence === 'medium' || result.confidence === 'low';
