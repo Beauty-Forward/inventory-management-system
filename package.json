@@ -8,7 +8,8 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "emulators": "firebase emulators:start --only auth,dataconnect,functions --project beauty-forward --import=./seed/snapshot --export-on-exit=./seed/snapshot",
-    "seed": "node seed/seed.mjs"
+    "seed": "node seed/seed.mjs",
+    "reset-dc-sdk": "git checkout -- src/app/core/dataconnect/"
   },
   "prettier": {
     "printWidth": 100,
