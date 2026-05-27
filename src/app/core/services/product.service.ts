@@ -1,9 +1,10 @@
 import { Injectable, inject } from '@angular/core';
+import { executeQuery, QueryFetchPolicy } from 'firebase/data-connect';
 import {
   getProduct,
   listAvailableProductsForShelter,
   listExpiringSoon,
-  listInventoryInStock,
+  listInventoryInStockRef,
   listProductsInBatch,
   markProductDiscarded,
   markProductExpired,
@@ -21,8 +22,6 @@ export type AvailableForShelterRow =
   ListAvailableProductsForShelterData['products'][number];
 
 export interface InventoryFilter {
-  type?: string;
-  brand?: string;
   limit?: number;
   offset?: number;
 }
@@ -32,12 +31,19 @@ export class ProductService {
   private readonly firebase = inject(FirebaseClientService);
 
   async listInStock(filter: InventoryFilter = {}): Promise<InventoryRow[]> {
-    const result = await listInventoryInStock(this.firebase.dataConnect, {
-      type: filter.type || null,
-      brand: filter.brand || null,
-      limit: filter.limit ?? 100,
-      offset: filter.offset ?? 0,
-    });
+    // Call executeQuery directly with the query ref instead of the
+    // auto-generated `listInventoryInStock` wrapper. The wrapper has a
+    // bug — it passes `options.fetchPolicy` (a string) where executeQuery
+    // expects the full options object, so the SDK never sees SERVER_ONLY
+    // and silently falls back to PREFER_CACHE. Direct call preserves the
+    // policy so the Inventory tab always reflects the latest inserts.
+    const result = await executeQuery(
+      listInventoryInStockRef(this.firebase.dataConnect, {
+        limit: filter.limit ?? 100,
+        offset: filter.offset ?? 0,
+      }),
+      { fetchPolicy: QueryFetchPolicy.SERVER_ONLY },
+    );
     return result.data.products;
   }
 

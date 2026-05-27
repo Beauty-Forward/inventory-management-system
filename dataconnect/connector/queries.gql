@@ -152,14 +152,17 @@ query GetShelter($id: UUID!) @auth(level: PUBLIC) {
 query ListInventoryInStock(
   $limit: Int
   $offset: Int
-  $type: String
-  $brand: String
 ) @auth(level: PUBLIC) {
+  # Returns all in-stock products. The inventory page filters by category
+  # client-side via CATEGORY_TYPES (a category covers multiple type values),
+  # so a single-type server filter wouldn't match the UI anyway. The
+  # previous version of this query took $type / $brand vars — but the only
+  # caller passed null for both, and Data Connect's `{eq: null}` matches
+  # null columns rather than skipping the filter, so the list came back
+  # empty for any product (since `type` is non-nullable in the schema).
   products(
     where: {
       status: { eq: IN_STOCK }
-      type: { eq: $type }
-      brand: { eq: $brand }
     }
     orderBy: [{ createdAt: DESC }]
     limit: $limit

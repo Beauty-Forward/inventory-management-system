@@ -499,8 +499,6 @@ export interface ListInventoryInStockData {
 export interface ListInventoryInStockVariables {
   limit?: number | null;
   offset?: number | null;
-  type?: string | null;
-  brand?: string | null;
 }
 
 export interface ListProductsInBatchData {
