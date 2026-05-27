@@ -8,9 +8,7 @@
     <div class="video-wrap">
       <video #videoEl playsinline muted></video>
       <canvas #canvasEl class="capture-canvas"></canvas>
-      @if (status() === 'scanning') {
-        <div class="aim-box"></div>
-      }
+      <div class="aim-box" [class.wide]="status() === 'photo-mode'"></div>
       @if (countdown(); as n) {
         <div class="countdown-overlay" aria-live="polite">{{ n }}</div>
       }

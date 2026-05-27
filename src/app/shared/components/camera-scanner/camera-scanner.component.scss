@@ -95,6 +95,15 @@
   border-radius: 12px;
   pointer-events: none;
   box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.4);
+  transition: width 0.25s ease, height 0.25s ease, box-shadow 0.25s ease;
+
+  // Photo-mode: expand almost to the full video, leaving a small inset so
+  // the yellow border still reads as a "frame" the volunteer should fill.
+  &.wide {
+    width: calc(100% - 16px);
+    height: calc(100% - 16px);
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.15);
+  }
 }
 
 .countdown-overlay {
