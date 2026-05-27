@@ -78,10 +78,15 @@ export class ProductFormCardComponent {
   @Input({ required: true }) model: ProductFormCardModel = EMPTY_PRODUCT_CARD();
   @Input() errors: Record<string, string> = {};
   @Input() canRemove = true;
+  // Field keys that were auto-populated from a medium/low-confidence source
+  // and should be visually flagged for verification. Cleared by the parent
+  // when the volunteer edits the field.
+  @Input() lowConfidenceFields: string[] = [];
 
   @Output() modelChange = new EventEmitter<ProductFormCardModel>();
   @Output() remove = new EventEmitter<void>();
   @Output() identify = new EventEmitter<void>();
+  @Output() fieldEdited = new EventEmitter<keyof ProductFormCardModel>();
 
   readonly categories = PRODUCT_TYPE_CATEGORIES;
   readonly ungroupedTypes = UNGROUPED_PRODUCT_TYPES;
@@ -109,6 +114,7 @@ export class ProductFormCardComponent {
   ): void {
     this.model = { ...this.model, [key]: value };
     this.modelChange.emit(this.model);
+    this.fieldEdited.emit(key);
   }
 
   toggleExpanded(): void {

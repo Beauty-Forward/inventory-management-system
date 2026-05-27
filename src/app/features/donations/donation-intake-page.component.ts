@@ -97,6 +97,10 @@ export class DonationIntakePageComponent {
   readonly donorLocked = signal(false);
 
   readonly products = signal<ProductFormCardModel[]>([EMPTY_PRODUCT_CARD()]);
+  // Field keys per product index that were just auto-populated from a
+  // medium/low-confidence Gemini result. Drives the red-ring "needs verify"
+  // highlight on the product card. Cleared when the volunteer edits the field.
+  readonly lowConfidenceFlags = signal<Record<number, string[]>>({});
 
   readonly saving = signal(false);
   readonly savingError = signal<string | null>(null);
@@ -231,6 +235,16 @@ export class DonationIntakePageComponent {
 
   removeProduct(index: number): void {
     this.products.update((list) => list.filter((_, i) => i !== index));
+    // Re-key the flags map so it stays aligned with the new array indices.
+    this.lowConfidenceFlags.update((m) => {
+      const next: Record<number, string[]> = {};
+      for (const [k, v] of Object.entries(m)) {
+        const idx = parseInt(k, 10);
+        if (idx < index) next[idx] = v;
+        else if (idx > index) next[idx - 1] = v;
+      }
+      return next;
+    });
   }
 
   updateProduct(index: number, model: ProductFormCardModel): void {
@@ -238,6 +252,18 @@ export class DonationIntakePageComponent {
       const next = [...list];
       next[index] = model;
       return next;
+    });
+  }
+
+  flagsFor(index: number): string[] {
+    return this.lowConfidenceFlags()[index] ?? [];
+  }
+
+  onFieldEdited(index: number, key: keyof ProductFormCardModel): void {
+    this.lowConfidenceFlags.update((m) => {
+      const current = m[index];
+      if (!current || !current.includes(key as string)) return m;
+      return { ...m, [index]: current.filter((k) => k !== key) };
     });
   }
 
@@ -344,21 +370,39 @@ export class DonationIntakePageComponent {
     this.lookupMessage.set(`Looking up ${barcode}…`);
     const result = await this.barcodeService.lookup(barcode);
 
+    const isLowConf =
+      result.confidence === 'medium' || result.confidence === 'low';
+    const flagged: string[] = [];
     this.products.update((list) => {
       const next = [...list];
       const current = next[index] ?? EMPTY_PRODUCT_CARD();
+      // User-typed values always win — auto-populate only fills blanks.
+      // `fill` also collects field names that came from a low-confidence
+      // result so we can ring them in the UI for verification.
+      const fill = <K extends keyof ProductFormCardModel>(
+        key: K,
+        incoming: ProductFormCardModel[K] | undefined,
+      ): ProductFormCardModel[K] => {
+        if (current[key]) return current[key];
+        if (!incoming) return current[key];
+        if (isLowConf) flagged.push(key as string);
+        return incoming;
+      };
       next[index] = {
         ...current,
         barcode,
-        name: result.name || current.name,
-        brand: result.brand || current.brand,
-        keyIngredients: result.keyIngredients || current.keyIngredients,
-        price: result.price || current.price,
-        color: result.color || current.color,
-        type: result.type || current.type,
+        name: fill('name', result.name),
+        brand: fill('brand', result.brand),
+        keyIngredients: fill('keyIngredients', result.keyIngredients),
+        price: fill('price', result.price),
+        color: fill('color', result.color),
+        // Default to 'other' so the volunteer is never left with a blank
+        // type after an Identify — they can still change it manually.
+        type: fill('type', result.type) || 'other',
       };
       return next;
     });
+    this.lowConfidenceFlags.update((m) => ({ ...m, [index]: flagged }));
 
     if (result.found) {
       const sourceLabel = {
@@ -404,21 +448,34 @@ export class DonationIntakePageComponent {
       return;
     }
 
+    const isLowConf =
+      result.confidence === 'medium' || result.confidence === 'low';
+    const flagged: string[] = [];
     this.products.update((list) => {
       const next = [...list];
       const current = next[index] ?? EMPTY_PRODUCT_CARD();
+      const fill = <K extends keyof ProductFormCardModel>(
+        key: K,
+        incoming: ProductFormCardModel[K] | undefined,
+      ): ProductFormCardModel[K] => {
+        if (current[key]) return current[key];
+        if (!incoming) return current[key];
+        if (isLowConf) flagged.push(key as string);
+        return incoming;
+      };
       next[index] = {
         ...current,
-        name: result.name || current.name,
-        brand: result.brand || current.brand,
-        type: result.type || current.type,
-        color: result.color || current.color,
-        colorCategory: result.colorCategory || current.colorCategory,
-        keyIngredients: result.keyIngredients || current.keyIngredients,
-        size: result.size || current.size,
+        name: fill('name', result.name),
+        brand: fill('brand', result.brand),
+        type: fill('type', result.type) || 'other',
+        color: fill('color', result.color),
+        colorCategory: fill('colorCategory', result.colorCategory),
+        keyIngredients: fill('keyIngredients', result.keyIngredients),
+        size: fill('size', result.size),
       };
       return next;
     });
+    this.lowConfidenceFlags.update((m) => ({ ...m, [index]: flagged }));
 
     const confLabel =
       result.confidence === 'high'

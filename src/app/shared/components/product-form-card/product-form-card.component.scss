@@ -86,6 +86,20 @@
     @include field-label;
     color: $muted-ink;
   }
+
+  // Auto-populated from a medium/low-confidence Gemini result — ring + label
+  // badge so the volunteer's eye is drawn to verify. Clears on edit.
+  &.needs-verify {
+    .text-input {
+      border-color: $crimson-deep;
+      box-shadow: 0 0 0 2px rgba($crimson-deep, 0.15);
+    }
+    label::after {
+      content: ' · verify';
+      color: $crimson-deep;
+      font-weight: 700;
+    }
+  }
 }
 
 .text-input {
