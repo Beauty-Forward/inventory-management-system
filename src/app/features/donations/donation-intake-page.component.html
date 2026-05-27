@@ -224,9 +224,11 @@
           [model]="product"
           [errors]="productErrorsAt(i)"
           [canRemove]="products().length > 1"
+          [lowConfidenceFields]="flagsFor(i)"
           (modelChange)="updateProduct(i, $event)"
           (remove)="removeProduct(i)"
           (identify)="openIdentifier(i)"
+          (fieldEdited)="onFieldEdited(i, $event)"
         />
       }
     </div>
