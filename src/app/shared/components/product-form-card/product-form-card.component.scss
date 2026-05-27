@@ -30,8 +30,7 @@
   gap: 5px;
 }
 
-.scan-btn,
-.photo-btn {
+.identify-btn {
   padding: 5px 10px;
   border-radius: 999px;
   font-family: $font-heading;
@@ -43,20 +42,10 @@
   align-items: center;
   gap: 4px;
   transition: background 0.12s ease;
-}
-
-.scan-btn {
   background: $eucalyptus;
   border: 1px solid transparent;
   color: $hunter-green-deep;
   &:hover { filter: brightness(0.95); }
-}
-
-.photo-btn {
-  background: transparent;
-  border: 1px solid rgba(26, 26, 26, 0.15);
-  color: $double-espresso;
-  &:hover { background: $panel-bg; }
 }
 
 .remove-btn {

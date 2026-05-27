@@ -61,6 +61,29 @@
   }
 }
 
+// Hidden scratch surface for grabbing a still frame from the video stream
+// when we fall back to photo identification.
+.capture-canvas {
+  display: none;
+}
+
+.actions {
+  padding: 12px 20px 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.use-photo-btn {
+  @include pill-button-sm('secondary');
+  background: transparent;
+  border: 1px solid rgba($porcelain, 0.35);
+  color: $porcelain;
+
+  &:hover {
+    background: rgba($porcelain, 0.1);
+  }
+}
+
 .aim-box {
   position: absolute;
   top: 50%;
