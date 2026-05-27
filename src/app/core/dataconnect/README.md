@@ -989,8 +989,6 @@ The `ListInventoryInStock` query has an optional argument of type `ListInventory
 export interface ListInventoryInStockVariables {
   limit?: number | null;
   offset?: number | null;
-  type?: string | null;
-  brand?: string | null;
 }
 ```
 ### Return Type
@@ -1031,15 +1029,13 @@ import { connectorConfig, listInventoryInStock, ListInventoryInStockVariables } 
 const listInventoryInStockVars: ListInventoryInStockVariables = {
   limit: ..., // optional
   offset: ..., // optional
-  type: ..., // optional
-  brand: ..., // optional
 };
 
 // Call the `listInventoryInStock()` function to execute the query.
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await listInventoryInStock(listInventoryInStockVars);
 // Variables can be defined inline as well.
-const { data } = await listInventoryInStock({ limit: ..., offset: ..., type: ..., brand: ..., });
+const { data } = await listInventoryInStock({ limit: ..., offset: ..., });
 // Since all variables are optional for this query, you can omit the `ListInventoryInStockVariables` argument.
 const { data } = await listInventoryInStock();
 
@@ -1066,14 +1062,12 @@ import { connectorConfig, listInventoryInStockRef, ListInventoryInStockVariables
 const listInventoryInStockVars: ListInventoryInStockVariables = {
   limit: ..., // optional
   offset: ..., // optional
-  type: ..., // optional
-  brand: ..., // optional
 };
 
 // Call the `listInventoryInStockRef()` function to get a reference to the query.
 const ref = listInventoryInStockRef(listInventoryInStockVars);
 // Variables can be defined inline as well.
-const ref = listInventoryInStockRef({ limit: ..., offset: ..., type: ..., brand: ..., });
+const ref = listInventoryInStockRef({ limit: ..., offset: ..., });
 // Since all variables are optional for this query, you can omit the `ListInventoryInStockVariables` argument.
 const ref = listInventoryInStockRef();
 

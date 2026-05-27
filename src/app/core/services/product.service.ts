@@ -21,8 +21,6 @@ export type AvailableForShelterRow =
   ListAvailableProductsForShelterData['products'][number];
 
 export interface InventoryFilter {
-  type?: string;
-  brand?: string;
   limit?: number;
   offset?: number;
 }
@@ -33,8 +31,6 @@ export class ProductService {
 
   async listInStock(filter: InventoryFilter = {}): Promise<InventoryRow[]> {
     const result = await listInventoryInStock(this.firebase.dataConnect, {
-      type: filter.type || null,
-      brand: filter.brand || null,
       limit: filter.limit ?? 100,
       offset: filter.offset ?? 0,
     });
