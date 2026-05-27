@@ -684,6 +684,14 @@ input Donation_Data {
   """
   donationRequestId_expr: String_Expr @fdc_forbiddenInVariables
   """
+  ✨ Generated from Field `Donation`.`logisticsStatus` of type `String!`
+  """
+  logisticsStatus: String
+  """
+  ✨ `_expr` server value variant of `logisticsStatus` (✨ Generated from Field `Donation`.`logisticsStatus` of type `String!`)
+  """
+  logisticsStatus_expr: String_Expr @fdc_forbiddenInVariables
+  """
   ✨ Generated from Field `Donation`.`method` of type `String!`
   """
   method: String
@@ -773,6 +781,10 @@ input Donation_Filter {
   """
   donationRequestId: String_Filter
   """
+  ✨ Generated from Field `Donation`.`logisticsStatus` of type `String!`
+  """
+  logisticsStatus: String_Filter
+  """
   ✨ Generated from Field `Donation`.`method` of type `String!`
   """
   method: String_Filter
@@ -854,6 +866,10 @@ input Donation_Having {
   ✨ Generated from Field `Donation`.`id_count` of type `Int!`
   """
   id_count: Int_Filter
+  """
+  ✨ Generated from Field `Donation`.`logisticsStatus_count` of type `Int!`
+  """
+  logisticsStatus_count: Int_Filter
   """
   ✨ Generated from Field `Donation`.`method_count` of type `Int!`
   """
@@ -954,6 +970,10 @@ input Donation_Order {
   """
   donationRequestId: OrderDirection
   """
+  ✨ Generated from Field `Donation`.`logisticsStatus` of type `String!`
+  """
+  logisticsStatus: OrderDirection
+  """
   ✨ Generated from Field `Donation`.`method` of type `String!`
   """
   method: OrderDirection
@@ -997,6 +1017,10 @@ input Donation_Order {
   ✨ Generated from Field `Donation`.`id_count` of type `Int!`
   """
   id_count: OrderDirection
+  """
+  ✨ Generated from Field `Donation`.`logisticsStatus_count` of type `Int!`
+  """
+  logisticsStatus_count: OrderDirection
   """
   ✨ Generated from Field `Donation`.`method_count` of type `Int!`
   """

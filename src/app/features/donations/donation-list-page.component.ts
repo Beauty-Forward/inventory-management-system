@@ -47,20 +47,34 @@ export class DonationListPageComponent implements OnInit {
   readonly error = signal<string | null>(null);
 
   readonly searchQuery = signal('');
-  readonly activeFilter = signal<'incoming' | 'processed' | 'all'>('incoming');
+  readonly activeFilter = signal<'incoming' | 'arrived' | 'processed' | 'all'>('arrived');
 
   readonly filters: PillFilter[] = [
     { key: 'incoming', label: 'incoming' },
+    { key: 'arrived', label: 'arrived' },
     { key: 'processed', label: 'processed' },
     { key: 'all', label: 'all' },
   ];
 
-  // A donation is "Incoming" if it has no products attached yet — that's
-  // the implicit state signal. Scheduled donations land here via the
-  // delivery-app sync; walk-ins skip Incoming since the manager adds
-  // products in the same intake flow that creates the donation.
+  // Logistics buckets:
+  //   incoming  — still in flight from the delivery app (logisticsStatus
+  //               is neither 'completed' nor 'walk_in')
+  //   arrived   — physically here, no products attached yet; needs the
+  //               manager's attention. The "Process" CTA shows here.
+  //   processed — has products attached
+  // Walk-ins skip Incoming since the intake flow creates the donation and
+  // its products in one shot, so they land as Processed.
+  isHere(d: DonationListRow): boolean {
+    return d.logisticsStatus === 'completed' || d.logisticsStatus === 'walk_in';
+  }
+  isProcessed(d: DonationListRow): boolean {
+    return (d.products?.length ?? 0) > 0;
+  }
   isIncoming(d: DonationListRow): boolean {
-    return (d.products?.length ?? 0) === 0;
+    return !this.isHere(d) && !this.isProcessed(d);
+  }
+  isArrived(d: DonationListRow): boolean {
+    return this.isHere(d) && !this.isProcessed(d);
   }
 
   readonly thisWeekCount = computed(() => {
@@ -91,7 +105,8 @@ export class DonationListPageComponent implements OnInit {
     const f = this.activeFilter();
     return this.donations().filter((d) => {
       if (f === 'incoming' && !this.isIncoming(d)) return false;
-      if (f === 'processed' && this.isIncoming(d)) return false;
+      if (f === 'arrived' && !this.isArrived(d)) return false;
+      if (f === 'processed' && !this.isProcessed(d)) return false;
       if (q) {
         const hay = `${d.donor.fullName} ${d.donor.email} ${d.id}`.toLowerCase();
         if (!hay.includes(q)) return false;
@@ -100,9 +115,20 @@ export class DonationListPageComponent implements OnInit {
     });
   });
 
-  readonly incomingCount = computed(
-    () => this.donations().filter((d) => this.isIncoming(d)).length,
+  readonly arrivedCount = computed(
+    () => this.donations().filter((d) => this.isArrived(d)).length,
   );
+
+  // Click handler on the Process button shown on Arrived rows — drops
+  // the manager into the products step of intake with the donation
+  // pre-loaded.
+  processArrived(donationId: string, event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.router.navigate(['/donations/new'], {
+      queryParams: { donationId },
+    });
+  }
 
   readonly buckets = computed<DayBucket[]>(() => {
     const today = new Date();

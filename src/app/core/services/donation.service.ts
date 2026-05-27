@@ -84,6 +84,21 @@ export class DonationService {
     return { donationId, donorId, productIds };
   }
 
+  // Used when the manager processes an Arrived donation that came from
+  // the delivery-app sync — the Donation row already exists, we just
+  // need to attach products to it. No donor upsert, no createDonation.
+  async addProductsToDonation(
+    donationId: string,
+    products: ProductFormInput[],
+  ): Promise<string[]> {
+    const productIds: string[] = [];
+    for (const product of products) {
+      const id = await this.createProductForDonation(donationId, product);
+      productIds.push(id);
+    }
+    return productIds;
+  }
+
   async createProductForDonation(
     donationId: string,
     product: ProductFormInput,
