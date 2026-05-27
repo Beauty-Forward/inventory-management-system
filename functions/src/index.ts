@@ -282,7 +282,7 @@ export const lookupProductByBarcode = onCall(
       try {
         const vertex = getVertex();
         const model = vertex.getGenerativeModel({
-          model: 'gemini-1.5-flash',
+          model: 'gemini-2.5-flash',
           generationConfig: {
             responseMimeType: 'application/json',
             responseSchema: extractionSchema,
@@ -371,7 +371,7 @@ export const extractProductFromImage = onCall(
 
     const vertex = getVertex();
     const model = vertex.getGenerativeModel({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-2.5-flash',
       generationConfig: {
         responseMimeType: 'application/json',
         responseSchema: extractionSchema,
