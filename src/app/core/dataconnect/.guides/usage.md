@@ -14,7 +14,7 @@ If a user is not using a supported framework, they can use the generated SDK dir
 Here's an example of how to use it with the first 5 operations:
 
 ```js
-import { createDonor, updateDonor, incrementDonorDonationCount, createDonation, createProduct, allocateProductToBatch, unallocateProduct, markBatchProductsShipped, markProductExpired, markProductDiscarded } from '@bf-ims/dataconnect';
+import { createDonor, updateDonor, incrementDonorDonationCount, createDonation, updateDonationLogistics, createProduct, allocateProductToBatch, unallocateProduct, markBatchProductsShipped, markProductExpired } from '@bf-ims/dataconnect';
 
 
 // Operation CreateDonor:  For variables, look at type CreateDonorVars in ../index.d.ts
@@ -28,6 +28,9 @@ const { data } = await IncrementDonorDonationCount(dataConnect, incrementDonorDo
 
 // Operation CreateDonation:  For variables, look at type CreateDonationVars in ../index.d.ts
 const { data } = await CreateDonation(dataConnect, createDonationVars);
+
+// Operation UpdateDonationLogistics:  For variables, look at type UpdateDonationLogisticsVars in ../index.d.ts
+const { data } = await UpdateDonationLogistics(dataConnect, updateDonationLogisticsVars);
 
 // Operation CreateProduct:  For variables, look at type CreateProductVars in ../index.d.ts
 const { data } = await CreateProduct(dataConnect, createProductVars);
@@ -43,9 +46,6 @@ const { data } = await MarkBatchProductsShipped(dataConnect, markBatchProductsSh
 
 // Operation MarkProductExpired:  For variables, look at type MarkProductExpiredVars in ../index.d.ts
 const { data } = await MarkProductExpired(dataConnect, markProductExpiredVars);
-
-// Operation MarkProductDiscarded:  For variables, look at type MarkProductDiscardedVars in ../index.d.ts
-const { data } = await MarkProductDiscarded(dataConnect, markProductDiscardedVars);
 
 
 ```

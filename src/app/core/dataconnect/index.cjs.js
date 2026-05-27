@@ -80,6 +80,20 @@ exports.createDonation = function createDonation(dcOrVars, vars) {
 }
 ;
 
+const updateDonationLogisticsRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'UpdateDonationLogistics', inputVars);
+}
+updateDonationLogisticsRef.operationName = 'UpdateDonationLogistics';
+exports.updateDonationLogisticsRef = updateDonationLogisticsRef;
+
+exports.updateDonationLogistics = function updateDonationLogistics(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(updateDonationLogisticsRef(dcInstance, inputVars));
+}
+;
+
 const createProductRef = (dcOrVars, vars) => {
   const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
   dcInstance._useGeneratedSdk();
@@ -360,6 +374,21 @@ exports.listRecentDonations = function listRecentDonations(dcOrVars, varsOrOptio
   
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, false);
   return executeQuery(listRecentDonationsRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
+}
+;
+
+const getDonationByRequestIdRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetDonationByRequestId', inputVars);
+}
+getDonationByRequestIdRef.operationName = 'GetDonationByRequestId';
+exports.getDonationByRequestIdRef = getDonationByRequestIdRef;
+
+exports.getDonationByRequestId = function getDonationByRequestId(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getDonationByRequestIdRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
 }
 ;
 

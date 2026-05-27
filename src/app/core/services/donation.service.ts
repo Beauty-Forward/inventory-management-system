@@ -67,6 +67,9 @@ export class DonationService {
       method: input.method,
       notes: input.notes ?? null,
       processedBy,
+      // Walk-in intake never goes through the delivery-app lifecycle.
+      // Scheduled donations get their status set by the Firestore trigger.
+      logisticsStatus: 'walk_in',
     });
     const donationId = donationResult.data.donation_insert.id;
 

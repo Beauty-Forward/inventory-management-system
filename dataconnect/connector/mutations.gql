@@ -75,6 +75,7 @@ mutation CreateDonation(
   $method: String!
   $notes: String
   $processedBy: String!
+  $logisticsStatus: String
 ) @auth(level: PUBLIC) {
   donation_insert(
     data: {
@@ -85,6 +86,27 @@ mutation CreateDonation(
       method: $method
       notes: $notes
       processedBy: $processedBy
+      logisticsStatus: $logisticsStatus
+    }
+  )
+}
+
+# Used by the cross-app sync (Firestore trigger) to update an existing
+# IMS donation's logistics state when the delivery-app `donation_requests`
+# doc transitions through its lifecycle (submitted → … → completed).
+mutation UpdateDonationLogistics(
+  $id: UUID!
+  $logisticsStatus: String!
+  $method: String
+  $notes: String
+) @auth(level: PUBLIC) {
+  donation_update(
+    id: $id
+    data: {
+      logisticsStatus: $logisticsStatus
+      method: $method
+      notes: $notes
+      updatedAt_expr: "request.time"
     }
   )
 }

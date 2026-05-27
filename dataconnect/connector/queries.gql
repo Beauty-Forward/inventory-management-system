@@ -44,6 +44,7 @@ query ListRecentDonations($limit: Int) @auth(level: PUBLIC) {
     date
     method
     notes
+    logisticsStatus
     createdAt
     donor {
       id
@@ -55,6 +56,16 @@ query ListRecentDonations($limit: Int) @auth(level: PUBLIC) {
     products: products_on_donation {
       id
     }
+  }
+}
+
+# Cross-app sync uses this to find an already-synced IMS donation when a
+# `donation_requests` Firestore doc fires a re-write, so we update in
+# place rather than inserting duplicates.
+query GetDonationByRequestId($donationRequestId: String!) @auth(level: PUBLIC) {
+  donations(where: { donationRequestId: { eq: $donationRequestId } }, limit: 1) {
+    id
+    logisticsStatus
   }
 }
 

@@ -11,6 +11,7 @@ This README will guide you through the process of using the generated JavaScript
   - [*GetDonorByEmail*](#getdonorbyemail)
   - [*GetDonor*](#getdonor)
   - [*ListRecentDonations*](#listrecentdonations)
+  - [*GetDonationByRequestId*](#getdonationbyrequestid)
   - [*GetDonation*](#getdonation)
   - [*ListShelters*](#listshelters)
   - [*ListAllShelters*](#listallshelters)
@@ -31,6 +32,7 @@ This README will guide you through the process of using the generated JavaScript
   - [*UpdateDonor*](#updatedonor)
   - [*IncrementDonorDonationCount*](#incrementdonordonationcount)
   - [*CreateDonation*](#createdonation)
+  - [*UpdateDonationLogistics*](#updatedonationlogistics)
   - [*CreateProduct*](#createproduct)
   - [*AllocateProductToBatch*](#allocateproducttobatch)
   - [*UnallocateProduct*](#unallocateproduct)
@@ -382,12 +384,16 @@ export interface ListRecentDonationsData {
     date: DateString;
     method: string;
     notes?: string | null;
+    logisticsStatus: string;
     createdAt: TimestampString;
     donor: {
       id: UUIDString;
       fullName: string;
       email: string;
     } & Donor_Key;
+      products: ({
+        id: UUIDString;
+      } & Product_Key)[];
   } & Donation_Key)[];
 }
 ```
@@ -444,6 +450,118 @@ const ref = listRecentDonationsRef();
 // You can also pass in a `DataConnect` instance to the `QueryRef` function.
 const dataConnect = getDataConnect(connectorConfig);
 const ref = listRecentDonationsRef(dataConnect, listRecentDonationsVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.donations);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.donations);
+});
+```
+
+## GetDonationByRequestId
+You can execute the `GetDonationByRequestId` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getDonationByRequestId(vars: GetDonationByRequestIdVariables, options?: ExecuteQueryOptions): QueryPromise<GetDonationByRequestIdData, GetDonationByRequestIdVariables>;
+
+interface GetDonationByRequestIdRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetDonationByRequestIdVariables): QueryRef<GetDonationByRequestIdData, GetDonationByRequestIdVariables>;
+}
+export const getDonationByRequestIdRef: GetDonationByRequestIdRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getDonationByRequestId(dc: DataConnect, vars: GetDonationByRequestIdVariables, options?: ExecuteQueryOptions): QueryPromise<GetDonationByRequestIdData, GetDonationByRequestIdVariables>;
+
+interface GetDonationByRequestIdRef {
+  ...
+  (dc: DataConnect, vars: GetDonationByRequestIdVariables): QueryRef<GetDonationByRequestIdData, GetDonationByRequestIdVariables>;
+}
+export const getDonationByRequestIdRef: GetDonationByRequestIdRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getDonationByRequestIdRef:
+```typescript
+const name = getDonationByRequestIdRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetDonationByRequestId` query requires an argument of type `GetDonationByRequestIdVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetDonationByRequestIdVariables {
+  donationRequestId: string;
+}
+```
+### Return Type
+Recall that executing the `GetDonationByRequestId` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetDonationByRequestIdData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetDonationByRequestIdData {
+  donations: ({
+    id: UUIDString;
+    logisticsStatus: string;
+  } & Donation_Key)[];
+}
+```
+### Using `GetDonationByRequestId`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getDonationByRequestId, GetDonationByRequestIdVariables } from '@bf-ims/dataconnect';
+
+// The `GetDonationByRequestId` query requires an argument of type `GetDonationByRequestIdVariables`:
+const getDonationByRequestIdVars: GetDonationByRequestIdVariables = {
+  donationRequestId: ..., 
+};
+
+// Call the `getDonationByRequestId()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getDonationByRequestId(getDonationByRequestIdVars);
+// Variables can be defined inline as well.
+const { data } = await getDonationByRequestId({ donationRequestId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getDonationByRequestId(dataConnect, getDonationByRequestIdVars);
+
+console.log(data.donations);
+
+// Or, you can use the `Promise` API.
+getDonationByRequestId(getDonationByRequestIdVars).then((response) => {
+  const data = response.data;
+  console.log(data.donations);
+});
+```
+
+### Using `GetDonationByRequestId`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getDonationByRequestIdRef, GetDonationByRequestIdVariables } from '@bf-ims/dataconnect';
+
+// The `GetDonationByRequestId` query requires an argument of type `GetDonationByRequestIdVariables`:
+const getDonationByRequestIdVars: GetDonationByRequestIdVariables = {
+  donationRequestId: ..., 
+};
+
+// Call the `getDonationByRequestIdRef()` function to get a reference to the query.
+const ref = getDonationByRequestIdRef(getDonationByRequestIdVars);
+// Variables can be defined inline as well.
+const ref = getDonationByRequestIdRef({ donationRequestId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getDonationByRequestIdRef(dataConnect, getDonationByRequestIdVars);
 
 // Call `executeQuery()` on the reference to execute the query.
 // You can use the `await` keyword to wait for the promise to resolve.
@@ -2699,6 +2817,7 @@ export interface CreateDonationVariables {
   method: string;
   notes?: string | null;
   processedBy: string;
+  logisticsStatus?: string | null;
 }
 ```
 ### Return Type
@@ -2725,13 +2844,14 @@ const createDonationVars: CreateDonationVariables = {
   method: ..., 
   notes: ..., // optional
   processedBy: ..., 
+  logisticsStatus: ..., // optional
 };
 
 // Call the `createDonation()` function to execute the mutation.
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await createDonation(createDonationVars);
 // Variables can be defined inline as well.
-const { data } = await createDonation({ donorId: ..., donationRequestId: ..., warehouseReference: ..., date: ..., method: ..., notes: ..., processedBy: ..., });
+const { data } = await createDonation({ donorId: ..., donationRequestId: ..., warehouseReference: ..., date: ..., method: ..., notes: ..., processedBy: ..., logisticsStatus: ..., });
 
 // You can also pass in a `DataConnect` instance to the action shortcut function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -2761,12 +2881,13 @@ const createDonationVars: CreateDonationVariables = {
   method: ..., 
   notes: ..., // optional
   processedBy: ..., 
+  logisticsStatus: ..., // optional
 };
 
 // Call the `createDonationRef()` function to get a reference to the mutation.
 const ref = createDonationRef(createDonationVars);
 // Variables can be defined inline as well.
-const ref = createDonationRef({ donorId: ..., donationRequestId: ..., warehouseReference: ..., date: ..., method: ..., notes: ..., processedBy: ..., });
+const ref = createDonationRef({ donorId: ..., donationRequestId: ..., warehouseReference: ..., date: ..., method: ..., notes: ..., processedBy: ..., logisticsStatus: ..., });
 
 // You can also pass in a `DataConnect` instance to the `MutationRef` function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -2782,6 +2903,124 @@ console.log(data.donation_insert);
 executeMutation(ref).then((response) => {
   const data = response.data;
   console.log(data.donation_insert);
+});
+```
+
+## UpdateDonationLogistics
+You can execute the `UpdateDonationLogistics` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+updateDonationLogistics(vars: UpdateDonationLogisticsVariables): MutationPromise<UpdateDonationLogisticsData, UpdateDonationLogisticsVariables>;
+
+interface UpdateDonationLogisticsRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: UpdateDonationLogisticsVariables): MutationRef<UpdateDonationLogisticsData, UpdateDonationLogisticsVariables>;
+}
+export const updateDonationLogisticsRef: UpdateDonationLogisticsRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+updateDonationLogistics(dc: DataConnect, vars: UpdateDonationLogisticsVariables): MutationPromise<UpdateDonationLogisticsData, UpdateDonationLogisticsVariables>;
+
+interface UpdateDonationLogisticsRef {
+  ...
+  (dc: DataConnect, vars: UpdateDonationLogisticsVariables): MutationRef<UpdateDonationLogisticsData, UpdateDonationLogisticsVariables>;
+}
+export const updateDonationLogisticsRef: UpdateDonationLogisticsRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the updateDonationLogisticsRef:
+```typescript
+const name = updateDonationLogisticsRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `UpdateDonationLogistics` mutation requires an argument of type `UpdateDonationLogisticsVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface UpdateDonationLogisticsVariables {
+  id: UUIDString;
+  logisticsStatus: string;
+  method?: string | null;
+  notes?: string | null;
+}
+```
+### Return Type
+Recall that executing the `UpdateDonationLogistics` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `UpdateDonationLogisticsData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface UpdateDonationLogisticsData {
+  donation_update?: Donation_Key | null;
+}
+```
+### Using `UpdateDonationLogistics`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, updateDonationLogistics, UpdateDonationLogisticsVariables } from '@bf-ims/dataconnect';
+
+// The `UpdateDonationLogistics` mutation requires an argument of type `UpdateDonationLogisticsVariables`:
+const updateDonationLogisticsVars: UpdateDonationLogisticsVariables = {
+  id: ..., 
+  logisticsStatus: ..., 
+  method: ..., // optional
+  notes: ..., // optional
+};
+
+// Call the `updateDonationLogistics()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await updateDonationLogistics(updateDonationLogisticsVars);
+// Variables can be defined inline as well.
+const { data } = await updateDonationLogistics({ id: ..., logisticsStatus: ..., method: ..., notes: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await updateDonationLogistics(dataConnect, updateDonationLogisticsVars);
+
+console.log(data.donation_update);
+
+// Or, you can use the `Promise` API.
+updateDonationLogistics(updateDonationLogisticsVars).then((response) => {
+  const data = response.data;
+  console.log(data.donation_update);
+});
+```
+
+### Using `UpdateDonationLogistics`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, updateDonationLogisticsRef, UpdateDonationLogisticsVariables } from '@bf-ims/dataconnect';
+
+// The `UpdateDonationLogistics` mutation requires an argument of type `UpdateDonationLogisticsVariables`:
+const updateDonationLogisticsVars: UpdateDonationLogisticsVariables = {
+  id: ..., 
+  logisticsStatus: ..., 
+  method: ..., // optional
+  notes: ..., // optional
+};
+
+// Call the `updateDonationLogisticsRef()` function to get a reference to the mutation.
+const ref = updateDonationLogisticsRef(updateDonationLogisticsVars);
+// Variables can be defined inline as well.
+const ref = updateDonationLogisticsRef({ id: ..., logisticsStatus: ..., method: ..., notes: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = updateDonationLogisticsRef(dataConnect, updateDonationLogisticsVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.donation_update);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.donation_update);
 });
 ```
 
