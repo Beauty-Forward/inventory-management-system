@@ -288,8 +288,11 @@
 
   @if (identifyOpen()) {
     <app-camera-scanner
+      [identifyState]="identifyState()"
+      [errorMessage]="identifyError()"
       (scanned)="onBarcodeScanned($event)"
       (captured)="onPhotoCaptured($event)"
+      (retry)="retryIdentify()"
       (cancelled)="closeIdentifier()"
     />
   }

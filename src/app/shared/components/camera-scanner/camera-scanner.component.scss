@@ -67,23 +67,6 @@
   display: none;
 }
 
-.actions {
-  padding: 12px 20px 16px;
-  display: flex;
-  justify-content: center;
-}
-
-.use-photo-btn {
-  @include pill-button-sm('secondary');
-  background: transparent;
-  border: 1px solid rgba($porcelain, 0.35);
-  color: $porcelain;
-
-  &:hover {
-    background: rgba($porcelain, 0.1);
-  }
-}
-
 .aim-box {
   position: absolute;
   top: 50%;
@@ -95,6 +78,74 @@
   border-radius: 12px;
   pointer-events: none;
   box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.4);
+  transition: width 0.25s ease, height 0.25s ease, box-shadow 0.25s ease;
+
+  // Photo mode: yellow frame expands almost to the full video, leaving a
+  // small inset so it still reads as a "fill this frame" guide. Vignette
+  // lightens so the volunteer can see what's outside the framing box.
+  &.wide {
+    width: calc(100% - 16px);
+    height: calc(100% - 16px);
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.15);
+  }
+}
+
+// Error overlay shown when Gemini couldn't identify the product. The parent
+// re-opens the modal on failure so retake / scan-barcode are one tap away.
+.error-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.78);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+  gap: 8px;
+}
+
+.err-headline {
+  @include subtitle;
+  color: $porcelain;
+  margin: 0;
+}
+
+.err-hint {
+  @include p3;
+  color: rgba($porcelain, 0.8);
+  margin: 0;
+  max-width: 280px;
+}
+
+.err-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.err-btn {
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-family: $font-heading;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: filter 0.12s ease, background 0.12s ease;
+}
+
+.err-primary {
+  background: $buttercup;
+  color: $double-espresso;
+  &:hover { filter: brightness(0.95); }
+}
+
+.err-secondary {
+  background: transparent;
+  border-color: rgba($porcelain, 0.35);
+  color: $porcelain;
+  &:hover { background: rgba($porcelain, 0.1); }
 }
 
 .status {
@@ -104,6 +155,87 @@
 
   p { @include p3; margin: 0; color: $porcelain; }
   .err { color: $apricot; }
+}
+
+// Bottom action bar — iOS-camera-style: mode toggle on the left, big circle
+// capture button centered, balanced spacer on the right.
+.actions {
+  padding: 8px 20px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mode-btn {
+  background: transparent;
+  border: 1px solid rgba($porcelain, 0.35);
+  color: $porcelain;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-family: $font-heading;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  transition: background 0.12s ease;
+
+  &:hover {
+    background: rgba($porcelain, 0.1);
+  }
+
+  // When in barcode mode, the photo-toggle is the only action — center it.
+  &.mode-btn-center {
+    margin: 0 auto;
+  }
+}
+
+.mode-icon {
+  font-size: 13px;
+  line-height: 1;
+}
+
+// iOS-camera shutter button: large white circle with an inner ring.
+.capture-btn {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 4px solid $porcelain;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.08s ease;
+
+  &:hover {
+    transform: scale(1.04);
+  }
+  &:active {
+    transform: scale(0.94);
+  }
+}
+
+.capture-ring {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: $porcelain;
+}
+
+// Phantom element matching mode-btn width so the capture button sits
+// optically centered when the mode-btn is in the left slot.
+.action-spacer {
+  flex-shrink: 0;
+  // Approximate the mode-btn width so the capture is visually centered.
+  // Doesn't need to be exact — small asymmetry is fine.
+  width: 132px;
 }
 
 // DEBUG: remove once scanner is fixed. Pinned to top of the screen so it

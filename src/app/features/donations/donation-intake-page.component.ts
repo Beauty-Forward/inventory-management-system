@@ -77,6 +77,12 @@ export class DonationIntakePageComponent {
 
   readonly identifyOpen = signal(false);
   readonly identifyTargetIndex = signal<number | null>(null);
+  // 'failed' re-opens the camera modal with the error overlay so the
+  // volunteer can retake or switch to barcode mode without re-tapping
+  // Identify. While Gemini is analyzing, the modal is closed and the
+  // inline lookupMessage handles the feedback.
+  readonly identifyState = signal<'idle' | 'failed'>('idle');
+  readonly identifyError = signal<string>('');
   readonly lookupMessage = signal<string | null>(null);
 
   readonly step = signal<Step>('lookup');
@@ -354,12 +360,23 @@ export class DonationIntakePageComponent {
   openIdentifier(index: number): void {
     this.identifyTargetIndex.set(index);
     this.identifyOpen.set(true);
+    this.identifyState.set('idle');
+    this.identifyError.set('');
     this.lookupMessage.set(null);
   }
 
   closeIdentifier(): void {
     this.identifyOpen.set(false);
     this.identifyTargetIndex.set(null);
+    this.identifyState.set('idle');
+    this.identifyError.set('');
+  }
+
+  // Camera-scanner's error overlay "Try again" / "Scan barcode" button —
+  // clear the failed state so the volunteer is back in the live camera.
+  retryIdentify(): void {
+    this.identifyState.set('idle');
+    this.identifyError.set('');
   }
 
   async onBarcodeScanned(barcode: string): Promise<void> {
@@ -427,26 +444,40 @@ export class DonationIntakePageComponent {
     setTimeout(() => this.lookupMessage.set(null), 4000);
   }
 
-  // --- Photo fallback: scanner emits `captured` after barcode timeout ---
+  // --- Photo capture: scanner emits `captured` when the volunteer taps the
+  // big capture button. Close the modal immediately so they're not holding
+  // the camera up as if the photo is still being taken; show progress
+  // inline above the form. On failure we re-open the modal in 'failed'
+  // state so retake/scan-barcode are one tap away. ---
 
   async onPhotoCaptured(photo: CapturedPhoto): Promise<void> {
     const index = this.identifyTargetIndex();
-    this.identifyOpen.set(false);
     if (index === null) return;
 
+    // Photo's already in flight — let them put the product down.
+    this.identifyOpen.set(false);
+    this.identifyState.set('idle');
+    this.identifyError.set('');
     this.lookupMessage.set('Identifying product from photo…');
+
     const result = await this.barcodeService.identifyFromImage(
       photo.base64,
       photo.mimeType,
     );
 
     if (!result.found) {
-      this.lookupMessage.set(
-        'Could not identify the product. Try a clearer photo, or fill in manually.',
+      // Re-open the camera modal with the error overlay so retake / scan
+      // barcode are one tap away.
+      this.lookupMessage.set(null);
+      this.identifyState.set('failed');
+      this.identifyError.set(
+        'Try a clearer shot of the front, or scan the barcode if there is one.',
       );
-      setTimeout(() => this.lookupMessage.set(null), 5000);
+      this.identifyOpen.set(true);
       return;
     }
+
+    // Success — modal stays closed, message goes inline.
 
     const isLowConf =
       result.confidence === 'medium' || result.confidence === 'low';
