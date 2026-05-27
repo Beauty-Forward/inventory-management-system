@@ -50,6 +50,11 @@ query ListRecentDonations($limit: Int) @auth(level: PUBLIC) {
       fullName
       email
     }
+    # Just the IDs — used client-side to determine whether the donation
+    # is still Incoming (no products yet) or Processed (has products).
+    products: products_on_donation {
+      id
+    }
   }
 }
 
