@@ -61,6 +61,7 @@ export interface CreateDonationVariables {
   method: string;
   notes?: string | null;
   processedBy: string;
+  logisticsStatus?: string | null;
 }
 
 export interface CreateDonorData {
@@ -224,6 +225,17 @@ export interface GetCatalogByBarcodeData {
 
 export interface GetCatalogByBarcodeVariables {
   barcode: string;
+}
+
+export interface GetDonationByRequestIdData {
+  donations: ({
+    id: UUIDString;
+    logisticsStatus: string;
+  } & Donation_Key)[];
+}
+
+export interface GetDonationByRequestIdVariables {
+  donationRequestId: string;
 }
 
 export interface GetDonationData {
@@ -522,6 +534,7 @@ export interface ListRecentDonationsData {
     date: DateString;
     method: string;
     notes?: string | null;
+    logisticsStatus: string;
     createdAt: TimestampString;
     donor: {
       id: UUIDString;
@@ -629,6 +642,17 @@ export interface UpdateBatchNotesVariables {
   notes?: string | null;
 }
 
+export interface UpdateDonationLogisticsData {
+  donation_update?: Donation_Key | null;
+}
+
+export interface UpdateDonationLogisticsVariables {
+  id: UUIDString;
+  logisticsStatus: string;
+  method?: string | null;
+  notes?: string | null;
+}
+
 export interface UpdateDonorData {
   donor_update?: Donor_Key | null;
 }
@@ -728,6 +752,18 @@ export const createDonationRef: CreateDonationRef;
 
 export function createDonation(vars: CreateDonationVariables): MutationPromise<CreateDonationData, CreateDonationVariables>;
 export function createDonation(dc: DataConnect, vars: CreateDonationVariables): MutationPromise<CreateDonationData, CreateDonationVariables>;
+
+interface UpdateDonationLogisticsRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: UpdateDonationLogisticsVariables): MutationRef<UpdateDonationLogisticsData, UpdateDonationLogisticsVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: UpdateDonationLogisticsVariables): MutationRef<UpdateDonationLogisticsData, UpdateDonationLogisticsVariables>;
+  operationName: string;
+}
+export const updateDonationLogisticsRef: UpdateDonationLogisticsRef;
+
+export function updateDonationLogistics(vars: UpdateDonationLogisticsVariables): MutationPromise<UpdateDonationLogisticsData, UpdateDonationLogisticsVariables>;
+export function updateDonationLogistics(dc: DataConnect, vars: UpdateDonationLogisticsVariables): MutationPromise<UpdateDonationLogisticsData, UpdateDonationLogisticsVariables>;
 
 interface CreateProductRef {
   /* Allow users to create refs without passing in DataConnect */
@@ -968,6 +1004,18 @@ export const listRecentDonationsRef: ListRecentDonationsRef;
 
 export function listRecentDonations(vars?: ListRecentDonationsVariables, options?: ExecuteQueryOptions): QueryPromise<ListRecentDonationsData, ListRecentDonationsVariables>;
 export function listRecentDonations(dc: DataConnect, vars?: ListRecentDonationsVariables, options?: ExecuteQueryOptions): QueryPromise<ListRecentDonationsData, ListRecentDonationsVariables>;
+
+interface GetDonationByRequestIdRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetDonationByRequestIdVariables): QueryRef<GetDonationByRequestIdData, GetDonationByRequestIdVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetDonationByRequestIdVariables): QueryRef<GetDonationByRequestIdData, GetDonationByRequestIdVariables>;
+  operationName: string;
+}
+export const getDonationByRequestIdRef: GetDonationByRequestIdRef;
+
+export function getDonationByRequestId(vars: GetDonationByRequestIdVariables, options?: ExecuteQueryOptions): QueryPromise<GetDonationByRequestIdData, GetDonationByRequestIdVariables>;
+export function getDonationByRequestId(dc: DataConnect, vars: GetDonationByRequestIdVariables, options?: ExecuteQueryOptions): QueryPromise<GetDonationByRequestIdData, GetDonationByRequestIdVariables>;
 
 interface GetDonationRef {
   /* Allow users to create refs without passing in DataConnect */

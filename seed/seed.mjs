@@ -135,6 +135,9 @@ async function run() {
       date,
       method,
       processedBy: FAKE_UID,
+      // Seed acts as if these donations have been received at the warehouse.
+      // Walk-ins use 'walk_in'; scheduled donations get 'completed' (arrived).
+      logisticsStatus: method === 'walk-in' ? 'walk_in' : 'completed',
     })).data.donation_insert.id;
 
     const productIds = [];

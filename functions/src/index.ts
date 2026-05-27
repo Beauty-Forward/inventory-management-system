@@ -1,5 +1,7 @@
 import { initializeApp } from 'firebase-admin/app';
+import { getDataConnect } from 'firebase-admin/data-connect';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
+import { onDocumentWritten } from 'firebase-functions/v2/firestore';
 import { SchemaType, VertexAI } from '@google-cloud/vertexai';
 
 initializeApp();
@@ -426,4 +428,230 @@ export const extractProductFromImage = onCall(
       );
     }
   }
+);
+
+
+// ============================================================
+// Cross-app donation sync (Block B)
+// ============================================================
+// Listens to the delivery app's `donation_requests` collection in
+// Firestore and mirrors each doc into the IMS as a Donation row. Fires
+// on every write so the IMS reflects the full lifecycle (submitted →
+// queued → … → completed), not just terminal arrivals — manager sees
+// in-flight donations too instead of them appearing only on arrival.
+//
+// Idempotent via lookup-by-donationRequestId: a re-fired write or a
+// status update on the same doc updates the existing IMS donation
+// rather than inserting a duplicate.
+
+const DC_CONNECTOR = {
+  serviceId: 'beauty-forward-service',
+  location: 'us-central1',
+  connector: 'bf-ims',
+} as const;
+
+interface DeliveryAppDonationDoc {
+  donationType?: 'pickup' | 'shipping' | 'dropoff';
+  status?: string;
+  createdAt?: string;
+  donor?: {
+    fullName?: string;
+    email?: string;
+    phone?: string;
+  };
+  pickup?: { preferredDate?: string };
+  dropoff?: { preferredDate?: string; referenceCode?: string };
+  shipping?: Record<string, unknown>;
+}
+
+function pickDate(doc: DeliveryAppDonationDoc): string {
+  return (
+    doc.dropoff?.preferredDate ||
+    doc.pickup?.preferredDate ||
+    doc.createdAt?.slice(0, 10) ||
+    new Date().toISOString().slice(0, 10)
+  );
+}
+
+function fallbackWarehouseRef(docId: string): string {
+  // Mirrors the delivery app's dropoffReference format for non-dropoff
+  // donations that have no pre-minted code.
+  const yyyymmdd = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  return `BFD-${yyyymmdd}-${docId.slice(0, 6).toUpperCase()}`;
+}
+
+export const onDonationRequestWrite = onDocumentWritten(
+  'donation_requests/{docId}',
+  async (event) => {
+    const docId = event.params.docId;
+    const after = event.data?.after?.data() as DeliveryAppDonationDoc | undefined;
+
+    if (!after) {
+      console.log(JSON.stringify({ fn: 'donationSync', docId, action: 'deleted-skip' }));
+      return;
+    }
+    if (!after.donor?.email || !after.donationType || !after.status) {
+      console.warn(
+        JSON.stringify({
+          fn: 'donationSync',
+          docId,
+          action: 'incomplete-skip',
+          hasEmail: !!after.donor?.email,
+          hasType: !!after.donationType,
+          hasStatus: !!after.status,
+        }),
+      );
+      return;
+    }
+
+    const dc = getDataConnect(DC_CONNECTOR);
+
+    // 1. Upsert donor by email. Either query existing or create with defaults.
+    interface DonorIdResult {
+      donors: Array<{ id: string }>;
+    }
+    const donorLookup = await dc.executeGraphql<
+      DonorIdResult,
+      { email: string }
+    >(
+      'query Q($email: String!) { donors(where: { email: { eq: $email } }, limit: 1) { id } }',
+      { variables: { email: after.donor.email } },
+    );
+    let donorId = donorLookup.data.donors[0]?.id;
+    if (!donorId) {
+      interface DonorInsertResult {
+        donor_insert: { id: string };
+      }
+      const created = await dc.executeGraphql<
+        DonorInsertResult,
+        {
+          fullName: string;
+          email: string;
+          phone: string;
+          city: string;
+          state: string;
+          linkedRequestId: string;
+        }
+      >(
+        `mutation M($fullName: String!, $email: String!, $phone: String!, $city: String!, $state: String!, $linkedRequestId: String!) {
+          donor_insert(data: {
+            fullName: $fullName, email: $email, phone: $phone,
+            city: $city, state: $state, linkedRequestId: $linkedRequestId
+          })
+        }`,
+        {
+          variables: {
+            fullName: after.donor.fullName ?? '',
+            email: after.donor.email,
+            phone: after.donor.phone ?? '',
+            city: 'Unknown',
+            state: 'NY',
+            linkedRequestId: docId,
+          },
+        },
+      );
+      donorId = created.data.donor_insert.id;
+    }
+
+    // 2. Find existing IMS donation for this Firestore doc, if any.
+    interface DonationLookupResult {
+      donations: Array<{ id: string; logisticsStatus: string }>;
+    }
+    const donationLookup = await dc.executeGraphql<
+      DonationLookupResult,
+      { donationRequestId: string }
+    >(
+      'query Q($donationRequestId: String!) { donations(where: { donationRequestId: { eq: $donationRequestId } }, limit: 1) { id logisticsStatus } }',
+      { variables: { donationRequestId: docId } },
+    );
+
+    const existing = donationLookup.data.donations[0];
+    const method = after.donationType === 'dropoff'
+      ? 'dropoff'
+      : after.donationType === 'pickup'
+        ? 'pickup'
+        : 'shipping';
+
+    if (existing) {
+      // 3a. Update logisticsStatus + method/notes if changed.
+      if (existing.logisticsStatus === after.status) {
+        console.log(
+          JSON.stringify({
+            fn: 'donationSync',
+            docId,
+            action: 'noop-status-unchanged',
+            status: after.status,
+          }),
+        );
+        return;
+      }
+      await dc.executeGraphql<unknown, { id: string; logisticsStatus: string; method: string }>(
+        `mutation M($id: UUID!, $logisticsStatus: String!, $method: String) {
+          donation_update(id: $id, data: { logisticsStatus: $logisticsStatus, method: $method, updatedAt_expr: "request.time" })
+        }`,
+        { variables: { id: existing.id, logisticsStatus: after.status, method } },
+      );
+      console.log(
+        JSON.stringify({
+          fn: 'donationSync',
+          docId,
+          action: 'updated',
+          from: existing.logisticsStatus,
+          to: after.status,
+        }),
+      );
+      return;
+    }
+
+    // 3b. No IMS donation yet — insert one. processedBy is the sync's
+    // sentinel so a human UID isn't fabricated.
+    const warehouseRef = after.dropoff?.referenceCode || fallbackWarehouseRef(docId);
+    interface DonationInsertResult {
+      donation_insert: { id: string };
+    }
+    const inserted = await dc.executeGraphql<
+      DonationInsertResult,
+      {
+        donorId: string;
+        donationRequestId: string;
+        warehouseReference: string;
+        date: string;
+        method: string;
+        processedBy: string;
+        logisticsStatus: string;
+      }
+    >(
+      `mutation M($donorId: UUID!, $donationRequestId: String!, $warehouseReference: String!, $date: Date!, $method: String!, $processedBy: String!, $logisticsStatus: String!) {
+        donation_insert(data: {
+          donorId: $donorId,
+          donationRequestId: $donationRequestId,
+          warehouseReference: $warehouseReference,
+          date: $date,
+          method: $method,
+          processedBy: $processedBy,
+          logisticsStatus: $logisticsStatus
+        })
+      }`,
+      {
+        variables: {
+          donorId,
+          donationRequestId: docId,
+          warehouseReference: warehouseRef,
+          date: pickDate(after),
+          method,
+          processedBy: 'delivery-app-sync',
+          logisticsStatus: after.status,
+        },
+      },
+    );
+    console.log(
+      JSON.stringify({
+        fn: 'donationSync',
+        docId,
+        action: 'inserted',
+        donationId: inserted.data.donation_insert.id,
+        status: after.status,
+      }),
+    );
+  },
 );

@@ -68,6 +68,18 @@ export function createDonation(dcOrVars, vars) {
   return executeMutation(createDonationRef(dcInstance, inputVars));
 }
 
+export const updateDonationLogisticsRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'UpdateDonationLogistics', inputVars);
+}
+updateDonationLogisticsRef.operationName = 'UpdateDonationLogistics';
+
+export function updateDonationLogistics(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(updateDonationLogisticsRef(dcInstance, inputVars));
+}
+
 export const createProductRef = (dcOrVars, vars) => {
   const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
   dcInstance._useGeneratedSdk();
@@ -309,6 +321,19 @@ export function listRecentDonations(dcOrVars, varsOrOptions, options) {
   
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, false);
   return executeQuery(listRecentDonationsRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
+}
+
+export const getDonationByRequestIdRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetDonationByRequestId', inputVars);
+}
+getDonationByRequestIdRef.operationName = 'GetDonationByRequestId';
+
+export function getDonationByRequestId(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getDonationByRequestIdRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
 }
 
 export const getDonationRef = (dcOrVars, vars) => {
