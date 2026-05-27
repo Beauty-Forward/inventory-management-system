@@ -8,7 +8,7 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
-    "serve": "npm run build && firebase emulators:start --only functions",
+    "serve": "npm run build && firebase emulators:start --only auth,dataconnect,functions --project beauty-forward",
     "deploy": "firebase deploy --only functions:ims",
     "logs": "firebase functions:log"
   },

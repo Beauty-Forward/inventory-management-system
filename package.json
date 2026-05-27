@@ -6,7 +6,9 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "emulators": "firebase emulators:start --only auth,dataconnect,functions --project beauty-forward --import=./seed/snapshot --export-on-exit=./seed/snapshot",
+    "seed": "node seed/seed.mjs"
   },
   "prettier": {
     "printWidth": 100,
