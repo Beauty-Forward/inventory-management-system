@@ -11,7 +11,8 @@ const PRODUCT_TYPE_ENUM = [
   'mascara', 'blush', 'bronzer',
   'soap', 'body_wash', 'deodorant', 'toothpaste', 'toothbrush', 'feminine_products',
   'nail_polish', 'nail_polish_remover', 'nail_tools',
-  'perfume', 'body_spray', 'body_lotion',
+  'perfume', 'body_spray', 'lotion', 'balm',
+  'other',
 ] as const;
 
 type ProductType = typeof PRODUCT_TYPE_ENUM[number];
@@ -28,7 +29,6 @@ const CATEGORY_PATTERNS: Array<[RegExp, ProductType]> = [
   [/\bnail\s*polish\s*remover/i, 'nail_polish_remover'],
   [/\bnail\s*polish/i, 'nail_polish'],
   [/\bnail\s*(tools|file|clipper|kit|art)/i, 'nail_tools'],
-  [/\bbody\s*lotion/i, 'body_lotion'],
   [/\bbody\s*(spray|mist)/i, 'body_spray'],
   [/\bbody\s*wash/i, 'body_wash'],
   [/\blip\s*gloss/i, 'lip_gloss'],
@@ -37,11 +37,12 @@ const CATEGORY_PATTERNS: Array<[RegExp, ProductType]> = [
   [/\bhair\s*mask/i, 'hair_mask'],
   [/\b(hair\s*spray|hair\s*gel|hair\s*mousse|hair\s*styling|styling\s*(product|cream|gel))/i, 'styling_product'],
   // Skincare
-  [/\b(moisturizer|moisturiser|face\s*cream|day\s*cream|night\s*cream)/i, 'moisturizer'],
+  [/\b(moisturizer|moisturiser|face\s*cream|day\s*cream|night\s*cream|face\s*lotion)/i, 'moisturizer'],
   [/\b(cleanser|face\s*wash|facial\s*wash|micellar\s*water)/i, 'cleanser'],
   [/\bserum/i, 'serum'],
   [/\b(sunscreen|sunblock|sun\s*protect|spf)/i, 'sunscreen'],
   [/\btoner/i, 'toner'],
+  [/\b(balm|ointment|salve)/i, 'balm'],
   // Makeup
   [/\blipstick/i, 'lipstick'],
   [/\bfoundation/i, 'foundation'],
@@ -53,6 +54,10 @@ const CATEGORY_PATTERNS: Array<[RegExp, ProductType]> = [
   [/\bshampoo/i, 'shampoo'],
   [/\bconditioner/i, 'conditioner'],
   // Body / hygiene
+  // Note: \blotion is ordered BEFORE \bsoap because UPCitemdb sometimes
+  // miscategorizes lotions (e.g. Lubriderm) under "Liquid Hand Soap".
+  // Face-specific lotion is caught earlier by the moisturizer pattern.
+  [/\blotion/i, 'lotion'],
   [/\bsoap/i, 'soap'],
   [/\b(deodorant|antiperspirant)/i, 'deodorant'],
   [/\btoothpaste/i, 'toothpaste'],

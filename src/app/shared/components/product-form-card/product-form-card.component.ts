@@ -6,7 +6,7 @@ import {
   computed,
   signal,
 } from '@angular/core';
-import { PRODUCT_TYPE_CATEGORIES } from '../../../core/models/product-types';
+import { PRODUCT_TYPE_CATEGORIES, UNGROUPED_PRODUCT_TYPES } from '../../../core/models/product-types';
 import type { ProductFormInput } from '../../../core/validators/donation.validators';
 
 export interface ProductFormCardModel {
@@ -85,6 +85,7 @@ export class ProductFormCardComponent {
   @Output() capturePhoto = new EventEmitter<void>();
 
   readonly categories = PRODUCT_TYPE_CATEGORIES;
+  readonly ungroupedTypes = UNGROUPED_PRODUCT_TYPES;
   readonly expanded = signal(false);
 
   readonly isHairCare = computed(() =>
@@ -100,7 +101,7 @@ export class ProductFormCardComponent {
   );
 
   readonly isFragrance = computed(() =>
-    ['perfume', 'body_spray', 'body_lotion'].includes(this.model.type),
+    ['perfume', 'body_spray'].includes(this.model.type),
   );
 
   updateField<K extends keyof ProductFormCardModel>(

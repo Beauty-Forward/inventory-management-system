@@ -77,7 +77,7 @@ async function run() {
     postalCode: '11432',
     contactName: 'Priya Chandra',
     contactEmail: 'priya@northsidewc.org',
-    acceptedTypes: ['feminine_products', 'body_lotion', 'hair_oil', 'cleanser', 'toner'],
+    acceptedTypes: ['feminine_products', 'lotion', 'hair_oil', 'cleanser', 'toner'],
     capacityPerBatch: 60,
   })).data.shelter_insert.id;
 
@@ -151,7 +151,7 @@ async function run() {
     method: 'pickup',
     ref: ref('20260509', 'NMPK0001'),
     products: [
-      { name: 'Daily Moisturizing Lotion', brand: 'CeraVe', type: 'body_lotion', quantity: 2, price: '14.99', details: { size: '12oz' } },
+      { name: 'Daily Moisturizing Lotion', brand: 'CeraVe', type: 'lotion', quantity: 2, price: '14.99', details: { size: '12oz' } },
       { name: 'Hydrating Cleanser', brand: 'CeraVe', type: 'cleanser', quantity: 1, price: '13.99' },
       { name: 'SuperStay Matte Ink', brand: 'Maybelline', type: 'lipstick', quantity: 3, color: 'Pioneer', colorCategory: 'warm red' },
     ],
@@ -227,7 +227,7 @@ async function run() {
   // --- Product Catalog (barcode cache) ---
   console.log('Seeding product catalog…');
   const catalog = [
-    { barcode: '0301871239014', name: 'Daily Moisturizing Lotion', brand: 'CeraVe', type: 'body_lotion', price: '14.99', source: 'seed' },
+    { barcode: '0301871239014', name: 'Daily Moisturizing Lotion', brand: 'CeraVe', type: 'lotion', price: '14.99', source: 'seed' },
     { barcode: '0301871417023', name: 'Hydrating Cleanser', brand: 'CeraVe', type: 'cleanser', price: '13.99', source: 'seed' },
     { barcode: '0022796974938', name: 'Argan Oil Treatment', brand: 'OGX', type: 'hair_oil', price: '8.99', source: 'seed' },
     { barcode: '0041100008060', name: 'Pure Castile Soap', brand: 'Dr. Bronner\'s', type: 'soap', source: 'seed' },

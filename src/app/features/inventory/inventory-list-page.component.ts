@@ -26,15 +26,17 @@ type CategoryKey =
   | 'hygiene'
   | 'nail'
   | 'fragrance'
+  | 'other'
   | 'expiring';
 
 const CATEGORY_TYPES: Record<Exclude<CategoryKey, 'all' | 'expiring'>, string[]> = {
   hair: ['shampoo', 'conditioner', 'hair_oil', 'hair_mask', 'styling_product'],
-  skin: ['moisturizer', 'cleanser', 'serum', 'sunscreen', 'toner'],
+  skin: ['moisturizer', 'cleanser', 'serum', 'sunscreen', 'toner', 'balm'],
   makeup: ['lipstick', 'lip_gloss', 'foundation', 'concealer', 'eyeshadow', 'mascara', 'blush', 'bronzer'],
-  hygiene: ['soap', 'body_wash', 'deodorant', 'toothpaste', 'toothbrush', 'feminine_products'],
+  hygiene: ['soap', 'body_wash', 'lotion', 'deodorant', 'toothpaste', 'toothbrush', 'feminine_products'],
   nail: ['nail_polish', 'nail_polish_remover', 'nail_tools'],
-  fragrance: ['perfume', 'body_spray', 'body_lotion'],
+  fragrance: ['perfume', 'body_spray'],
+  other: ['other'],
 };
 
 const SWATCH_BY_CATEGORY: Record<Exclude<CategoryKey, 'all' | 'expiring'>, SwatchVariant> = {
@@ -44,6 +46,7 @@ const SWATCH_BY_CATEGORY: Record<Exclude<CategoryKey, 'all' | 'expiring'>, Swatc
   hygiene: 'eucalyptus',
   nail: 'apricot',
   fragrance: 'dust',
+  other: 'cobalt',
 };
 
 @Component({
@@ -79,6 +82,7 @@ export class InventoryListPageComponent implements OnInit {
     { key: 'makeup', label: 'color' },
     { key: 'hygiene', label: 'hygiene' },
     { key: 'fragrance', label: 'fragrance' },
+    { key: 'other', label: 'other' },
     { key: 'expiring', label: 'expiring', variant: 'warn' },
   ];
 

@@ -54,6 +54,9 @@
             }
           </optgroup>
         }
+        @for (t of ungroupedTypes; track t.value) {
+          <option [value]="t.value">{{ t.label }}</option>
+        }
       </select>
       @if (errors['type']) {<p class="field-error">{{ errors['type'] }}</p>}
     </div>
