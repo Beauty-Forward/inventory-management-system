@@ -14,6 +14,62 @@ const PRODUCT_TYPE_ENUM = [
   'perfume', 'body_spray', 'body_lotion',
 ] as const;
 
+type ProductType = typeof PRODUCT_TYPE_ENUM[number];
+
+// Maps free-text "categories" strings returned by UPCitemdb / OBF / OFF
+// into our controlled product-type enum. Patterns are ordered most-specific
+// first so compound phrases ("nail polish remover", "body lotion") match
+// before their parent words ("nail polish", "body").
+//
+// Returns undefined when no confident match — the client treats that as
+// "type still blank, ask the volunteer to pick one."
+const CATEGORY_PATTERNS: Array<[RegExp, ProductType]> = [
+  // Compound terms — must come before single-word variants
+  [/\bnail\s*polish\s*remover/i, 'nail_polish_remover'],
+  [/\bnail\s*polish/i, 'nail_polish'],
+  [/\bnail\s*(tools|file|clipper|kit|art)/i, 'nail_tools'],
+  [/\bbody\s*lotion/i, 'body_lotion'],
+  [/\bbody\s*(spray|mist)/i, 'body_spray'],
+  [/\bbody\s*wash/i, 'body_wash'],
+  [/\blip\s*gloss/i, 'lip_gloss'],
+  [/\beye\s*shadow/i, 'eyeshadow'],
+  [/\bhair\s*oil/i, 'hair_oil'],
+  [/\bhair\s*mask/i, 'hair_mask'],
+  [/\b(hair\s*spray|hair\s*gel|hair\s*mousse|hair\s*styling|styling\s*(product|cream|gel))/i, 'styling_product'],
+  // Skincare
+  [/\b(moisturizer|moisturiser|face\s*cream|day\s*cream|night\s*cream)/i, 'moisturizer'],
+  [/\b(cleanser|face\s*wash|facial\s*wash|micellar\s*water)/i, 'cleanser'],
+  [/\bserum/i, 'serum'],
+  [/\b(sunscreen|sunblock|sun\s*protect|spf)/i, 'sunscreen'],
+  [/\btoner/i, 'toner'],
+  // Makeup
+  [/\blipstick/i, 'lipstick'],
+  [/\bfoundation/i, 'foundation'],
+  [/\bconcealer/i, 'concealer'],
+  [/\bmascara/i, 'mascara'],
+  [/\bblusher?\b/i, 'blush'],
+  [/\bbronzer/i, 'bronzer'],
+  // Hair
+  [/\bshampoo/i, 'shampoo'],
+  [/\bconditioner/i, 'conditioner'],
+  // Body / hygiene
+  [/\bsoap/i, 'soap'],
+  [/\b(deodorant|antiperspirant)/i, 'deodorant'],
+  [/\btoothpaste/i, 'toothpaste'],
+  [/\btoothbrush/i, 'toothbrush'],
+  [/\b(feminine|menstrual|sanitary\s*pad|tampon)/i, 'feminine_products'],
+  // Fragrance
+  [/\b(perfume|eau\s*de|cologne|fragrance)/i, 'perfume'],
+];
+
+function categoriesToProductType(categories: string): ProductType | undefined {
+  if (!categories) return undefined;
+  for (const [pattern, type] of CATEGORY_PATTERNS) {
+    if (pattern.test(categories)) return type;
+  }
+  return undefined;
+}
+
 const extractionSchema = {
   type: SchemaType.OBJECT,
   properties: {
@@ -114,15 +170,18 @@ export const lookupProductByBarcode = onCall(
         };
         const item = body.items?.[0];
         if (body.code === 'OK' && item?.title) {
+          const type = categoriesToProductType(item.category ?? '');
           log('upcitemdb', 'hit', {
             title: item.title.slice(0, 80),
             brand: item.brand,
+            mappedType: type,
           });
           return {
             found: true,
             barcode,
             name: item.title,
             brand: item.brand ?? '',
+            type,
             ingredients: '',
             categories: item.category ?? '',
             imageUrl: item.images?.[0] ?? null,
@@ -186,14 +245,17 @@ export const lookupProductByBarcode = onCall(
           continue;
         }
 
-        log(tier, 'hit', { name: name.slice(0, 80) });
+        const categoriesText = (p['categories'] as string) ?? '';
+        const type = categoriesToProductType(categoriesText);
+        log(tier, 'hit', { name: name.slice(0, 80), mappedType: type });
         return {
           found: true,
           barcode,
           name,
           brand: (p['brands'] as string)?.split(',')[0]?.trim() ?? '',
+          type,
           ingredients: (p['ingredients_text'] as string) ?? '',
-          categories: (p['categories'] as string) ?? '',
+          categories: categoriesText,
           imageUrl: (p['image_url'] as string) ?? null,
           source,
         };
