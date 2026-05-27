@@ -47,6 +47,7 @@ export const PRODUCT_TYPE_CATEGORIES: ProductTypeCategory[] = [
     types: [
       { value: 'soap', label: 'Soap' },
       { value: 'body_wash', label: 'Body Wash' },
+      { value: 'lotion', label: 'Lotion' },
       { value: 'deodorant', label: 'Deodorant' },
       { value: 'toothpaste', label: 'Toothpaste' },
       { value: 'toothbrush', label: 'Toothbrush' },
@@ -66,7 +67,6 @@ export const PRODUCT_TYPE_CATEGORIES: ProductTypeCategory[] = [
     types: [
       { value: 'perfume', label: 'Perfume' },
       { value: 'body_spray', label: 'Body Spray' },
-      { value: 'body_lotion', label: 'Body Lotion' },
     ],
   },
 ];

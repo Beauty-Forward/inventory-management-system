@@ -100,7 +100,7 @@ export class ProductFormCardComponent {
   );
 
   readonly isFragrance = computed(() =>
-    ['perfume', 'body_spray', 'body_lotion'].includes(this.model.type),
+    ['perfume', 'body_spray'].includes(this.model.type),
   );
 
   updateField<K extends keyof ProductFormCardModel>(
