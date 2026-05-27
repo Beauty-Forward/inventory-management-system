@@ -11,7 +11,7 @@ const PRODUCT_TYPE_ENUM = [
   'mascara', 'blush', 'bronzer',
   'soap', 'body_wash', 'deodorant', 'toothpaste', 'toothbrush', 'feminine_products',
   'nail_polish', 'nail_polish_remover', 'nail_tools',
-  'perfume', 'body_spray', 'lotion',
+  'perfume', 'body_spray', 'lotion', 'balm',
   'other',
 ] as const;
 
@@ -42,6 +42,7 @@ const CATEGORY_PATTERNS: Array<[RegExp, ProductType]> = [
   [/\bserum/i, 'serum'],
   [/\b(sunscreen|sunblock|sun\s*protect|spf)/i, 'sunscreen'],
   [/\btoner/i, 'toner'],
+  [/\b(balm|ointment|salve)/i, 'balm'],
   // Makeup
   [/\blipstick/i, 'lipstick'],
   [/\bfoundation/i, 'foundation'],

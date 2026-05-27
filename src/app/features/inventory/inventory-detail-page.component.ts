@@ -15,7 +15,7 @@ import { SwatchVariant } from '../../shared/components/swatch-card/swatch-card.c
 
 const CATEGORY_TYPES: Record<string, string[]> = {
   hair: ['shampoo', 'conditioner', 'hair_oil', 'hair_mask', 'styling_product'],
-  skin: ['moisturizer', 'cleanser', 'serum', 'sunscreen', 'toner'],
+  skin: ['moisturizer', 'cleanser', 'serum', 'sunscreen', 'toner', 'balm'],
   makeup: ['lipstick', 'lip_gloss', 'foundation', 'concealer', 'eyeshadow', 'mascara', 'blush', 'bronzer'],
   hygiene: ['soap', 'body_wash', 'lotion', 'deodorant', 'toothpaste', 'toothbrush', 'feminine_products'],
   nail: ['nail_polish', 'nail_polish_remover', 'nail_tools'],
