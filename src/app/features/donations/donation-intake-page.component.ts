@@ -347,15 +347,20 @@ export class DonationIntakePageComponent {
     this.products.update((list) => {
       const next = [...list];
       const current = next[index] ?? EMPTY_PRODUCT_CARD();
+      // User-typed values always win — auto-populate only fills blanks.
+      // The actual workflow is Identify first, then manual corrections, so
+      // this is a quiet safety net for the rare re-scan-after-edit case.
       next[index] = {
         ...current,
         barcode,
-        name: result.name || current.name,
-        brand: result.brand || current.brand,
-        keyIngredients: result.keyIngredients || current.keyIngredients,
-        price: result.price || current.price,
-        color: result.color || current.color,
-        type: result.type || current.type,
+        name: current.name || result.name || '',
+        brand: current.brand || result.brand || '',
+        keyIngredients: current.keyIngredients || result.keyIngredients || '',
+        price: current.price || result.price || '',
+        color: current.color || result.color || '',
+        // Default to 'other' so the volunteer is never left with a blank
+        // type after an Identify — they can still change it manually.
+        type: current.type || result.type || 'other',
       };
       return next;
     });
@@ -409,13 +414,13 @@ export class DonationIntakePageComponent {
       const current = next[index] ?? EMPTY_PRODUCT_CARD();
       next[index] = {
         ...current,
-        name: result.name || current.name,
-        brand: result.brand || current.brand,
-        type: result.type || current.type,
-        color: result.color || current.color,
-        colorCategory: result.colorCategory || current.colorCategory,
-        keyIngredients: result.keyIngredients || current.keyIngredients,
-        size: result.size || current.size,
+        name: current.name || result.name || '',
+        brand: current.brand || result.brand || '',
+        type: current.type || result.type || 'other',
+        color: current.color || result.color || '',
+        colorCategory: current.colorCategory || result.colorCategory || '',
+        keyIngredients: current.keyIngredients || result.keyIngredients || '',
+        size: current.size || result.size || '',
       };
       return next;
     });
