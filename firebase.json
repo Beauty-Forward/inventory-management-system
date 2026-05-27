@@ -14,6 +14,10 @@
   "dataconnect": {
     "source": "dataconnect"
   },
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
   "functions": {
     "source": "functions",
     "codebase": "ims"
@@ -24,6 +28,9 @@
     },
     "dataconnect": {
       "port": 9399
+    },
+    "firestore": {
+      "port": 8080
     },
     "functions": {
       "port": 5001
