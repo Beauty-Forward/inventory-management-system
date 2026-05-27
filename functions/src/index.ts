@@ -62,10 +62,15 @@ const CATEGORY_PATTERNS: Array<[RegExp, ProductType]> = [
   [/\b(perfume|eau\s*de|cologne|fragrance)/i, 'perfume'],
 ];
 
-function categoriesToProductType(categories: string): ProductType | undefined {
-  if (!categories) return undefined;
+// Looks for product-type keywords in the provided strings (typically the
+// categories field, with the product name as a secondary haystack since
+// some sources — UPCitemdb especially — stop the category breadcrumb at a
+// generic level like "Face Makeup" when the name itself says "Foundation").
+function inferProductType(...haystacks: string[]): ProductType | undefined {
+  const text = haystacks.filter(Boolean).join(' ').trim();
+  if (!text) return undefined;
   for (const [pattern, type] of CATEGORY_PATTERNS) {
-    if (pattern.test(categories)) return type;
+    if (pattern.test(text)) return type;
   }
   return undefined;
 }
@@ -170,7 +175,7 @@ export const lookupProductByBarcode = onCall(
         };
         const item = body.items?.[0];
         if (body.code === 'OK' && item?.title) {
-          const type = categoriesToProductType(item.category ?? '');
+          const type = inferProductType(item.category ?? '', item.title ?? '');
           log('upcitemdb', 'hit', {
             title: item.title.slice(0, 80),
             brand: item.brand,
@@ -246,7 +251,7 @@ export const lookupProductByBarcode = onCall(
         }
 
         const categoriesText = (p['categories'] as string) ?? '';
-        const type = categoriesToProductType(categoriesText);
+        const type = inferProductType(categoriesText, name);
         log(tier, 'hit', { name: name.slice(0, 80), mappedType: type });
         return {
           found: true,
