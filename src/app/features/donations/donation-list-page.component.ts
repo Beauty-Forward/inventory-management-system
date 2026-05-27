@@ -47,14 +47,21 @@ export class DonationListPageComponent implements OnInit {
   readonly error = signal<string | null>(null);
 
   readonly searchQuery = signal('');
-  readonly activeFilter = signal('all');
+  readonly activeFilter = signal<'arrived' | 'processed' | 'all'>('arrived');
 
   readonly filters: PillFilter[] = [
+    { key: 'arrived', label: 'arrived' },
+    { key: 'processed', label: 'processed' },
     { key: 'all', label: 'all' },
-    { key: 'scheduled', label: 'scheduled' },
-    { key: 'walk-in', label: 'walk-in' },
-    { key: 'shipping', label: 'shipping' },
   ];
+
+  // A donation is "Arrived" if it has no products attached yet — physically
+  // here but the manager hasn't processed it. (Phase 2 of cross-app sync
+  // will add an "Incoming" tab for donations still in flight from the
+  // delivery app; that needs the new logisticsStatus field to exist.)
+  isArrived(d: DonationListRow): boolean {
+    return (d.products?.length ?? 0) === 0;
+  }
 
   readonly thisWeekCount = computed(() => {
     const weekAgo = new Date();
@@ -83,7 +90,8 @@ export class DonationListPageComponent implements OnInit {
     const q = this.searchQuery().toLowerCase().trim();
     const f = this.activeFilter();
     return this.donations().filter((d) => {
-      if (f !== 'all' && d.method !== f) return false;
+      if (f === 'arrived' && !this.isArrived(d)) return false;
+      if (f === 'processed' && this.isArrived(d)) return false;
       if (q) {
         const hay = `${d.donor.fullName} ${d.donor.email} ${d.id}`.toLowerCase();
         if (!hay.includes(q)) return false;
@@ -91,6 +99,10 @@ export class DonationListPageComponent implements OnInit {
       return true;
     });
   });
+
+  readonly arrivedCount = computed(
+    () => this.donations().filter((d) => this.isArrived(d)).length,
+  );
 
   readonly buckets = computed<DayBucket[]>(() => {
     const today = new Date();
