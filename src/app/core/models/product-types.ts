@@ -70,14 +70,19 @@ export const PRODUCT_TYPE_CATEGORIES: ProductTypeCategory[] = [
       { value: 'body_spray', label: 'Body Spray' },
     ],
   },
-  {
-    label: 'Other',
-    types: [{ value: 'other', label: 'Other' }],
-  },
 ];
 
-export const ALL_PRODUCT_TYPES: ProductTypeOption[] =
-  PRODUCT_TYPE_CATEGORIES.flatMap((c) => c.types);
+// Top-level catch-all options shown ungrouped in the picker — chosen
+// when nothing else fits. Sitting outside PRODUCT_TYPE_CATEGORIES so
+// they don't render as an unselectable <optgroup> header.
+export const UNGROUPED_PRODUCT_TYPES: ProductTypeOption[] = [
+  { value: 'other', label: 'Other' },
+];
+
+export const ALL_PRODUCT_TYPES: ProductTypeOption[] = [
+  ...PRODUCT_TYPE_CATEGORIES.flatMap((c) => c.types),
+  ...UNGROUPED_PRODUCT_TYPES,
+];
 
 export const PRODUCT_TYPE_VALUES: string[] =
   ALL_PRODUCT_TYPES.map((t) => t.value);
