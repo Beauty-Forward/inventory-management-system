@@ -27,6 +27,7 @@ export const PRODUCT_TYPE_CATEGORIES: ProductTypeCategory[] = [
       { value: 'serum', label: 'Serum' },
       { value: 'sunscreen', label: 'Sunscreen' },
       { value: 'toner', label: 'Toner' },
+      { value: 'balm', label: 'Balm' },
     ],
   },
   {
