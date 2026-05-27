@@ -8,36 +8,80 @@
     <div class="video-wrap">
       <video #videoEl playsinline muted></video>
       <canvas #canvasEl class="capture-canvas"></canvas>
-      <div class="aim-box"></div>
+
+      @if (cameraStatus() === 'ready' && identifyState === 'idle') {
+        <div class="aim-box" [class.wide]="mode() === 'photo'"></div>
+      }
+
+      @if (identifyState === 'busy') {
+        <div class="busy-overlay" aria-live="polite">
+          <p class="busy-label">Identifying…</p>
+        </div>
+      }
+
+      @if (identifyState === 'failed') {
+        <div class="error-overlay" aria-live="assertive">
+          <p class="err-headline">Couldn't identify the product</p>
+          <p class="err-hint">
+            {{ errorMessage || 'Try a clearer shot of the front, or scan the barcode if there is one.' }}
+          </p>
+          <div class="err-actions">
+            <button type="button" class="err-btn err-primary" (click)="onRetry()">Try again</button>
+            <button type="button" class="err-btn err-secondary" (click)="onSwitchToBarcode()">
+              Scan barcode
+            </button>
+          </div>
+        </div>
+      }
     </div>
 
     <div class="status">
-      @switch (status()) {
+      @switch (cameraStatus()) {
         @case ('starting') { <p>Starting camera…</p> }
-        @case ('scanning') { <p>Point at the barcode — we'll take a photo if it doesn't scan</p> }
-        @case ('photo-mode') { <p>No barcode found — using photo to identify…</p> }
-        @case ('error') {
-          <p class="err">{{ errorMessage() }}</p>
+        @case ('error') { <p class="err">{{ cameraError() }}</p> }
+        @case ('ready') {
+          @if (identifyState === 'idle') {
+            @switch (mode()) {
+              @case ('photo') { <p>Aim at the front of the product, then tap to capture</p> }
+              @case ('barcode') { <p>Point at the barcode</p> }
+            }
+          }
         }
       }
     </div>
 
-    @if (status() === 'scanning') {
+    @if (cameraStatus() === 'ready' && identifyState === 'idle') {
       <div class="actions">
-        <button type="button" class="use-photo-btn" (click)="usePhotoNow()">
-          Skip barcode
-        </button>
+        @if (mode() === 'photo') {
+          <button type="button" class="mode-btn" (click)="toggleMode()">
+            <span class="mode-icon" aria-hidden="true">║║</span>
+            Scan barcode
+          </button>
+          <button
+            type="button"
+            class="capture-btn"
+            (click)="capturePhoto()"
+            aria-label="Capture photo"
+          >
+            <span class="capture-ring"></span>
+          </button>
+          <span class="action-spacer" aria-hidden="true"></span>
+        } @else {
+          <button type="button" class="mode-btn mode-btn-center" (click)="toggleMode()">
+            <span class="mode-icon" aria-hidden="true">◯</span>
+            Take photo instead
+          </button>
+        }
       </div>
     }
 
     <!-- DEBUG: remove once scanner is fixed. Diagnostic readout for iOS troubleshooting. -->
     <div class="debug">
-      <p>path: <b>{{ debugPath() }}</b></p>
+      <p>mode: <b>{{ mode() }}</b></p>
+      <p>cam: <b>{{ cameraStatus() }}</b></p>
+      <p>identify: <b>{{ identifyState }}</b></p>
       <p>attempts: <b>{{ debugAttempts() }}</b></p>
       <p>video: <b>{{ debugVideoState() || '—' }}</b></p>
-      @if (debugSupportedFormats()) {
-        <p>fmts: <b>{{ debugSupportedFormats() }}</b></p>
-      }
       @if (debugLastError()) {
         <p>last err: <b>{{ debugLastError() }}</b></p>
       }

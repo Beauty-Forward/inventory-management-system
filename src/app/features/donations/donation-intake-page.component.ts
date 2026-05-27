@@ -77,6 +77,11 @@ export class DonationIntakePageComponent {
 
   readonly identifyOpen = signal(false);
   readonly identifyTargetIndex = signal<number | null>(null);
+  // Drives the camera-scanner's busy/failed overlays. While Gemini is
+  // analyzing the captured photo this is 'busy'; on failure it stays open
+  // as 'failed' so the volunteer can retry without reopening the modal.
+  readonly identifyState = signal<'idle' | 'busy' | 'failed'>('idle');
+  readonly identifyError = signal<string>('');
   readonly lookupMessage = signal<string | null>(null);
 
   readonly step = signal<Step>('lookup');
@@ -354,12 +359,23 @@ export class DonationIntakePageComponent {
   openIdentifier(index: number): void {
     this.identifyTargetIndex.set(index);
     this.identifyOpen.set(true);
+    this.identifyState.set('idle');
+    this.identifyError.set('');
     this.lookupMessage.set(null);
   }
 
   closeIdentifier(): void {
     this.identifyOpen.set(false);
     this.identifyTargetIndex.set(null);
+    this.identifyState.set('idle');
+    this.identifyError.set('');
+  }
+
+  // Camera-scanner's error overlay "Try again" / "Scan barcode" button —
+  // clear the failed state so the volunteer is back in the live camera.
+  retryIdentify(): void {
+    this.identifyState.set('idle');
+    this.identifyError.set('');
   }
 
   async onBarcodeScanned(barcode: string): Promise<void> {
@@ -427,26 +443,34 @@ export class DonationIntakePageComponent {
     setTimeout(() => this.lookupMessage.set(null), 4000);
   }
 
-  // --- Photo fallback: scanner emits `captured` after barcode timeout ---
+  // --- Photo capture: scanner emits `captured` when the volunteer taps the
+  // big capture button. We keep the modal open through the Gemini call so
+  // the volunteer can retry on failure without re-opening it. ---
 
   async onPhotoCaptured(photo: CapturedPhoto): Promise<void> {
     const index = this.identifyTargetIndex();
-    this.identifyOpen.set(false);
     if (index === null) return;
 
-    this.lookupMessage.set('Identifying product from photo…');
+    this.identifyState.set('busy');
+    this.identifyError.set('');
     const result = await this.barcodeService.identifyFromImage(
       photo.base64,
       photo.mimeType,
     );
 
     if (!result.found) {
-      this.lookupMessage.set(
-        'Could not identify the product. Try a clearer photo, or fill in manually.',
+      // Keep the modal open so the volunteer can retake or switch to
+      // barcode mode without re-opening Identify.
+      this.identifyState.set('failed');
+      this.identifyError.set(
+        'Try a clearer shot of the front, or scan the barcode if there is one.',
       );
-      setTimeout(() => this.lookupMessage.set(null), 5000);
       return;
     }
+
+    // Success — close the modal and apply the populate.
+    this.identifyOpen.set(false);
+    this.identifyState.set('idle');
 
     const isLowConf =
       result.confidence === 'medium' || result.confidence === 'low';
