@@ -7,10 +7,7 @@ import {
   toProductFormInput,
 } from '../../shared/components/product-form-card/product-form-card.component';
 import { CameraScannerComponent } from '../../shared/components/camera-scanner/camera-scanner.component';
-import {
-  CapturedPhoto,
-  PhotoCaptureComponent,
-} from '../../shared/components/photo-capture/photo-capture.component';
+import { CapturedPhoto } from '../../shared/components/photo-capture/photo-capture.component';
 import { CrumbComponent } from '../../shared/components/crumb/crumb.component';
 import { StepperComponent, StepperStep } from '../../shared/components/stepper/stepper.component';
 import { AuthService } from '../../core/services/auth.service';
@@ -65,7 +62,6 @@ const TODAY = (): string => {
   imports: [
     ProductFormCardComponent,
     CameraScannerComponent,
-    PhotoCaptureComponent,
     CrumbComponent,
     StepperComponent,
   ],
@@ -79,10 +75,8 @@ export class DonationIntakePageComponent {
   private readonly authService = inject(AuthService);
   private readonly barcodeService = inject(BarcodeLookupService);
 
-  readonly scannerOpen = signal(false);
-  readonly scannerTargetIndex = signal<number | null>(null);
-  readonly photoCaptureOpen = signal(false);
-  readonly photoTargetIndex = signal<number | null>(null);
+  readonly identifyOpen = signal(false);
+  readonly identifyTargetIndex = signal<number | null>(null);
   readonly lookupMessage = signal<string | null>(null);
 
   readonly step = signal<Step>('lookup');
@@ -331,20 +325,20 @@ export class DonationIntakePageComponent {
     return out;
   }
 
-  openScanner(index: number): void {
-    this.scannerTargetIndex.set(index);
-    this.scannerOpen.set(true);
+  openIdentifier(index: number): void {
+    this.identifyTargetIndex.set(index);
+    this.identifyOpen.set(true);
     this.lookupMessage.set(null);
   }
 
-  closeScanner(): void {
-    this.scannerOpen.set(false);
-    this.scannerTargetIndex.set(null);
+  closeIdentifier(): void {
+    this.identifyOpen.set(false);
+    this.identifyTargetIndex.set(null);
   }
 
   async onBarcodeScanned(barcode: string): Promise<void> {
-    const index = this.scannerTargetIndex();
-    this.scannerOpen.set(false);
+    const index = this.identifyTargetIndex();
+    this.identifyOpen.set(false);
     if (index === null) return;
 
     this.lookupMessage.set(`Looking up ${barcode}…`);
@@ -389,22 +383,11 @@ export class DonationIntakePageComponent {
     setTimeout(() => this.lookupMessage.set(null), 4000);
   }
 
-  // --- Photo capture + Gemini extraction ---
-
-  openPhotoCapture(index: number): void {
-    this.photoTargetIndex.set(index);
-    this.photoCaptureOpen.set(true);
-    this.lookupMessage.set(null);
-  }
-
-  closePhotoCapture(): void {
-    this.photoCaptureOpen.set(false);
-    this.photoTargetIndex.set(null);
-  }
+  // --- Photo fallback: scanner emits `captured` after barcode timeout ---
 
   async onPhotoCaptured(photo: CapturedPhoto): Promise<void> {
-    const index = this.photoTargetIndex();
-    this.photoCaptureOpen.set(false);
+    const index = this.identifyTargetIndex();
+    this.identifyOpen.set(false);
     if (index === null) return;
 
     this.lookupMessage.set('Identifying product from photo…');

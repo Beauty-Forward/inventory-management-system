@@ -226,8 +226,7 @@
           [canRemove]="products().length > 1"
           (modelChange)="updateProduct(i, $event)"
           (remove)="removeProduct(i)"
-          (scanBarcode)="openScanner(i)"
-          (capturePhoto)="openPhotoCapture(i)"
+          (identify)="openIdentifier(i)"
         />
       }
     </div>
@@ -285,17 +284,11 @@
     </div>
   }
 
-  @if (scannerOpen()) {
+  @if (identifyOpen()) {
     <app-camera-scanner
       (scanned)="onBarcodeScanned($event)"
-      (cancelled)="closeScanner()"
-    />
-  }
-
-  @if (photoCaptureOpen()) {
-    <app-photo-capture
       (captured)="onPhotoCaptured($event)"
-      (cancelled)="closePhotoCapture()"
+      (cancelled)="closeIdentifier()"
     />
   }
 </section>

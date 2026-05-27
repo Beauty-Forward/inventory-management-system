@@ -10,12 +10,19 @@ import {
 } from '@angular/core';
 import { BrowserMultiFormatReader, IScannerControls } from '@zxing/browser';
 import { BarcodeFormat, DecodeHintType, NotFoundException } from '@zxing/library';
+import { CapturedPhoto } from '../photo-capture/photo-capture.component';
 
 type BarcodeDetectorCtor = new (config?: {
   formats?: string[];
 }) => {
   detect: (source: HTMLVideoElement) => Promise<Array<{ rawValue: string }>>;
 };
+
+// How long to scan for a barcode before falling back to a photo capture.
+// Picked empirically: long enough to lock onto an angled or motion-blurred
+// barcode, short enough that volunteers don't feel stuck waiting on a
+// product that simply has no readable code.
+const FALLBACK_TIMEOUT_MS = 5000;
 
 // Native BarcodeDetector is available in Chromium browsers (Android Chrome).
 // iOS WebKit (including Chrome on iPhone) lacks it — we fall back to @zxing/browser.
@@ -32,11 +39,13 @@ function getNativeDetector(): BarcodeDetectorCtor | null {
 })
 export class CameraScannerComponent implements AfterViewInit, OnDestroy {
   @ViewChild('videoEl') videoElRef?: ElementRef<HTMLVideoElement>;
+  @ViewChild('canvasEl') canvasElRef?: ElementRef<HTMLCanvasElement>;
 
   @Output() scanned = new EventEmitter<string>();
+  @Output() captured = new EventEmitter<CapturedPhoto>();
   @Output() cancelled = new EventEmitter<void>();
 
-  readonly status = signal<'starting' | 'scanning' | 'error'>('starting');
+  readonly status = signal<'starting' | 'scanning' | 'photo-mode' | 'error'>('starting');
   readonly errorMessage = signal<string>('');
 
   // DEBUG: on-screen diagnostics for troubleshooting iOS WebKit. Remove once fixed.
@@ -49,6 +58,7 @@ export class CameraScannerComponent implements AfterViewInit, OnDestroy {
   private mediaStream: MediaStream | null = null;
   private detectInterval: number | null = null;
   private zxingControls: IScannerControls | null = null;
+  private fallbackTimeout: number | null = null;
 
   async ngAfterViewInit(): Promise<void> {
     const NativeDetector = getNativeDetector();
@@ -72,6 +82,7 @@ export class CameraScannerComponent implements AfterViewInit, OnDestroy {
       video.srcObject = this.mediaStream;
       await video.play();
       this.status.set('scanning');
+      this.startFallbackTimer();
 
       // DEBUG: report supported formats so we know whether our list is valid.
       try {
@@ -162,6 +173,7 @@ export class CameraScannerComponent implements AfterViewInit, OnDestroy {
         },
       );
       this.status.set('scanning');
+      this.startFallbackTimer();
     } catch (err) {
       console.error('Fallback scanner failed', err);
       this.debugLastError.set(`fallback-init: ${String(err).slice(0, 60)}`);
@@ -179,12 +191,65 @@ export class CameraScannerComponent implements AfterViewInit, OnDestroy {
     this.scanned.emit(trimmed);
   }
 
+  private startFallbackTimer(): void {
+    if (this.fallbackTimeout !== null) return;
+    this.fallbackTimeout = window.setTimeout(
+      () => void this.captureFrame(),
+      FALLBACK_TIMEOUT_MS,
+    );
+  }
+
+  private clearFallbackTimer(): void {
+    if (this.fallbackTimeout !== null) {
+      clearTimeout(this.fallbackTimeout);
+      this.fallbackTimeout = null;
+    }
+  }
+
+  // Grabs the current video frame as a base64 JPEG and emits captured. Called
+  // automatically after FALLBACK_TIMEOUT_MS without a barcode hit, or when the
+  // volunteer clicks "Use photo now."
+  private async captureFrame(): Promise<void> {
+    if (this.status() !== 'scanning') return;
+    this.status.set('photo-mode');
+    this.clearFallbackTimer();
+
+    const video = this.videoElRef?.nativeElement;
+    const canvas = this.canvasElRef?.nativeElement;
+    if (!video || !canvas || !video.videoWidth) {
+      // Camera never produced a frame — give up gracefully.
+      await this.stopAll();
+      this.cancelled.emit();
+      return;
+    }
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      await this.stopAll();
+      this.cancelled.emit();
+      return;
+    }
+    ctx.drawImage(video, 0, 0);
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+    const base64 = dataUrl.split(',')[1] ?? '';
+
+    await this.stopAll();
+    this.captured.emit({ base64, mimeType: 'image/jpeg' });
+  }
+
+  async usePhotoNow(): Promise<void> {
+    await this.captureFrame();
+  }
+
   async onCancel(): Promise<void> {
     await this.stopAll();
     this.cancelled.emit();
   }
 
   private async stopAll(): Promise<void> {
+    this.clearFallbackTimer();
     if (this.detectInterval !== null) {
       clearInterval(this.detectInterval);
       this.detectInterval = null;

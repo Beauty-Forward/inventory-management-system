@@ -81,8 +81,7 @@ export class ProductFormCardComponent {
 
   @Output() modelChange = new EventEmitter<ProductFormCardModel>();
   @Output() remove = new EventEmitter<void>();
-  @Output() scanBarcode = new EventEmitter<void>();
-  @Output() capturePhoto = new EventEmitter<void>();
+  @Output() identify = new EventEmitter<void>();
 
   readonly categories = PRODUCT_TYPE_CATEGORIES;
   readonly ungroupedTypes = UNGROUPED_PRODUCT_TYPES;
@@ -120,11 +119,7 @@ export class ProductFormCardComponent {
     this.remove.emit();
   }
 
-  onScanBarcode(): void {
-    this.scanBarcode.emit();
-  }
-
-  onCapturePhoto(): void {
-    this.capturePhoto.emit();
+  onIdentify(): void {
+    this.identify.emit();
   }
 }

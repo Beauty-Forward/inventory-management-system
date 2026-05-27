@@ -1,24 +1,34 @@
-<div class="overlay" role="dialog" aria-label="Scan barcode">
+<div class="overlay" role="dialog" aria-label="Identify product">
   <div class="viewport">
     <header class="head">
-      <span class="title">Scan barcode</span>
+      <span class="title">Identify product</span>
       <button type="button" class="close-btn" (click)="onCancel()" aria-label="Close">×</button>
     </header>
 
     <div class="video-wrap">
       <video #videoEl playsinline muted></video>
+      <canvas #canvasEl class="capture-canvas"></canvas>
       <div class="aim-box"></div>
     </div>
 
     <div class="status">
       @switch (status()) {
         @case ('starting') { <p>Starting camera…</p> }
-        @case ('scanning') { <p>Point at the barcode</p> }
+        @case ('scanning') { <p>Point at the barcode — we'll take a photo if it doesn't scan</p> }
+        @case ('photo-mode') { <p>No barcode found — using photo to identify…</p> }
         @case ('error') {
           <p class="err">{{ errorMessage() }}</p>
         }
       }
     </div>
+
+    @if (status() === 'scanning') {
+      <div class="actions">
+        <button type="button" class="use-photo-btn" (click)="usePhotoNow()">
+          Use photo instead
+        </button>
+      </div>
+    }
 
     <!-- DEBUG: remove once scanner is fixed. Diagnostic readout for iOS troubleshooting. -->
     <div class="debug">
