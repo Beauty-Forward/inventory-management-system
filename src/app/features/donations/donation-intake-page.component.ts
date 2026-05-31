@@ -1,5 +1,5 @@
-import { Component, computed, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   ProductFormCardComponent,
   ProductFormCardModel,
@@ -103,12 +103,18 @@ function normalizeName(value: string | undefined): string | undefined {
   templateUrl: './donation-intake-page.component.html',
   styleUrl: './donation-intake-page.component.scss',
 })
-export class DonationIntakePageComponent {
+export class DonationIntakePageComponent implements OnInit {
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly donationService = inject(DonationService);
   private readonly referenceService = inject(ReferenceLookupService);
   private readonly authService = inject(AuthService);
   private readonly barcodeService = inject(BarcodeLookupService);
+
+  // When set, the intake skips lookup/donor steps and lands straight on
+  // products — the donation already exists (created by the delivery-app
+  // sync), the manager just needs to attach products to it.
+  readonly preLoadedDonationId = signal<string | null>(null);
 
   readonly identifyOpen = signal(false);
   readonly identifyTargetIndex = signal<number | null>(null);
@@ -177,6 +183,47 @@ export class DonationIntakePageComponent {
       return acc + q * price;
     }, 0),
   );
+
+  // --- Pre-load path: open this page with ?donationId=xxx to add products
+  // to an existing Donation (created by the delivery-app sync). ---
+
+  async ngOnInit(): Promise<void> {
+    const id = this.route.snapshot.queryParamMap.get('donationId');
+    if (id) await this.preLoadDonation(id);
+  }
+
+  private async preLoadDonation(id: string): Promise<void> {
+    const donation = await this.donationService.get(id);
+    if (!donation) {
+      this.lookupError.set('Could not find that donation.');
+      return;
+    }
+    this.preLoadedDonationId.set(id);
+    this.donationRequestId.set(donation.donationRequestId ?? '');
+    this.warehouseReference.set(donation.warehouseReference);
+    this.referenceCode.set(donation.warehouseReference);
+    this.donationMethod.set(
+      donation.method === 'pickup'
+        ? 'pickup'
+        : donation.method === 'shipping'
+          ? 'shipping'
+          : donation.method === 'walk-in'
+            ? 'walk-in'
+            : 'dropoff',
+    );
+    this.donationDate.set(donation.date);
+    this.donor.set({
+      fullName: donation.donor.fullName,
+      email: donation.donor.email,
+      phone: donation.donor.phone,
+      smsOptIn: false,
+      city: donation.donor.city,
+      state: donation.donor.state,
+      instagramHandle: '',
+    });
+    this.donorLocked.set(true);
+    this.step.set('products');
+  }
 
   // --- Step 1: reference code lookup ---
 
@@ -321,6 +368,38 @@ export class DonationIntakePageComponent {
   async completeDonation(): Promise<void> {
     this.savingError.set(null);
     this.fieldErrors.set({});
+
+    // Pre-load path: Donation already exists, just create products.
+    const preLoadedId = this.preLoadedDonationId();
+    if (preLoadedId) {
+      const productInputs = this.products().map(toProductFormInput);
+      if (
+        productInputs.some(
+          (p) => !p.name || !p.brand || !p.type || !p.quantity,
+        )
+      ) {
+        this.savingError.set(
+          'Each product needs a name, brand, type, and quantity.',
+        );
+        return;
+      }
+      this.saving.set(true);
+      this.step.set('saving');
+      try {
+        await this.donationService.addProductsToDonation(
+          preLoadedId,
+          productInputs,
+        );
+        await this.router.navigate(['/donations', preLoadedId]);
+      } catch (err) {
+        console.error(err);
+        this.savingError.set('Save failed. Please try again.');
+        this.step.set('products');
+      } finally {
+        this.saving.set(false);
+      }
+      return;
+    }
 
     const donorForm = this.donor();
     const candidate: DonationIntakeInput = {

@@ -2,10 +2,15 @@
   <app-crumb [items]="[{ label: 'donations', link: '/donations' }, { label: 'new' }]" />
 
   <h1 class="title">
-    @if (step() === 'lookup') { process a donation }
-    @else if (step() === 'donor') { who's dropping off? }
-    @else if (step() === 'products') { what did they drop off? }
-    @else { saving… }
+    @if (step() === 'lookup') {
+      process a donation
+    } @else if (step() === 'donor') {
+      who's dropping off?
+    } @else if (step() === 'products') {
+      what did they drop off?
+    } @else {
+      saving…
+    }
   </h1>
 
   <app-stepper [steps]="stepperSteps" [currentStep]="currentStepNum()" />
@@ -57,8 +62,8 @@
       </div>
     </div>
     <p class="tip">
-      Tip: most drop-offs come through the delivery app, so scan or paste the
-      reference first when you can.
+      Tip: most drop-offs come through the delivery app, so scan or paste the reference first when
+      you can.
     </p>
   }
 
@@ -68,9 +73,8 @@
       <div class="explain">
         <div class="explain-ic">i</div>
         <div>
-          Walk-in donations create a matching record so every donation has a
-          single source of truth. We'll use the email to send a thank-you and
-          tax receipt.
+          Walk-in donations create a matching record so every donation has a single source of truth.
+          We'll use the email to send a thank-you and tax receipt.
         </div>
       </div>
 
@@ -82,7 +86,7 @@
           class="inp"
           [value]="donor().fullName"
           (input)="updateDonor('fullName', $any($event.target).value)"
-          placeholder="Mary Imevbore"
+          placeholder="Naomi Campbell"
         />
       </div>
       <div class="grid-2">
@@ -151,9 +155,7 @@
           [checked]="donor().smsOptIn"
           (change)="updateDonor('smsOptIn', $any($event.target).checked)"
         />
-        <span class="cb-label">
-          Donor opted in to SMS updates about where their items go
-        </span>
+        <span class="cb-label"> Donor opted in to SMS updates about where their items go </span>
       </label>
 
       @if (fieldErrors()['donor']) {
@@ -163,9 +165,7 @@
       <div class="footer">
         <div class="left-group">
           <button type="button" class="btn ghost" (click)="goBackToLookup()">← back</button>
-          <span class="saving-pill">
-            <span class="ping"></span>draft saved
-          </span>
+          <span class="saving-pill"> <span class="ping"></span>draft saved </span>
         </div>
         <button
           type="button"
@@ -208,9 +208,7 @@
           {{ productCount() }} item{{ productCount() === 1 ? '' : 's' }} · {{ totalUnits() }} units
         </span>
       </div>
-      <span class="saving-pill">
-        <span class="ping"></span>autosaved
-      </span>
+      <span class="saving-pill"> <span class="ping"></span>autosaved </span>
     </div>
 
     @if (lookupMessage()) {
@@ -233,9 +231,7 @@
       }
     </div>
 
-    <button type="button" class="add-row" (click)="addProduct()">
-      + add another product
-    </button>
+    <button type="button" class="add-row" (click)="addProduct()">+ add another product</button>
 
     <div class="notes">
       <span class="lbl-s">donation notes (optional)</span>
@@ -281,9 +277,7 @@
   }
 
   @if (step() === 'saving') {
-    <div class="saving-state">
-      Saving {{ productCount() }} product(s) to inventory…
-    </div>
+    <div class="saving-state">Saving {{ productCount() }} product(s) to inventory…</div>
   }
 
   @if (identifyOpen()) {

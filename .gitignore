@@ -53,3 +53,4 @@ pglite-debug.log
 firebase-debug.*.log
 .firebaserc.local
 seed/snapshot/
+dataconnect/.dataconnect/
