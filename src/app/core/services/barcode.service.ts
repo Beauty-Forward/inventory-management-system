@@ -160,8 +160,11 @@ export class BarcodeLookupService {
       const { data } = await fn({ imageBase64, mimeType });
       return data;
     } catch (err) {
+      // Keep the real error in the reason so an upload/size/timeout failure is
+      // distinguishable from a genuine "no product found" when diagnosing on a
+      // device (where the console isn't visible).
       console.warn('photo extraction failed', err);
-      return { found: false, reason: 'function error' };
+      return { found: false, reason: `function error: ${String(err)}` };
     }
   }
 }
