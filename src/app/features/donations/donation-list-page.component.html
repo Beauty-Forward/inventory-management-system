@@ -52,7 +52,7 @@
         <span>{{ bucket.donations.length }} drop-off{{ bucket.donations.length === 1 ? '' : 's' }}</span>
       </div>
       @for (d of bucket.donations; track d.id) {
-        <a class="don" [routerLink]="['/donations', d.id]">
+        <a class="don" [class.is-arrived]="isArrived(d)" [routerLink]="['/donations', d.id]">
           <div class="avatar" [attr.data-swatch]="swatch(d)">
             {{ initials(d.donor.fullName) }}
           </div>
@@ -69,7 +69,13 @@
             <span class="count">{{ d.date | date: 'MMM d' }}</span>
           </div>
           <div class="ref">{{ shortRef(d) }}</div>
-          <app-status-pill [variant]="variant(d)">{{ d.method }}</app-status-pill>
+          @if (isArrived(d)) {
+            <button type="button" class="process-cta" (click)="processArrived(d.id, $event)">
+              process →
+            </button>
+          } @else {
+            <app-status-pill [variant]="variant(d)">{{ d.method }}</app-status-pill>
+          }
         </a>
       }
     }
