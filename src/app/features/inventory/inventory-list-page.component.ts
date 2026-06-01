@@ -17,6 +17,7 @@ import {
   StatusPillVariant,
 } from '../../shared/components/status-pill/status-pill.component';
 import { SwatchCardComponent, SwatchVariant } from '../../shared/components/swatch-card/swatch-card.component';
+import { sessionPersistedSignal } from '../../shared/utils/session-persisted-signal';
 
 type CategoryKey =
   | 'all'
@@ -28,6 +29,19 @@ type CategoryKey =
   | 'fragrance'
   | 'other'
   | 'expiring';
+
+// Selectable category pills (a subset of CategoryKey) used to validate a
+// persisted value read back from sessionStorage.
+const CATEGORY_FILTER_KEYS: readonly CategoryKey[] = [
+  'all',
+  'skin',
+  'hair',
+  'makeup',
+  'hygiene',
+  'fragrance',
+  'other',
+  'expiring',
+];
 
 const CATEGORY_TYPES: Record<Exclude<CategoryKey, 'all' | 'expiring'>, string[]> = {
   hair: ['shampoo', 'conditioner', 'hair_oil', 'hair_mask', 'styling_product'],
@@ -73,7 +87,13 @@ export class InventoryListPageComponent implements OnInit {
   readonly error = signal<string | null>(null);
 
   readonly searchQuery = signal('');
-  readonly activeCategory = signal<CategoryKey>('all');
+  // Persists the active category per browser session; a refresh keeps the
+  // category, a new session falls back to 'all'.
+  readonly activeCategory = sessionPersistedSignal<CategoryKey>(
+    'inventory.activeCategory',
+    'all',
+    CATEGORY_FILTER_KEYS,
+  );
 
   readonly filters: PillFilter[] = [
     { key: 'all', label: 'all' },

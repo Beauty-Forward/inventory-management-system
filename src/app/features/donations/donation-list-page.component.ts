@@ -15,8 +15,12 @@ import {
   StatusPillComponent,
   StatusPillVariant,
 } from '../../shared/components/status-pill/status-pill.component';
+import { sessionPersistedSignal } from '../../shared/utils/session-persisted-signal';
 
 type SwatchKey = 'rose' | 'butter' | 'dust' | 'eucalyptus' | 'apricot' | 'cobalt';
+
+const DONATION_FILTERS = ['incoming', 'arrived', 'processed', 'all'] as const;
+type DonationFilter = (typeof DONATION_FILTERS)[number];
 
 interface DayBucket {
   key: string;
@@ -47,7 +51,13 @@ export class DonationListPageComponent implements OnInit {
   readonly error = signal<string | null>(null);
 
   readonly searchQuery = signal('');
-  readonly activeFilter = signal<'incoming' | 'arrived' | 'processed' | 'all'>('arrived');
+  // Persists the active tab per browser session; a refresh keeps the tab,
+  // a new session falls back to 'arrived'.
+  readonly activeFilter = sessionPersistedSignal<DonationFilter>(
+    'donations.activeFilter',
+    'arrived',
+    DONATION_FILTERS,
+  );
 
   readonly filters: PillFilter[] = [
     { key: 'incoming', label: 'incoming' },
