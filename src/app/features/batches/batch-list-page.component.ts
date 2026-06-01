@@ -16,6 +16,9 @@ import {
   StatusPillVariant,
 } from '../../shared/components/status-pill/status-pill.component';
 import { SwatchVariant } from '../../shared/components/swatch-card/swatch-card.component';
+import { sessionPersistedSignal } from '../../shared/utils/session-persisted-signal';
+
+const STATUS_FILTER_KEYS = ['all', 'DRAFT', 'FINALIZED', 'SHIPPED', 'DELIVERED'];
 
 @Component({
   selector: 'app-batch-list-page',
@@ -40,7 +43,13 @@ export class BatchListPageComponent implements OnInit {
   readonly error = signal<string | null>(null);
 
   readonly searchQuery = signal('');
-  readonly statusFilter = signal<string>('all');
+  // Persists the active status filter per browser session; a refresh keeps
+  // the filter, a new session falls back to 'all'.
+  readonly statusFilter = sessionPersistedSignal<string>(
+    'batches.statusFilter',
+    'all',
+    STATUS_FILTER_KEYS,
+  );
 
   readonly filters: PillFilter[] = [
     { key: 'all', label: 'all' },
