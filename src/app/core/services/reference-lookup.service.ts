@@ -26,21 +26,6 @@ export interface ReferenceLookupResult {
   createdAt?: string | null;
 }
 
-export interface WalkInDonationResult {
-  requestId: string;
-  dropoffReference: string;
-  createdAt: string;
-}
-
-export interface WalkInDonationInput {
-  donor: {
-    fullName: string;
-    email: string;
-    phone: string;
-  };
-  notes?: string;
-}
-
 @Injectable({ providedIn: 'root' })
 export class ReferenceLookupService {
   private readonly firebase = inject(FirebaseClientService);
@@ -51,17 +36,6 @@ export class ReferenceLookupService {
       ReferenceLookupResult
     >(this.firebase.functions, 'lookupDonationByReference');
     const result = await fn({ referenceCode });
-    return result.data;
-  }
-
-  async createWalkIn(
-    input: WalkInDonationInput,
-  ): Promise<WalkInDonationResult> {
-    const fn = httpsCallable<WalkInDonationInput, WalkInDonationResult>(
-      this.firebase.functions,
-      'createWalkInDonation',
-    );
-    const result = await fn(input);
     return result.data;
   }
 }
