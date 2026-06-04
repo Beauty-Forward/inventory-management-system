@@ -2,7 +2,7 @@ import { initializeApp } from 'firebase-admin/app';
 import { getDataConnect } from 'firebase-admin/data-connect';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { onDocumentWritten } from 'firebase-functions/v2/firestore';
-import { SchemaType, VertexAI } from '@google-cloud/vertexai';
+import { GoogleGenAI, Type } from '@google/genai';
 
 initializeApp();
 
@@ -83,29 +83,30 @@ function inferProductType(...haystacks: string[]): ProductType | undefined {
 }
 
 const extractionSchema = {
-  type: SchemaType.OBJECT,
+  type: Type.OBJECT,
   properties: {
-    name: { type: SchemaType.STRING, description: 'Product name on the package' },
-    brand: { type: SchemaType.STRING, description: 'Brand name' },
-    type: { type: SchemaType.STRING, enum: PRODUCT_TYPE_ENUM as unknown as string[] },
-    color: { type: SchemaType.STRING, description: 'Specific color/shade if visible' },
-    colorCategory: { type: SchemaType.STRING, description: 'Broad category like warm nude, rose, cool pink' },
-    keyIngredients: { type: SchemaType.STRING, description: 'Comma-separated key ingredients if visible' },
-    size: { type: SchemaType.STRING, description: 'Package size, e.g. 8oz or 250ml' },
-    confidence: { type: SchemaType.STRING, enum: ['high', 'medium', 'low'] },
+    name: { type: Type.STRING, description: 'Product name on the package' },
+    brand: { type: Type.STRING, description: 'Brand name' },
+    type: { type: Type.STRING, enum: PRODUCT_TYPE_ENUM as unknown as string[] },
+    color: { type: Type.STRING, description: 'Specific color/shade if visible' },
+    colorCategory: { type: Type.STRING, description: 'Broad category like warm nude, rose, cool pink' },
+    keyIngredients: { type: Type.STRING, description: 'Comma-separated key ingredients if visible' },
+    size: { type: Type.STRING, description: 'Package size, e.g. 8oz or 250ml' },
+    confidence: { type: Type.STRING, enum: ['high', 'medium', 'low'] },
   },
   required: ['name', 'brand', 'type', 'confidence'],
 };
 
-let _vertex: VertexAI | null = null;
-function getVertex(): VertexAI {
-  if (!_vertex) {
-    _vertex = new VertexAI({
+let _genai: GoogleGenAI | null = null;
+function getGenAI(): GoogleGenAI {
+  if (!_genai) {
+    _genai = new GoogleGenAI({
+      vertexai: true,
       project: process.env['GCLOUD_PROJECT'] || 'beauty-forward',
       location: 'us-central1',
     });
   }
-  return _vertex;
+  return _genai;
 }
 
 // Multi-tier barcode lookup. Cascade order is empirical: UPCitemdb has the best
@@ -282,15 +283,7 @@ export const lookupProductByBarcode = onCall(
     // to verify. Only fires for numeric barcodes.
     if (/^\d{8,14}$/.test(barcode)) {
       try {
-        const vertex = getVertex();
-        const model = vertex.getGenerativeModel({
-          model: 'gemini-2.5-flash',
-          generationConfig: {
-            responseMimeType: 'application/json',
-            responseSchema: extractionSchema,
-            temperature: 0.2,
-          },
-        });
+        const genai = getGenAI();
         const prompt =
           `A volunteer at a beauty product donation warehouse scanned UPC/EAN "${barcode}". ` +
           'Identify the product from this barcode using your product knowledge. ' +
@@ -299,11 +292,16 @@ export const lookupProductByBarcode = onCall(
           '"low" if guessing. If you have no knowledge of this barcode, ' +
           'return confidence "low" and leave name/brand empty.';
 
-        const result = await model.generateContent({
+        const result = await genai.models.generateContent({
+          model: 'gemini-2.5-flash',
           contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          config: {
+            responseMimeType: 'application/json',
+            responseSchema: extractionSchema,
+            temperature: 0.2,
+          },
         });
-        const text =
-          result.response.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
+        const text = result.text ?? '';
         if (text) {
           const parsed = JSON.parse(text) as {
             name?: string;
@@ -371,15 +369,7 @@ export const extractProductFromImage = onCall(
       throw new HttpsError('invalid-argument', 'unsupported mimeType');
     }
 
-    const vertex = getVertex();
-    const model = vertex.getGenerativeModel({
-      model: 'gemini-2.5-flash',
-      generationConfig: {
-        responseMimeType: 'application/json',
-        responseSchema: extractionSchema,
-        temperature: 0.2,
-      },
-    });
+    const genai = getGenAI();
 
     const prompt =
       'You are helping a beauty product donation warehouse catalog products. ' +
@@ -390,7 +380,8 @@ export const extractProductFromImage = onCall(
       '"medium" if partial, "low" if unsure.';
 
     try {
-      const result = await model.generateContent({
+      const result = await genai.models.generateContent({
+        model: 'gemini-2.5-flash',
         contents: [
           {
             role: 'user',
@@ -400,10 +391,14 @@ export const extractProductFromImage = onCall(
             ],
           },
         ],
+        config: {
+          responseMimeType: 'application/json',
+          responseSchema: extractionSchema,
+          temperature: 0.2,
+        },
       });
 
-      const text =
-        result.response.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
+      const text = result.text ?? '';
       if (!text) {
         return { found: false, reason: 'empty response' };
       }
