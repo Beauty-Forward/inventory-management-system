@@ -2,9 +2,7 @@
   <app-crumb [items]="[{ label: 'donations', link: '/donations' }, { label: 'new' }]" />
 
   <h1 class="title">
-    @if (step() === 'lookup') {
-      process a donation
-    } @else if (step() === 'donor') {
+    @if (step() === 'donor') {
       who's dropping off?
     } @else if (step() === 'products') {
       what did they drop off?
@@ -15,59 +13,11 @@
 
   <app-stepper [steps]="stepperSteps" [currentStep]="currentStepNum()" />
 
-  <!-- Step 1: lookup or walk-in -->
-  @if (step() === 'lookup') {
-    <div class="lookup-cols">
-      <div class="lookup-card featured">
-        <div class="card-tag">fastest path</div>
-        <div class="card-title">scheduled drop-off</div>
-        <div class="card-help">
-          Enter the reference code on the package (e.g.
-          <code>BFD-20260422-ABC12345</code>) to auto-pull donor info.
-        </div>
-        <div class="inp-wrap">
-          <input
-            type="text"
-            class="inp pill"
-            [value]="referenceCode()"
-            (input)="referenceCode.set($any($event.target).value)"
-            placeholder="BFD-…"
-            autofocus
-          />
-          <button
-            type="button"
-            class="btn primary"
-            (click)="lookupReference()"
-            [disabled]="lookupLoading()"
-          >
-            {{ lookupLoading() ? 'looking up…' : 'look up →' }}
-          </button>
-        </div>
-        @if (lookupError()) {
-          <p class="error-text">{{ lookupError() }}</p>
-        }
-      </div>
-
-      <div class="lookup-card">
-        <div class="card-tag">no reference</div>
-        <div class="card-title">walk-in donation</div>
-        <ul class="walkthru">
-          <li>donor hands over products in person</li>
-          <li>we create a record so the delivery app has the truth</li>
-          <li>you'll enter donor info on the next step</li>
-        </ul>
-        <button type="button" class="btn ghost wide" (click)="skipLookup()">
-          register walk-in →
-        </button>
-      </div>
-    </div>
-    <p class="tip">
-      Tip: most drop-offs come through the delivery app, so scan or paste the reference first when
-      you can.
-    </p>
+  @if (lookupError()) {
+    <div class="error-banner">{{ lookupError() }}</div>
   }
 
-  <!-- Step 2: donor info -->
+  <!-- Step 1: donor info -->
   @if (step() === 'donor') {
     <div class="form">
       <div class="explain">
@@ -164,7 +114,9 @@
 
       <div class="footer">
         <div class="left-group">
-          <button type="button" class="btn ghost" (click)="goBackToLookup()">← back</button>
+          <button type="button" class="btn ghost" (click)="cancelIntake()">
+            ← back to donations
+          </button>
           <span class="saving-pill"> <span class="ping"></span>draft saved </span>
         </div>
         <button
@@ -179,7 +131,7 @@
     </div>
   }
 
-  <!-- Step 3: products -->
+  <!-- Step 2: products -->
   @if (step() === 'products') {
     <div class="donor-strip">
       <div class="ds">
@@ -198,7 +150,7 @@
         <span class="k">reference</span>
         <span class="v mono">{{ warehouseReference() || referenceCode() || '—' }}</span>
       </div>
-      <button type="button" class="ds-redo" (click)="goBackToLookup()">start over</button>
+      <button type="button" class="ds-redo" (click)="goBackToDonor()">edit donor</button>
     </div>
 
     <div class="sec-row">
@@ -263,7 +215,7 @@
 
     <div class="footer">
       <div class="left-group">
-        <button type="button" class="btn ghost" (click)="goBackToLookup()">← cancel</button>
+        <button type="button" class="btn ghost" (click)="cancelIntake()">← cancel</button>
       </div>
       <button
         type="button"

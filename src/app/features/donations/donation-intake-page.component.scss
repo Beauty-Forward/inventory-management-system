@@ -19,127 +19,11 @@ app-stepper {
   margin-bottom: 20px;
 }
 
-// --- Step 1: lookup vs walk-in ---
-
-.lookup-cols {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  max-width: 720px;
-
-  @media (max-width: $mobile-breakpoint) {
-    grid-template-columns: 1fr;
-  }
-}
-
-.lookup-card {
-  background: $white;
-  border: 1px solid $panel-border;
-  border-radius: 16px;
-  padding: 18px 18px 16px;
-  display: flex;
-  flex-direction: column;
-  min-height: 240px;
-
-  &.featured {
-    background: $buttercup;
-    border-color: rgba(26, 26, 26, 0.08);
-  }
-}
-
-.card-tag {
-  font-family: $font-heading;
-  font-weight: 700;
-  font-size: 9px;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: $muted-ink;
-  margin-bottom: 6px;
-}
-
-.card-title {
-  @include panel-title;
-  font-size: 18px;
-  letter-spacing: -0.02em;
-  line-height: 1.15;
-  margin-bottom: 4px;
-}
-
-.card-help {
-  font-family: $font-body;
-  font-size: 11px;
-  color: rgba(26, 26, 26, 0.65);
-  line-height: 1.45;
-  margin-bottom: 14px;
-
-  code {
-    background: rgba(26, 26, 26, 0.08);
-    padding: 1px 6px;
-    border-radius: 4px;
-    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-    font-size: 10px;
-    letter-spacing: 0.02em;
-  }
-}
-
-.inp-wrap {
-  display: flex;
-  gap: 6px;
-  margin-top: auto;
-
-  @media (max-width: 520px) {
-    flex-direction: column;
-  }
-}
-
 .inp {
   @include form-input-sm;
-
-  &.pill {
-    border-radius: 999px;
-    padding: 10px 14px;
-  }
 }
 
-.walkthru {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-
-  li {
-    font-family: $font-body;
-    font-size: 11px;
-    color: rgba(26, 26, 26, 0.7);
-    line-height: 1.4;
-    padding-left: 18px;
-    position: relative;
-
-    &::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 6px;
-      width: 10px;
-      height: 4px;
-      background: $crimson-deep;
-      border-radius: 999px;
-    }
-  }
-}
-
-.tip {
-  font-family: $font-body;
-  font-size: 10px;
-  color: $muted-ink;
-  margin-top: 10px;
-  max-width: 720px;
-  line-height: 1.5;
-}
-
-// --- Step 2: donor form ---
+// --- Step 1: donor form ---
 
 .form {
   max-width: 720px;
@@ -239,7 +123,7 @@ app-stepper {
   line-height: 1.4;
 }
 
-// --- Step 3: products ---
+// --- Step 2: products ---
 
 .donor-strip {
   background: $buttercup;
@@ -417,7 +301,6 @@ app-stepper {
   &.primary { @include pill-button-sm('primary'); }
   &.ghost { @include pill-button-sm('ghost'); }
   &.cta-green { @include pill-button-sm('cta'); }
-  &.wide { width: 100%; margin-top: auto; }
 }
 
 .saving-pill {

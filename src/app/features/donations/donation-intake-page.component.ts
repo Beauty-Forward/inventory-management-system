@@ -13,14 +13,7 @@ import { StepperComponent, StepperStep } from '../../shared/components/stepper/s
 import { AuthService } from '../../core/services/auth.service';
 import { BarcodeLookupService } from '../../core/services/barcode.service';
 import { DonationService } from '../../core/services/donation.service';
-import {
-  ReferenceLookupService,
-  type ReferenceLookupResult,
-} from '../../core/services/reference-lookup.service';
-import {
-  generateDeliveryFallbackReference,
-  generateWalkInReference,
-} from '../../core/utils/warehouse-reference';
+import { generateWalkInReference } from '../../core/utils/warehouse-reference';
 import {
   donationIntakeSchema,
   type DonationIntakeInput,
@@ -36,7 +29,7 @@ type DonorFormState = {
   instagramHandle: string;
 };
 
-type Step = 'lookup' | 'donor' | 'products' | 'saving';
+type Step = 'donor' | 'products' | 'saving';
 
 const EMPTY_DONOR = (): DonorFormState => ({
   fullName: '',
@@ -107,11 +100,10 @@ export class DonationIntakePageComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly donationService = inject(DonationService);
-  private readonly referenceService = inject(ReferenceLookupService);
   private readonly authService = inject(AuthService);
   private readonly barcodeService = inject(BarcodeLookupService);
 
-  // When set, the intake skips lookup/donor steps and lands straight on
+  // When set, the intake skips the donor step and lands straight on
   // products — the donation already exists (created by the delivery-app
   // sync), the manager just needs to attach products to it.
   readonly preLoadedDonationId = signal<string | null>(null);
@@ -126,19 +118,22 @@ export class DonationIntakePageComponent implements OnInit {
   readonly identifyError = signal<string>('');
   readonly lookupMessage = signal<string | null>(null);
 
-  readonly step = signal<Step>('lookup');
+  // Walk-in intake starts on the donor step — the donations-list "register
+  // walk-in" CTA already commits to a walk-in, so the reference-code lookup
+  // step it used to open on is gone. (Pre-load path jumps to 'products'.)
+  readonly step = signal<Step>('donor');
   readonly referenceCode = signal('');
-  readonly lookupLoading = signal(false);
+  // Only surfaced by the pre-load path when ?donationId points at a missing
+  // donation; the walk-in path no longer does any reference lookup.
   readonly lookupError = signal<string | null>(null);
 
   readonly donationRequestId = signal('');
   readonly warehouseReference = signal('');
   readonly donationMethod = signal<'pickup' | 'shipping' | 'dropoff' | 'walk-in'>(
-    'dropoff',
+    'walk-in',
   );
   readonly donationDate = signal(TODAY());
   readonly donationNotes = signal('');
-  readonly isWalkIn = signal(false);
 
   readonly donor = signal<DonorFormState>(EMPTY_DONOR());
   readonly donorLocked = signal(false);
@@ -156,17 +151,11 @@ export class DonationIntakePageComponent implements OnInit {
   readonly productCount = computed(() => this.products().length);
 
   readonly stepperSteps: StepperStep[] = [
-    { label: 'start' },
     { label: 'donor' },
     { label: 'products' },
   ];
 
-  readonly currentStepNum = computed(() => {
-    const s = this.step();
-    if (s === 'lookup') return 1;
-    if (s === 'donor') return 2;
-    return 3;
-  });
+  readonly currentStepNum = computed(() => (this.step() === 'donor' ? 1 : 2));
 
   readonly totalUnits = computed(() =>
     this.products().reduce((acc, p) => {
@@ -225,71 +214,7 @@ export class DonationIntakePageComponent implements OnInit {
     this.step.set('products');
   }
 
-  // --- Step 1: reference code lookup ---
-
-  async lookupReference(): Promise<void> {
-    const code = this.referenceCode().trim();
-    if (!code) {
-      this.lookupError.set('Enter a reference code');
-      return;
-    }
-    this.lookupLoading.set(true);
-    this.lookupError.set(null);
-    try {
-      const result = await this.referenceService.lookup(code);
-      if (!result.found) {
-        this.lookupError.set('No donation found with that code.');
-        return;
-      }
-      this.applyLookupResult(result);
-      this.step.set('products');
-    } catch (err) {
-      console.error(err);
-      this.lookupError.set(
-        'Lookup failed. The Cloud Function may not be deployed yet.',
-      );
-    } finally {
-      this.lookupLoading.set(false);
-    }
-  }
-
-  private applyLookupResult(result: ReferenceLookupResult): void {
-    if (!result.requestId || !result.donor) return;
-    this.donationRequestId.set(result.requestId);
-    // Prefer the donor-facing dropoff reference if available; otherwise mint a fallback.
-    this.warehouseReference.set(
-      result.dropoff?.referenceCode || generateDeliveryFallbackReference(),
-    );
-    this.donationMethod.set(result.donationType ?? 'dropoff');
-    this.donationDate.set(
-      result.dropoff?.preferredDate ||
-        result.pickup?.preferredDate ||
-        result.createdAt?.slice(0, 10) ||
-        TODAY(),
-    );
-    this.donor.set({
-      fullName: result.donor.fullName,
-      email: result.donor.email,
-      phone: result.donor.phone,
-      smsOptIn: false,
-      city: '',
-      state: '',
-      instagramHandle: '',
-    });
-    this.donorLocked.set(false); // allow manager to fill in missing city/state
-    this.isWalkIn.set(false);
-  }
-
-  skipLookup(): void {
-    // Walk-in path: no reference code, enter donor manually
-    this.isWalkIn.set(true);
-    this.donationMethod.set('walk-in');
-    this.donationDate.set(TODAY());
-    this.donor.set(EMPTY_DONOR());
-    this.step.set('donor');
-  }
-
-  // --- Step 2: donor info (walk-in only) ---
+  // --- Step 1: donor info (walk-in only) ---
 
   updateDonor<K extends keyof DonorFormState>(
     key: K,
@@ -315,7 +240,7 @@ export class DonationIntakePageComponent implements OnInit {
     this.step.set('products');
   }
 
-  // --- Step 3: products ---
+  // --- Step 2: products ---
 
   addProduct(): void {
     this.products.update((list) => [...list, EMPTY_PRODUCT_CARD()]);
@@ -357,9 +282,16 @@ export class DonationIntakePageComponent implements OnInit {
 
   // --- Back nav ---
 
-  goBackToLookup(): void {
-    this.step.set('lookup');
-    this.lookupError.set(null);
+  // Donor step "← back" and products step "← cancel": abandon the intake and
+  // return to the donations list (there's no lookup step to fall back to).
+  cancelIntake(): void {
+    void this.router.navigate(['/donations']);
+  }
+
+  // Products step "start over": hop back to the donor step to re-edit, keeping
+  // whatever's already entered.
+  goBackToDonor(): void {
+    this.step.set('donor');
     this.savingError.set(null);
   }
 
