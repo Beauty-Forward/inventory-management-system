@@ -186,14 +186,27 @@ export class CameraScannerComponent implements AfterViewInit, OnDestroy {
       return;
     }
 
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    // Downscale to a max dimension before encoding. A phone's rear camera
+    // streams at 1080p–4K; uploading that frame full-resolution (base64 JPEG)
+    // overruns the extractProductFromImage callable's request-size limit, so
+    // the photo never reaches Gemini and the user sees a bogus "couldn't
+    // identify." Clamping to 1024px keeps the payload small while staying
+    // sharp enough for vision extraction. Desktop webcams (~720p) were under
+    // the limit already, which is why this only bit on mobile.
+    const maxDim = 1024;
+    const ratio = Math.min(
+      maxDim / video.videoWidth,
+      maxDim / video.videoHeight,
+      1,
+    );
+    canvas.width = Math.round(video.videoWidth * ratio);
+    canvas.height = Math.round(video.videoHeight * ratio);
     const ctx = canvas.getContext('2d');
     if (!ctx) {
       this.cancelled.emit();
       return;
     }
-    ctx.drawImage(video, 0, 0);
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
     const base64 = dataUrl.split(',')[1] ?? '';
     this.captured.emit({ base64, mimeType: 'image/jpeg' });
