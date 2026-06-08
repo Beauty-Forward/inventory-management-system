@@ -28,12 +28,40 @@ const app = initializeApp({
 const dc = getDataConnect(app, connectorConfig);
 connectDataConnectEmulator(dc, '127.0.0.1', 9399);
 
+// Shared warehouse login, provisioned in the Auth emulator so the app's
+// auth gate is usable locally. Survives emulator restarts that drop the
+// snapshot. Re-running is safe — an existing account is left as-is.
+const AUTH_EMULATOR_HOST = '127.0.0.1:9099';
+const SEED_USER = { email: 'warehouse@beautyforward.local', password: 'beautyforward' };
+
+async function seedAuthUser() {
+  console.log('Creating shared login…');
+  const res = await fetch(
+    `http://${AUTH_EMULATOR_HOST}/identitytoolkit.googleapis.com/v1/accounts:signUp?key=fake-api-key`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...SEED_USER, returnSecureToken: true }),
+    },
+  );
+  const data = await res.json().catch(() => ({}));
+  if (res.ok) {
+    console.log(`  → ${SEED_USER.email} (password: ${SEED_USER.password})\n`);
+  } else if (data?.error?.message === 'EMAIL_EXISTS') {
+    console.log(`  → ${SEED_USER.email} already exists — skipping\n`);
+  } else {
+    throw new Error(`auth seed failed: ${data?.error?.message || res.status}`);
+  }
+}
+
 function ref(yyyymmdd, suffix) {
   return `BFW-${yyyymmdd}-${suffix}`;
 }
 
 async function run() {
   console.log('Seeding Data Connect emulator at 127.0.0.1:9399…\n');
+
+  await seedAuthUser();
 
   // --- Shelters ---
   console.log('Creating shelters…');
