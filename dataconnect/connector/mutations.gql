@@ -368,3 +368,55 @@ mutation IncrementCatalogUsage($barcode: String!) @auth(level: USER) {
     }
   )
 }
+
+# --- Deletes ---
+# Hard deletes for correcting mistakes. Children carry required foreign keys
+# to their parents, so parent deletes must clear/remove children first
+# (handled in the service layer) to avoid FK constraint violations.
+
+# Product is a leaf — nothing references it, so it deletes directly.
+mutation DeleteProduct($id: UUID!) @auth(level: USER) {
+  product_delete(id: $id)
+}
+
+# Donor's denormalized donationCount is decremented when a donation is removed.
+mutation DecrementDonorDonationCount($id: UUID!) @auth(level: USER) {
+  donor_update(
+    id: $id
+    data: {
+      donationCount_update: { inc: -1 }
+      updatedAt_expr: "request.time"
+    }
+  )
+}
+
+# Step 1 of donation delete: remove all products belonging to the donation
+# (they hold a required FK to it).
+mutation DeleteDonationProducts($donationId: UUID!) @auth(level: USER) {
+  product_deleteMany(where: { donationId: { eq: $donationId } })
+}
+
+# Step 2 of donation delete: remove the donation row itself.
+mutation DeleteDonation($id: UUID!) @auth(level: USER) {
+  donation_delete(id: $id)
+}
+
+# Step 1 of batch delete: return any allocated products to inventory so they
+# aren't stranded on a batch row that's about to disappear.
+mutation ReturnBatchProductsToStock($batchId: UUID!) @auth(level: USER) {
+  product_updateMany(
+    where: { batchId: { eq: $batchId } }
+    data: { batchId: null, status: IN_STOCK, updatedAt_expr: "request.time" }
+  )
+}
+
+# Step 2 of batch delete: remove the batch row itself.
+mutation DeleteBatch($id: UUID!) @auth(level: USER) {
+  batch_delete(id: $id)
+}
+
+# Shelters are only hard-deleted when they have no batches (enforced in the UI
+# and by the FK constraint); otherwise they're deactivated instead.
+mutation DeleteShelter($id: UUID!) @auth(level: USER) {
+  shelter_delete(id: $id)
+}

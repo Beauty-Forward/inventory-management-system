@@ -24,6 +24,11 @@
           <button class="btn ghost" [disabled]="mutating()" (click)="toggleActive()">
             {{ s.isActive ? 'deactivate' : 'reactivate' }}
           </button>
+          @if (canDelete()) {
+            <button class="btn ghost danger" [disabled]="mutating()" (click)="deleteShelter()">
+              delete
+            </button>
+          }
           <a class="btn primary" routerLink="/batches/new">+ new batch →</a>
         </div>
       </div>

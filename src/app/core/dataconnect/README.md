@@ -50,6 +50,13 @@ This README will guide you through the process of using the generated JavaScript
   - [*UpdateBatchNotes*](#updatebatchnotes)
   - [*UpsertCatalogEntry*](#upsertcatalogentry)
   - [*IncrementCatalogUsage*](#incrementcatalogusage)
+  - [*DeleteProduct*](#deleteproduct)
+  - [*DecrementDonorDonationCount*](#decrementdonordonationcount)
+  - [*DeleteDonationProducts*](#deletedonationproducts)
+  - [*DeleteDonation*](#deletedonation)
+  - [*ReturnBatchProductsToStock*](#returnbatchproductstostock)
+  - [*DeleteBatch*](#deletebatch)
+  - [*DeleteShelter*](#deleteshelter)
 
 # Accessing the connector
 A connector is a collection of Queries and Mutations. One SDK is generated for each connector - this SDK is generated for the connector `bf-ims`. You can find more information about connectors in the [Data Connect documentation](https://firebase.google.com/docs/data-connect#how-does).
@@ -5013,6 +5020,769 @@ console.log(data.productCatalog_update);
 executeMutation(ref).then((response) => {
   const data = response.data;
   console.log(data.productCatalog_update);
+});
+```
+
+## DeleteProduct
+You can execute the `DeleteProduct` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+deleteProduct(vars: DeleteProductVariables): MutationPromise<DeleteProductData, DeleteProductVariables>;
+
+interface DeleteProductRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DeleteProductVariables): MutationRef<DeleteProductData, DeleteProductVariables>;
+}
+export const deleteProductRef: DeleteProductRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+deleteProduct(dc: DataConnect, vars: DeleteProductVariables): MutationPromise<DeleteProductData, DeleteProductVariables>;
+
+interface DeleteProductRef {
+  ...
+  (dc: DataConnect, vars: DeleteProductVariables): MutationRef<DeleteProductData, DeleteProductVariables>;
+}
+export const deleteProductRef: DeleteProductRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the deleteProductRef:
+```typescript
+const name = deleteProductRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `DeleteProduct` mutation requires an argument of type `DeleteProductVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface DeleteProductVariables {
+  id: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `DeleteProduct` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `DeleteProductData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface DeleteProductData {
+  product_delete?: Product_Key | null;
+}
+```
+### Using `DeleteProduct`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, deleteProduct, DeleteProductVariables } from '@bf-ims/dataconnect';
+
+// The `DeleteProduct` mutation requires an argument of type `DeleteProductVariables`:
+const deleteProductVars: DeleteProductVariables = {
+  id: ..., 
+};
+
+// Call the `deleteProduct()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await deleteProduct(deleteProductVars);
+// Variables can be defined inline as well.
+const { data } = await deleteProduct({ id: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await deleteProduct(dataConnect, deleteProductVars);
+
+console.log(data.product_delete);
+
+// Or, you can use the `Promise` API.
+deleteProduct(deleteProductVars).then((response) => {
+  const data = response.data;
+  console.log(data.product_delete);
+});
+```
+
+### Using `DeleteProduct`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, deleteProductRef, DeleteProductVariables } from '@bf-ims/dataconnect';
+
+// The `DeleteProduct` mutation requires an argument of type `DeleteProductVariables`:
+const deleteProductVars: DeleteProductVariables = {
+  id: ..., 
+};
+
+// Call the `deleteProductRef()` function to get a reference to the mutation.
+const ref = deleteProductRef(deleteProductVars);
+// Variables can be defined inline as well.
+const ref = deleteProductRef({ id: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = deleteProductRef(dataConnect, deleteProductVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.product_delete);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.product_delete);
+});
+```
+
+## DecrementDonorDonationCount
+You can execute the `DecrementDonorDonationCount` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+decrementDonorDonationCount(vars: DecrementDonorDonationCountVariables): MutationPromise<DecrementDonorDonationCountData, DecrementDonorDonationCountVariables>;
+
+interface DecrementDonorDonationCountRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DecrementDonorDonationCountVariables): MutationRef<DecrementDonorDonationCountData, DecrementDonorDonationCountVariables>;
+}
+export const decrementDonorDonationCountRef: DecrementDonorDonationCountRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+decrementDonorDonationCount(dc: DataConnect, vars: DecrementDonorDonationCountVariables): MutationPromise<DecrementDonorDonationCountData, DecrementDonorDonationCountVariables>;
+
+interface DecrementDonorDonationCountRef {
+  ...
+  (dc: DataConnect, vars: DecrementDonorDonationCountVariables): MutationRef<DecrementDonorDonationCountData, DecrementDonorDonationCountVariables>;
+}
+export const decrementDonorDonationCountRef: DecrementDonorDonationCountRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the decrementDonorDonationCountRef:
+```typescript
+const name = decrementDonorDonationCountRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `DecrementDonorDonationCount` mutation requires an argument of type `DecrementDonorDonationCountVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface DecrementDonorDonationCountVariables {
+  id: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `DecrementDonorDonationCount` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `DecrementDonorDonationCountData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface DecrementDonorDonationCountData {
+  donor_update?: Donor_Key | null;
+}
+```
+### Using `DecrementDonorDonationCount`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, decrementDonorDonationCount, DecrementDonorDonationCountVariables } from '@bf-ims/dataconnect';
+
+// The `DecrementDonorDonationCount` mutation requires an argument of type `DecrementDonorDonationCountVariables`:
+const decrementDonorDonationCountVars: DecrementDonorDonationCountVariables = {
+  id: ..., 
+};
+
+// Call the `decrementDonorDonationCount()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await decrementDonorDonationCount(decrementDonorDonationCountVars);
+// Variables can be defined inline as well.
+const { data } = await decrementDonorDonationCount({ id: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await decrementDonorDonationCount(dataConnect, decrementDonorDonationCountVars);
+
+console.log(data.donor_update);
+
+// Or, you can use the `Promise` API.
+decrementDonorDonationCount(decrementDonorDonationCountVars).then((response) => {
+  const data = response.data;
+  console.log(data.donor_update);
+});
+```
+
+### Using `DecrementDonorDonationCount`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, decrementDonorDonationCountRef, DecrementDonorDonationCountVariables } from '@bf-ims/dataconnect';
+
+// The `DecrementDonorDonationCount` mutation requires an argument of type `DecrementDonorDonationCountVariables`:
+const decrementDonorDonationCountVars: DecrementDonorDonationCountVariables = {
+  id: ..., 
+};
+
+// Call the `decrementDonorDonationCountRef()` function to get a reference to the mutation.
+const ref = decrementDonorDonationCountRef(decrementDonorDonationCountVars);
+// Variables can be defined inline as well.
+const ref = decrementDonorDonationCountRef({ id: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = decrementDonorDonationCountRef(dataConnect, decrementDonorDonationCountVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.donor_update);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.donor_update);
+});
+```
+
+## DeleteDonationProducts
+You can execute the `DeleteDonationProducts` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+deleteDonationProducts(vars: DeleteDonationProductsVariables): MutationPromise<DeleteDonationProductsData, DeleteDonationProductsVariables>;
+
+interface DeleteDonationProductsRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DeleteDonationProductsVariables): MutationRef<DeleteDonationProductsData, DeleteDonationProductsVariables>;
+}
+export const deleteDonationProductsRef: DeleteDonationProductsRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+deleteDonationProducts(dc: DataConnect, vars: DeleteDonationProductsVariables): MutationPromise<DeleteDonationProductsData, DeleteDonationProductsVariables>;
+
+interface DeleteDonationProductsRef {
+  ...
+  (dc: DataConnect, vars: DeleteDonationProductsVariables): MutationRef<DeleteDonationProductsData, DeleteDonationProductsVariables>;
+}
+export const deleteDonationProductsRef: DeleteDonationProductsRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the deleteDonationProductsRef:
+```typescript
+const name = deleteDonationProductsRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `DeleteDonationProducts` mutation requires an argument of type `DeleteDonationProductsVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface DeleteDonationProductsVariables {
+  donationId: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `DeleteDonationProducts` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `DeleteDonationProductsData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface DeleteDonationProductsData {
+  product_deleteMany: number;
+}
+```
+### Using `DeleteDonationProducts`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, deleteDonationProducts, DeleteDonationProductsVariables } from '@bf-ims/dataconnect';
+
+// The `DeleteDonationProducts` mutation requires an argument of type `DeleteDonationProductsVariables`:
+const deleteDonationProductsVars: DeleteDonationProductsVariables = {
+  donationId: ..., 
+};
+
+// Call the `deleteDonationProducts()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await deleteDonationProducts(deleteDonationProductsVars);
+// Variables can be defined inline as well.
+const { data } = await deleteDonationProducts({ donationId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await deleteDonationProducts(dataConnect, deleteDonationProductsVars);
+
+console.log(data.product_deleteMany);
+
+// Or, you can use the `Promise` API.
+deleteDonationProducts(deleteDonationProductsVars).then((response) => {
+  const data = response.data;
+  console.log(data.product_deleteMany);
+});
+```
+
+### Using `DeleteDonationProducts`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, deleteDonationProductsRef, DeleteDonationProductsVariables } from '@bf-ims/dataconnect';
+
+// The `DeleteDonationProducts` mutation requires an argument of type `DeleteDonationProductsVariables`:
+const deleteDonationProductsVars: DeleteDonationProductsVariables = {
+  donationId: ..., 
+};
+
+// Call the `deleteDonationProductsRef()` function to get a reference to the mutation.
+const ref = deleteDonationProductsRef(deleteDonationProductsVars);
+// Variables can be defined inline as well.
+const ref = deleteDonationProductsRef({ donationId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = deleteDonationProductsRef(dataConnect, deleteDonationProductsVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.product_deleteMany);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.product_deleteMany);
+});
+```
+
+## DeleteDonation
+You can execute the `DeleteDonation` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+deleteDonation(vars: DeleteDonationVariables): MutationPromise<DeleteDonationData, DeleteDonationVariables>;
+
+interface DeleteDonationRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DeleteDonationVariables): MutationRef<DeleteDonationData, DeleteDonationVariables>;
+}
+export const deleteDonationRef: DeleteDonationRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+deleteDonation(dc: DataConnect, vars: DeleteDonationVariables): MutationPromise<DeleteDonationData, DeleteDonationVariables>;
+
+interface DeleteDonationRef {
+  ...
+  (dc: DataConnect, vars: DeleteDonationVariables): MutationRef<DeleteDonationData, DeleteDonationVariables>;
+}
+export const deleteDonationRef: DeleteDonationRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the deleteDonationRef:
+```typescript
+const name = deleteDonationRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `DeleteDonation` mutation requires an argument of type `DeleteDonationVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface DeleteDonationVariables {
+  id: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `DeleteDonation` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `DeleteDonationData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface DeleteDonationData {
+  donation_delete?: Donation_Key | null;
+}
+```
+### Using `DeleteDonation`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, deleteDonation, DeleteDonationVariables } from '@bf-ims/dataconnect';
+
+// The `DeleteDonation` mutation requires an argument of type `DeleteDonationVariables`:
+const deleteDonationVars: DeleteDonationVariables = {
+  id: ..., 
+};
+
+// Call the `deleteDonation()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await deleteDonation(deleteDonationVars);
+// Variables can be defined inline as well.
+const { data } = await deleteDonation({ id: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await deleteDonation(dataConnect, deleteDonationVars);
+
+console.log(data.donation_delete);
+
+// Or, you can use the `Promise` API.
+deleteDonation(deleteDonationVars).then((response) => {
+  const data = response.data;
+  console.log(data.donation_delete);
+});
+```
+
+### Using `DeleteDonation`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, deleteDonationRef, DeleteDonationVariables } from '@bf-ims/dataconnect';
+
+// The `DeleteDonation` mutation requires an argument of type `DeleteDonationVariables`:
+const deleteDonationVars: DeleteDonationVariables = {
+  id: ..., 
+};
+
+// Call the `deleteDonationRef()` function to get a reference to the mutation.
+const ref = deleteDonationRef(deleteDonationVars);
+// Variables can be defined inline as well.
+const ref = deleteDonationRef({ id: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = deleteDonationRef(dataConnect, deleteDonationVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.donation_delete);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.donation_delete);
+});
+```
+
+## ReturnBatchProductsToStock
+You can execute the `ReturnBatchProductsToStock` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+returnBatchProductsToStock(vars: ReturnBatchProductsToStockVariables): MutationPromise<ReturnBatchProductsToStockData, ReturnBatchProductsToStockVariables>;
+
+interface ReturnBatchProductsToStockRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: ReturnBatchProductsToStockVariables): MutationRef<ReturnBatchProductsToStockData, ReturnBatchProductsToStockVariables>;
+}
+export const returnBatchProductsToStockRef: ReturnBatchProductsToStockRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+returnBatchProductsToStock(dc: DataConnect, vars: ReturnBatchProductsToStockVariables): MutationPromise<ReturnBatchProductsToStockData, ReturnBatchProductsToStockVariables>;
+
+interface ReturnBatchProductsToStockRef {
+  ...
+  (dc: DataConnect, vars: ReturnBatchProductsToStockVariables): MutationRef<ReturnBatchProductsToStockData, ReturnBatchProductsToStockVariables>;
+}
+export const returnBatchProductsToStockRef: ReturnBatchProductsToStockRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the returnBatchProductsToStockRef:
+```typescript
+const name = returnBatchProductsToStockRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `ReturnBatchProductsToStock` mutation requires an argument of type `ReturnBatchProductsToStockVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface ReturnBatchProductsToStockVariables {
+  batchId: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `ReturnBatchProductsToStock` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `ReturnBatchProductsToStockData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface ReturnBatchProductsToStockData {
+  product_updateMany: number;
+}
+```
+### Using `ReturnBatchProductsToStock`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, returnBatchProductsToStock, ReturnBatchProductsToStockVariables } from '@bf-ims/dataconnect';
+
+// The `ReturnBatchProductsToStock` mutation requires an argument of type `ReturnBatchProductsToStockVariables`:
+const returnBatchProductsToStockVars: ReturnBatchProductsToStockVariables = {
+  batchId: ..., 
+};
+
+// Call the `returnBatchProductsToStock()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await returnBatchProductsToStock(returnBatchProductsToStockVars);
+// Variables can be defined inline as well.
+const { data } = await returnBatchProductsToStock({ batchId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await returnBatchProductsToStock(dataConnect, returnBatchProductsToStockVars);
+
+console.log(data.product_updateMany);
+
+// Or, you can use the `Promise` API.
+returnBatchProductsToStock(returnBatchProductsToStockVars).then((response) => {
+  const data = response.data;
+  console.log(data.product_updateMany);
+});
+```
+
+### Using `ReturnBatchProductsToStock`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, returnBatchProductsToStockRef, ReturnBatchProductsToStockVariables } from '@bf-ims/dataconnect';
+
+// The `ReturnBatchProductsToStock` mutation requires an argument of type `ReturnBatchProductsToStockVariables`:
+const returnBatchProductsToStockVars: ReturnBatchProductsToStockVariables = {
+  batchId: ..., 
+};
+
+// Call the `returnBatchProductsToStockRef()` function to get a reference to the mutation.
+const ref = returnBatchProductsToStockRef(returnBatchProductsToStockVars);
+// Variables can be defined inline as well.
+const ref = returnBatchProductsToStockRef({ batchId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = returnBatchProductsToStockRef(dataConnect, returnBatchProductsToStockVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.product_updateMany);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.product_updateMany);
+});
+```
+
+## DeleteBatch
+You can execute the `DeleteBatch` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+deleteBatch(vars: DeleteBatchVariables): MutationPromise<DeleteBatchData, DeleteBatchVariables>;
+
+interface DeleteBatchRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DeleteBatchVariables): MutationRef<DeleteBatchData, DeleteBatchVariables>;
+}
+export const deleteBatchRef: DeleteBatchRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+deleteBatch(dc: DataConnect, vars: DeleteBatchVariables): MutationPromise<DeleteBatchData, DeleteBatchVariables>;
+
+interface DeleteBatchRef {
+  ...
+  (dc: DataConnect, vars: DeleteBatchVariables): MutationRef<DeleteBatchData, DeleteBatchVariables>;
+}
+export const deleteBatchRef: DeleteBatchRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the deleteBatchRef:
+```typescript
+const name = deleteBatchRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `DeleteBatch` mutation requires an argument of type `DeleteBatchVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface DeleteBatchVariables {
+  id: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `DeleteBatch` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `DeleteBatchData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface DeleteBatchData {
+  batch_delete?: Batch_Key | null;
+}
+```
+### Using `DeleteBatch`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, deleteBatch, DeleteBatchVariables } from '@bf-ims/dataconnect';
+
+// The `DeleteBatch` mutation requires an argument of type `DeleteBatchVariables`:
+const deleteBatchVars: DeleteBatchVariables = {
+  id: ..., 
+};
+
+// Call the `deleteBatch()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await deleteBatch(deleteBatchVars);
+// Variables can be defined inline as well.
+const { data } = await deleteBatch({ id: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await deleteBatch(dataConnect, deleteBatchVars);
+
+console.log(data.batch_delete);
+
+// Or, you can use the `Promise` API.
+deleteBatch(deleteBatchVars).then((response) => {
+  const data = response.data;
+  console.log(data.batch_delete);
+});
+```
+
+### Using `DeleteBatch`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, deleteBatchRef, DeleteBatchVariables } from '@bf-ims/dataconnect';
+
+// The `DeleteBatch` mutation requires an argument of type `DeleteBatchVariables`:
+const deleteBatchVars: DeleteBatchVariables = {
+  id: ..., 
+};
+
+// Call the `deleteBatchRef()` function to get a reference to the mutation.
+const ref = deleteBatchRef(deleteBatchVars);
+// Variables can be defined inline as well.
+const ref = deleteBatchRef({ id: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = deleteBatchRef(dataConnect, deleteBatchVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.batch_delete);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.batch_delete);
+});
+```
+
+## DeleteShelter
+You can execute the `DeleteShelter` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+deleteShelter(vars: DeleteShelterVariables): MutationPromise<DeleteShelterData, DeleteShelterVariables>;
+
+interface DeleteShelterRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DeleteShelterVariables): MutationRef<DeleteShelterData, DeleteShelterVariables>;
+}
+export const deleteShelterRef: DeleteShelterRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+deleteShelter(dc: DataConnect, vars: DeleteShelterVariables): MutationPromise<DeleteShelterData, DeleteShelterVariables>;
+
+interface DeleteShelterRef {
+  ...
+  (dc: DataConnect, vars: DeleteShelterVariables): MutationRef<DeleteShelterData, DeleteShelterVariables>;
+}
+export const deleteShelterRef: DeleteShelterRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the deleteShelterRef:
+```typescript
+const name = deleteShelterRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `DeleteShelter` mutation requires an argument of type `DeleteShelterVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface DeleteShelterVariables {
+  id: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `DeleteShelter` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `DeleteShelterData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface DeleteShelterData {
+  shelter_delete?: Shelter_Key | null;
+}
+```
+### Using `DeleteShelter`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, deleteShelter, DeleteShelterVariables } from '@bf-ims/dataconnect';
+
+// The `DeleteShelter` mutation requires an argument of type `DeleteShelterVariables`:
+const deleteShelterVars: DeleteShelterVariables = {
+  id: ..., 
+};
+
+// Call the `deleteShelter()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await deleteShelter(deleteShelterVars);
+// Variables can be defined inline as well.
+const { data } = await deleteShelter({ id: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await deleteShelter(dataConnect, deleteShelterVars);
+
+console.log(data.shelter_delete);
+
+// Or, you can use the `Promise` API.
+deleteShelter(deleteShelterVars).then((response) => {
+  const data = response.data;
+  console.log(data.shelter_delete);
+});
+```
+
+### Using `DeleteShelter`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, deleteShelterRef, DeleteShelterVariables } from '@bf-ims/dataconnect';
+
+// The `DeleteShelter` mutation requires an argument of type `DeleteShelterVariables`:
+const deleteShelterVars: DeleteShelterVariables = {
+  id: ..., 
+};
+
+// Call the `deleteShelterRef()` function to get a reference to the mutation.
+const ref = deleteShelterRef(deleteShelterVars);
+// Variables can be defined inline as well.
+const ref = deleteShelterRef({ id: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = deleteShelterRef(dataConnect, deleteShelterVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.shelter_delete);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.shelter_delete);
 });
 ```
 

@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ALL_PRODUCT_TYPES } from '../../core/models/product-types';
 import {
   BatchDetail,
@@ -22,6 +22,7 @@ import { SwatchVariant } from '../../shared/components/swatch-card/swatch-card.c
 })
 export class BatchDetailPageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly batchService = inject(BatchService);
 
   readonly batch = signal<BatchDetail | null>(null);
@@ -49,6 +50,12 @@ export class BatchDetailPageComponent implements OnInit {
   readonly canFinalize = computed(() => this.batch()?.status === 'DRAFT');
   readonly canShip = computed(() => this.batch()?.status === 'FINALIZED');
   readonly canDeliver = computed(() => this.batch()?.status === 'SHIPPED');
+  // Shipped/delivered batches are historical records — only draft or
+  // finalized batches can be deleted.
+  readonly canDelete = computed(() => {
+    const status = this.batch()?.status;
+    return status === 'DRAFT' || status === 'FINALIZED';
+  });
 
   readonly statusVariant = computed<StatusPillVariant>(() => {
     const b = this.batch();
@@ -153,6 +160,26 @@ export class BatchDetailPageComponent implements OnInit {
     if (!b) return;
     if (!confirm(`Mark this batch as delivered?`)) return;
     await this.transition(() => this.batchService.deliver(b.id), b.id);
+  }
+
+  async deleteBatch(): Promise<void> {
+    const b = this.batch();
+    if (!b || !this.canDelete()) return;
+    const count = this.productCount();
+    const note =
+      count > 0
+        ? ` Its ${count} product${count === 1 ? '' : 's'} will be returned to inventory.`
+        : '';
+    if (!confirm(`Delete this batch?${note} This can't be undone.`)) return;
+    this.mutating.set(true);
+    try {
+      await this.batchService.delete(b.id);
+      await this.router.navigate(['/batches']);
+    } catch (err) {
+      console.error(err);
+      this.error.set('Could not delete batch.');
+      this.mutating.set(false);
+    }
   }
 
   private async transition(action: () => Promise<void>, id: string): Promise<void> {

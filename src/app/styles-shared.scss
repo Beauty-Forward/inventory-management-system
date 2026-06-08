@@ -239,6 +239,14 @@ $mobile-breakpoint: 768px;
   } @else if $variant == 'destructive' {
     background: $crimson;
     color: $white;
+  } @else if $variant == 'destructive-ghost' {
+    background: transparent;
+    color: $crimson;
+    border-color: $crimson;
+    &:hover:not(:disabled) {
+      background: $crimson;
+      color: $white;
+    }
   }
 }
 
@@ -273,6 +281,14 @@ $mobile-breakpoint: 768px;
   } @else if $variant == 'destructive' {
     background: $crimson;
     color: $white;
+  } @else if $variant == 'destructive-ghost' {
+    background: transparent;
+    color: $crimson;
+    border-color: $crimson;
+    &:hover:not(:disabled) {
+      background: $crimson;
+      color: $white;
+    }
   }
 }
 

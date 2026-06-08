@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import {
   createDonor,
+  decrementDonorDonationCount,
   getDonorByEmail,
   incrementDonorDonationCount,
   updateDonor,
@@ -61,5 +62,9 @@ export class DonorService {
 
   async incrementDonationCount(id: string): Promise<void> {
     await incrementDonorDonationCount(this.firebase.dataConnect, { id });
+  }
+
+  async decrementDonationCount(id: string): Promise<void> {
+    await decrementDonorDonationCount(this.firebase.dataConnect, { id });
   }
 }

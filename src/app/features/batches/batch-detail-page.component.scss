@@ -115,6 +115,7 @@
 
   &.primary { @include pill-button-sm('primary'); }
   &.ghost { @include pill-button-sm('ghost'); text-decoration: none; }
+  &.danger { @include pill-button-sm('destructive-ghost'); }
 }
 
 .cols {

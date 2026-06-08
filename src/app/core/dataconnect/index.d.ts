@@ -143,6 +143,54 @@ export interface DeactivateShelterVariables {
   id: UUIDString;
 }
 
+export interface DecrementDonorDonationCountData {
+  donor_update?: Donor_Key | null;
+}
+
+export interface DecrementDonorDonationCountVariables {
+  id: UUIDString;
+}
+
+export interface DeleteBatchData {
+  batch_delete?: Batch_Key | null;
+}
+
+export interface DeleteBatchVariables {
+  id: UUIDString;
+}
+
+export interface DeleteDonationData {
+  donation_delete?: Donation_Key | null;
+}
+
+export interface DeleteDonationProductsData {
+  product_deleteMany: number;
+}
+
+export interface DeleteDonationProductsVariables {
+  donationId: UUIDString;
+}
+
+export interface DeleteDonationVariables {
+  id: UUIDString;
+}
+
+export interface DeleteProductData {
+  product_delete?: Product_Key | null;
+}
+
+export interface DeleteProductVariables {
+  id: UUIDString;
+}
+
+export interface DeleteShelterData {
+  shelter_delete?: Shelter_Key | null;
+}
+
+export interface DeleteShelterVariables {
+  id: UUIDString;
+}
+
 export interface DeliverBatchData {
   batch_update?: Batch_Key | null;
 }
@@ -608,6 +656,14 @@ export interface ReactivateShelterVariables {
   id: UUIDString;
 }
 
+export interface ReturnBatchProductsToStockData {
+  product_updateMany: number;
+}
+
+export interface ReturnBatchProductsToStockVariables {
+  batchId: UUIDString;
+}
+
 export interface Shelter_Key {
   id: UUIDString;
   __typename?: 'Shelter_Key';
@@ -964,6 +1020,90 @@ export const incrementCatalogUsageRef: IncrementCatalogUsageRef;
 
 export function incrementCatalogUsage(vars: IncrementCatalogUsageVariables): MutationPromise<IncrementCatalogUsageData, IncrementCatalogUsageVariables>;
 export function incrementCatalogUsage(dc: DataConnect, vars: IncrementCatalogUsageVariables): MutationPromise<IncrementCatalogUsageData, IncrementCatalogUsageVariables>;
+
+interface DeleteProductRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DeleteProductVariables): MutationRef<DeleteProductData, DeleteProductVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: DeleteProductVariables): MutationRef<DeleteProductData, DeleteProductVariables>;
+  operationName: string;
+}
+export const deleteProductRef: DeleteProductRef;
+
+export function deleteProduct(vars: DeleteProductVariables): MutationPromise<DeleteProductData, DeleteProductVariables>;
+export function deleteProduct(dc: DataConnect, vars: DeleteProductVariables): MutationPromise<DeleteProductData, DeleteProductVariables>;
+
+interface DecrementDonorDonationCountRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DecrementDonorDonationCountVariables): MutationRef<DecrementDonorDonationCountData, DecrementDonorDonationCountVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: DecrementDonorDonationCountVariables): MutationRef<DecrementDonorDonationCountData, DecrementDonorDonationCountVariables>;
+  operationName: string;
+}
+export const decrementDonorDonationCountRef: DecrementDonorDonationCountRef;
+
+export function decrementDonorDonationCount(vars: DecrementDonorDonationCountVariables): MutationPromise<DecrementDonorDonationCountData, DecrementDonorDonationCountVariables>;
+export function decrementDonorDonationCount(dc: DataConnect, vars: DecrementDonorDonationCountVariables): MutationPromise<DecrementDonorDonationCountData, DecrementDonorDonationCountVariables>;
+
+interface DeleteDonationProductsRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DeleteDonationProductsVariables): MutationRef<DeleteDonationProductsData, DeleteDonationProductsVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: DeleteDonationProductsVariables): MutationRef<DeleteDonationProductsData, DeleteDonationProductsVariables>;
+  operationName: string;
+}
+export const deleteDonationProductsRef: DeleteDonationProductsRef;
+
+export function deleteDonationProducts(vars: DeleteDonationProductsVariables): MutationPromise<DeleteDonationProductsData, DeleteDonationProductsVariables>;
+export function deleteDonationProducts(dc: DataConnect, vars: DeleteDonationProductsVariables): MutationPromise<DeleteDonationProductsData, DeleteDonationProductsVariables>;
+
+interface DeleteDonationRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DeleteDonationVariables): MutationRef<DeleteDonationData, DeleteDonationVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: DeleteDonationVariables): MutationRef<DeleteDonationData, DeleteDonationVariables>;
+  operationName: string;
+}
+export const deleteDonationRef: DeleteDonationRef;
+
+export function deleteDonation(vars: DeleteDonationVariables): MutationPromise<DeleteDonationData, DeleteDonationVariables>;
+export function deleteDonation(dc: DataConnect, vars: DeleteDonationVariables): MutationPromise<DeleteDonationData, DeleteDonationVariables>;
+
+interface ReturnBatchProductsToStockRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: ReturnBatchProductsToStockVariables): MutationRef<ReturnBatchProductsToStockData, ReturnBatchProductsToStockVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: ReturnBatchProductsToStockVariables): MutationRef<ReturnBatchProductsToStockData, ReturnBatchProductsToStockVariables>;
+  operationName: string;
+}
+export const returnBatchProductsToStockRef: ReturnBatchProductsToStockRef;
+
+export function returnBatchProductsToStock(vars: ReturnBatchProductsToStockVariables): MutationPromise<ReturnBatchProductsToStockData, ReturnBatchProductsToStockVariables>;
+export function returnBatchProductsToStock(dc: DataConnect, vars: ReturnBatchProductsToStockVariables): MutationPromise<ReturnBatchProductsToStockData, ReturnBatchProductsToStockVariables>;
+
+interface DeleteBatchRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DeleteBatchVariables): MutationRef<DeleteBatchData, DeleteBatchVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: DeleteBatchVariables): MutationRef<DeleteBatchData, DeleteBatchVariables>;
+  operationName: string;
+}
+export const deleteBatchRef: DeleteBatchRef;
+
+export function deleteBatch(vars: DeleteBatchVariables): MutationPromise<DeleteBatchData, DeleteBatchVariables>;
+export function deleteBatch(dc: DataConnect, vars: DeleteBatchVariables): MutationPromise<DeleteBatchData, DeleteBatchVariables>;
+
+interface DeleteShelterRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DeleteShelterVariables): MutationRef<DeleteShelterData, DeleteShelterVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: DeleteShelterVariables): MutationRef<DeleteShelterData, DeleteShelterVariables>;
+  operationName: string;
+}
+export const deleteShelterRef: DeleteShelterRef;
+
+export function deleteShelter(vars: DeleteShelterVariables): MutationPromise<DeleteShelterData, DeleteShelterVariables>;
+export function deleteShelter(dc: DataConnect, vars: DeleteShelterVariables): MutationPromise<DeleteShelterData, DeleteShelterVariables>;
 
 interface GetDonorByEmailRef {
   /* Allow users to create refs without passing in DataConnect */

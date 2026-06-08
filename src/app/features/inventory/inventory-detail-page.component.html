@@ -70,6 +70,9 @@
       <button class="btn ghost" (click)="markDiscarded()" [disabled]="mutating()">
         {{ pendingAction() === 'discarded' ? 'discarding…' : 'mark discarded' }}
       </button>
+      <button class="btn ghost danger" (click)="deleteProduct()" [disabled]="mutating()">
+        delete
+      </button>
     </div>
 
     @if (actionMessage()) {

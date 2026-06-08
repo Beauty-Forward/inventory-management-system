@@ -176,6 +176,7 @@
 
   &.primary { @include pill-button-sm('primary'); }
   &.ghost { @include pill-button-sm('ghost'); }
+  &.danger { @include pill-button-sm('destructive-ghost'); }
 }
 
 .cols {

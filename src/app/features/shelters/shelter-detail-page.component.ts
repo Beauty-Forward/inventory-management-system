@@ -49,6 +49,12 @@ export class ShelterDetailPageComponent implements OnInit {
     () => this.swatch() === 'hunter' || this.swatch() === 'apricot',
   );
 
+  // A shelter can only be hard-deleted when no batches reference it.
+  // Otherwise the FK constraint would block it — deactivate instead.
+  readonly canDelete = computed(
+    () => (this.shelter()?.batches?.length ?? 0) === 0,
+  );
+
   readonly initials = computed(() => {
     const s = this.shelter();
     if (!s) return '';
@@ -114,6 +120,27 @@ export class ShelterDetailPageComponent implements OnInit {
       console.error(err);
       this.error.set('Update failed.');
     } finally {
+      this.mutating.set(false);
+    }
+  }
+
+  async deleteShelter(): Promise<void> {
+    const s = this.shelter();
+    if (!s || !this.canDelete()) return;
+    if (
+      !confirm(
+        `Permanently delete "${s.name}"? This can't be undone. (Use deactivate to keep the record but hide it.)`,
+      )
+    ) {
+      return;
+    }
+    this.mutating.set(true);
+    try {
+      await this.shelterService.delete(s.id);
+      await this.router.navigate(['/shelters']);
+    } catch (err) {
+      console.error(err);
+      this.error.set('Could not delete shelter.');
       this.mutating.set(false);
     }
   }

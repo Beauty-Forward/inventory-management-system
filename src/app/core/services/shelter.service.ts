@@ -3,6 +3,7 @@ import {
   createShelter,
   updateShelter,
   deactivateShelter,
+  deleteShelter,
   reactivateShelter,
   listAllShelters,
   listShelters,
@@ -81,6 +82,12 @@ export class ShelterService {
 
   async reactivate(id: string): Promise<void> {
     await reactivateShelter(this.firebase.dataConnect, { id });
+  }
+
+  // Hard delete. Only safe when the shelter has no batches referencing it
+  // (guarded in the UI); otherwise callers should deactivate instead.
+  async delete(id: string): Promise<void> {
+    await deleteShelter(this.firebase.dataConnect, { id });
   }
 }
 

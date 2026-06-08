@@ -42,6 +42,12 @@
       </div>
     </div>
 
+    <div class="actions">
+      <button class="btn ghost danger" [disabled]="mutating()" (click)="deleteDonation()">
+        delete donation
+      </button>
+    </div>
+
     <div class="cols">
       <div class="panel">
         <div class="panel-title">donor info</div>

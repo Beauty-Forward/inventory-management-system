@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { executeQuery, QueryFetchPolicy } from 'firebase/data-connect';
 import {
+  deleteProduct,
   getProduct,
   listAvailableProductsForShelter,
   listExpiringSoon,
@@ -86,5 +87,11 @@ export class ProductService {
 
   async markDiscarded(id: string): Promise<void> {
     await markProductDiscarded(this.firebase.dataConnect, { productId: id });
+  }
+
+  // Hard delete. A product is a leaf in the data graph (nothing references
+  // it), so this removes the row outright — used to correct bad entries.
+  async delete(id: string): Promise<void> {
+    await deleteProduct(this.firebase.dataConnect, { id });
   }
 }
