@@ -13,10 +13,11 @@
   font-family: $font-body;
   font-size: 11px;
   color: $muted-ink;
-  text-align: right;
+  text-align: left;
   line-height: 1.4;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 2px;
 
   b {
