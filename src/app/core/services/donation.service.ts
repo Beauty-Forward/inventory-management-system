@@ -6,6 +6,7 @@ import {
   deleteDonationProducts,
   getDonationRef,
   listRecentDonationsRef,
+  updateDonationLogistics,
   GetDonationData,
   ListRecentDonationsData,
 } from '../dataconnect';
@@ -42,6 +43,19 @@ export class DonationService {
       getDonationRef(this.firebase.dataConnect, { id }),
     );
     return data.donation ?? null;
+  }
+
+  // Manager confirms a scheduled donation physically arrived. Shipping and
+  // drop-off donations never reach the delivery-app 'completed' status (only
+  // pickups do, via payment verification), so without a manual nudge they'd
+  // sit in Incoming forever. Flipping logisticsStatus to 'arrived' moves them
+  // into the Arrived bucket so products can be attached — mirroring how
+  // 'walk_in' is stored in the same field.
+  async markArrived(id: string): Promise<void> {
+    await updateDonationLogistics(this.firebase.dataConnect, {
+      id,
+      logisticsStatus: 'arrived',
+    });
   }
 
   /**

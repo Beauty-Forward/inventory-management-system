@@ -175,3 +175,11 @@
     filter: brightness(0.95);
   }
 }
+
+// The action button on Incoming rows — a quieter, secondary look than the
+// brand-primary "process" CTA, since marking arrival is a lighter-weight
+// confirmation step.
+.arrive-cta {
+  @include pill-button-sm('ghost');
+  white-space: nowrap;
+}
