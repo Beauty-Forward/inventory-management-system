@@ -1,5 +1,4 @@
 import { Injectable, inject } from '@angular/core';
-import { executeQuery, QueryFetchPolicy } from 'firebase/data-connect';
 import {
   allocateProductToBatch,
   createBatch,
@@ -27,31 +26,25 @@ export type BatchDetail = NonNullable<GetBatchData['batch']>;
 export class BatchService {
   private readonly firebase = inject(FirebaseClientService);
 
-  // Reads call executeQuery directly with the query ref rather than the
-  // generated wrappers. The wrappers forward `options.fetchPolicy` (a string)
-  // where executeQuery expects the full options object, so SERVER_ONLY is
-  // dropped and the SDK falls back to PREFER_CACHE — returning stale data
-  // after a mutation (e.g. finalize). See product.service.listInStock.
   async listAll(): Promise<BatchListRow[]> {
-    const result = await executeQuery(listAllBatchesRef(this.firebase.dataConnect), {
-      fetchPolicy: QueryFetchPolicy.SERVER_ONLY,
-    });
-    return result.data.batches;
+    const data = await this.firebase.read(
+      listAllBatchesRef(this.firebase.dataConnect),
+    );
+    return data.batches;
   }
 
   async listByStatus(status: BatchStatus): Promise<BatchListRow[]> {
-    const result = await executeQuery(
+    const data = await this.firebase.read(
       listBatchesRef(this.firebase.dataConnect, { status }),
-      { fetchPolicy: QueryFetchPolicy.SERVER_ONLY },
     );
-    return result.data.batches;
+    return data.batches;
   }
 
   async get(id: string): Promise<BatchDetail | null> {
-    const result = await executeQuery(getBatchRef(this.firebase.dataConnect, { id }), {
-      fetchPolicy: QueryFetchPolicy.SERVER_ONLY,
-    });
-    return result.data.batch ?? null;
+    const data = await this.firebase.read(
+      getBatchRef(this.firebase.dataConnect, { id }),
+    );
+    return data.batch ?? null;
   }
 
   async create(

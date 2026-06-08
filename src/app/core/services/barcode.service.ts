@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { httpsCallable } from 'firebase/functions';
 import {
-  getCatalogByBarcode,
+  getCatalogByBarcodeRef,
   incrementCatalogUsage,
   upsertCatalogEntry,
   GetCatalogByBarcodeData,
@@ -104,10 +104,10 @@ export class BarcodeLookupService {
 
   private async fetchFromCatalog(barcode: string): Promise<CatalogRow | null> {
     try {
-      const result = await getCatalogByBarcode(this.firebase.dataConnect, {
-        barcode,
-      });
-      return result.data.productCatalog ?? null;
+      const data = await this.firebase.read(
+        getCatalogByBarcodeRef(this.firebase.dataConnect, { barcode }),
+      );
+      return data.productCatalog ?? null;
     } catch {
       return null;
     }
