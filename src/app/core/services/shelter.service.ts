@@ -1,13 +1,14 @@
 import { Injectable, inject } from '@angular/core';
+import { executeQuery, QueryFetchPolicy } from 'firebase/data-connect';
 import {
   createShelter,
   updateShelter,
   deactivateShelter,
   deleteShelter,
   reactivateShelter,
-  listAllShelters,
-  listShelters,
-  getShelter,
+  listAllSheltersRef,
+  listSheltersRef,
+  getShelterRef,
   ListAllSheltersData,
   GetShelterData,
 } from '../dataconnect';
@@ -21,18 +22,30 @@ type ShelterDetail = NonNullable<GetShelterData['shelter']>;
 export class ShelterService {
   private readonly firebase = inject(FirebaseClientService);
 
+  // Reads call executeQuery directly with the query ref rather than the
+  // generated wrappers. The wrappers forward `options.fetchPolicy` (a string)
+  // where executeQuery expects the full options object, so SERVER_ONLY is
+  // dropped and the SDK falls back to PREFER_CACHE — returning stale data
+  // after a mutation (e.g. deactivate). See product.service.listInStock.
   async listAll(): Promise<ShelterListRow[]> {
-    const result = await listAllShelters(this.firebase.dataConnect);
+    const result = await executeQuery(listAllSheltersRef(this.firebase.dataConnect), {
+      fetchPolicy: QueryFetchPolicy.SERVER_ONLY,
+    });
     return result.data.shelters;
   }
 
   async listByActive(isActive: boolean): Promise<ShelterListRow[]> {
-    const result = await listShelters(this.firebase.dataConnect, { isActive });
+    const result = await executeQuery(
+      listSheltersRef(this.firebase.dataConnect, { isActive }),
+      { fetchPolicy: QueryFetchPolicy.SERVER_ONLY },
+    );
     return result.data.shelters;
   }
 
   async get(id: string): Promise<ShelterDetail | null> {
-    const result = await getShelter(this.firebase.dataConnect, { id });
+    const result = await executeQuery(getShelterRef(this.firebase.dataConnect, { id }), {
+      fetchPolicy: QueryFetchPolicy.SERVER_ONLY,
+    });
     return result.data.shelter ?? null;
   }
 
