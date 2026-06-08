@@ -105,5 +105,11 @@
         }
       }
     </div>
+
+    <div class="danger-zone">
+      <button class="btn ghost danger" [disabled]="mutating()" (click)="deleteDonation()">
+        delete donation
+      </button>
+    </div>
   }
 </section>

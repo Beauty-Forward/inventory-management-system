@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ALL_PRODUCT_TYPES } from '../../core/models/product-types';
 import {
   DonationDetail,
@@ -22,11 +22,13 @@ import { SwatchVariant } from '../../shared/components/swatch-card/swatch-card.c
 })
 export class DonationDetailPageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly donationService = inject(DonationService);
 
   readonly donation = signal<DonationDetail | null>(null);
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
+  readonly mutating = signal(false);
 
   readonly productCount = computed(
     () => this.donation()?.products.length ?? 0,
@@ -95,6 +97,32 @@ export class DonationDetailPageComponent implements OnInit {
 
   typeLabel(value: string): string {
     return ALL_PRODUCT_TYPES.find((t) => t.value === value)?.label ?? value;
+  }
+
+  async deleteDonation(): Promise<void> {
+    const d = this.donation();
+    if (!d) return;
+    const count = this.productCount();
+    const note =
+      count > 0
+        ? ` Its ${count} product${count === 1 ? '' : 's'} will also be deleted.`
+        : '';
+    if (
+      !confirm(
+        `Permanently delete this donation from ${d.donor.fullName}?${note} This can't be undone.`,
+      )
+    ) {
+      return;
+    }
+    this.mutating.set(true);
+    try {
+      await this.donationService.delete(d.id, d.donor.id);
+      await this.router.navigate(['/donations']);
+    } catch (err) {
+      console.error(err);
+      this.error.set('Could not delete donation.');
+      this.mutating.set(false);
+    }
   }
 
   productVariant(status: string): StatusPillVariant {

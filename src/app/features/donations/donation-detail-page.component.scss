@@ -134,6 +134,21 @@
   line-height: 1;
 }
 
+.btn {
+  @include pill-button-sm('ghost');
+
+  &.primary { @include pill-button-sm('primary'); }
+  &.ghost { @include pill-button-sm('ghost'); }
+  &.danger { @include pill-button-sm('destructive-ghost'); }
+}
+
+.danger-zone {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid $divider;
+  display: flex;
+}
+
 .cols {
   display: grid;
   grid-template-columns: 1fr 1fr;

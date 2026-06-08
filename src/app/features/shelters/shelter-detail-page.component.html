@@ -117,5 +117,20 @@
         }
       }
     </div>
+
+    <div class="danger-zone">
+      <button
+        class="btn ghost danger"
+        [disabled]="mutating() || !canDelete()"
+        (click)="deleteShelter()"
+      >
+        delete shelter
+      </button>
+      @if (!canDelete()) {
+        <span class="danger-note">
+          Has batches — deactivate instead, or delete its batches first.
+        </span>
+      }
+    </div>
   }
 </section>

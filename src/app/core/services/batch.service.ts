@@ -2,12 +2,14 @@ import { Injectable, inject } from '@angular/core';
 import {
   allocateProductToBatch,
   createBatch,
+  deleteBatch,
   deliverBatch,
   finalizeBatch,
   getBatch,
   listAllBatches,
   listBatches,
   markBatchProductsShipped,
+  returnBatchProductsToStock,
   shipBatch,
   unallocateProduct,
   updateBatchNotes,
@@ -79,5 +81,13 @@ export class BatchService {
       id,
       notes: notes || null,
     });
+  }
+
+  // Hard delete. Return any allocated products to inventory first so they
+  // aren't stranded on a batch row that no longer exists, then drop the batch.
+  // Only meaningful for batches that haven't shipped (enforced in the UI).
+  async delete(id: string): Promise<void> {
+    await returnBatchProductsToStock(this.firebase.dataConnect, { batchId: id });
+    await deleteBatch(this.firebase.dataConnect, { id });
   }
 }

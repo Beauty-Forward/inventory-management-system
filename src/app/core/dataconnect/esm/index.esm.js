@@ -284,6 +284,90 @@ export function incrementCatalogUsage(dcOrVars, vars) {
   return executeMutation(incrementCatalogUsageRef(dcInstance, inputVars));
 }
 
+export const deleteProductRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'DeleteProduct', inputVars);
+}
+deleteProductRef.operationName = 'DeleteProduct';
+
+export function deleteProduct(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(deleteProductRef(dcInstance, inputVars));
+}
+
+export const decrementDonorDonationCountRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'DecrementDonorDonationCount', inputVars);
+}
+decrementDonorDonationCountRef.operationName = 'DecrementDonorDonationCount';
+
+export function decrementDonorDonationCount(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(decrementDonorDonationCountRef(dcInstance, inputVars));
+}
+
+export const deleteDonationProductsRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'DeleteDonationProducts', inputVars);
+}
+deleteDonationProductsRef.operationName = 'DeleteDonationProducts';
+
+export function deleteDonationProducts(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(deleteDonationProductsRef(dcInstance, inputVars));
+}
+
+export const deleteDonationRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'DeleteDonation', inputVars);
+}
+deleteDonationRef.operationName = 'DeleteDonation';
+
+export function deleteDonation(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(deleteDonationRef(dcInstance, inputVars));
+}
+
+export const returnBatchProductsToStockRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'ReturnBatchProductsToStock', inputVars);
+}
+returnBatchProductsToStockRef.operationName = 'ReturnBatchProductsToStock';
+
+export function returnBatchProductsToStock(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(returnBatchProductsToStockRef(dcInstance, inputVars));
+}
+
+export const deleteBatchRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'DeleteBatch', inputVars);
+}
+deleteBatchRef.operationName = 'DeleteBatch';
+
+export function deleteBatch(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(deleteBatchRef(dcInstance, inputVars));
+}
+
+export const deleteShelterRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'DeleteShelter', inputVars);
+}
+deleteShelterRef.operationName = 'DeleteShelter';
+
+export function deleteShelter(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(deleteShelterRef(dcInstance, inputVars));
+}
+
 export const getDonorByEmailRef = (dcOrVars, vars) => {
   const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
   dcInstance._useGeneratedSdk();

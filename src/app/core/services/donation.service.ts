@@ -3,6 +3,8 @@ import { executeQuery, QueryFetchPolicy } from 'firebase/data-connect';
 import {
   createDonation,
   createProduct,
+  deleteDonation,
+  deleteDonationProducts,
   getDonation,
   listRecentDonationsRef,
   GetDonationData,
@@ -95,6 +97,15 @@ export class DonationService {
       productIds.push(id);
     }
     return productIds;
+  }
+
+  // Hard delete with cascade. Products carry a required FK to the donation,
+  // so they're removed first, then the donation row, then the donor's
+  // denormalized counter is corrected. Deletes everything the intake created.
+  async delete(id: string, donorId: string): Promise<void> {
+    await deleteDonationProducts(this.firebase.dataConnect, { donationId: id });
+    await deleteDonation(this.firebase.dataConnect, { id });
+    await this.donorService.decrementDonationCount(donorId);
   }
 
   async createProductForDonation(

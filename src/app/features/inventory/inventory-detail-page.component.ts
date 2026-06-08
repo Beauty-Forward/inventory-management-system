@@ -195,6 +195,30 @@ export class InventoryDetailPageComponent implements OnInit {
     }
   }
 
+  async deleteProduct(): Promise<void> {
+    const p = this.product();
+    if (!p) return;
+    if (
+      !confirm(
+        `Permanently delete "${p.name}"? This removes the lot entirely and can't be undone.`,
+      )
+    ) {
+      return;
+    }
+    this.actionMessage.set(null);
+    this.actionError.set(null);
+    this.pendingAction.set(null);
+    this.mutating.set(true);
+    try {
+      await this.productService.delete(p.id);
+      await this.router.navigate(['/inventory']);
+    } catch (err) {
+      console.error(err);
+      this.actionError.set(`Couldn't delete "${p.name}". Please try again.`);
+      this.mutating.set(false);
+    }
+  }
+
   goToBatch(): void {
     const p = this.product();
     if (p?.batch) this.router.navigate(['/batches', p.batch.id]);

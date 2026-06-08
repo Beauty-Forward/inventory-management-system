@@ -148,5 +148,13 @@
         }
       }
     </div>
+
+    @if (canDelete()) {
+      <div class="danger-zone">
+        <button class="btn ghost danger" [disabled]="mutating()" (click)="deleteBatch()">
+          delete batch
+        </button>
+      </div>
+    }
   }
 </section>
