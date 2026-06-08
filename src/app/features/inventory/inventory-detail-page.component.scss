@@ -148,6 +148,29 @@
   flex-wrap: wrap;
 }
 
+.action-feedback {
+  @include body-sm;
+  margin: -6px 0 18px;
+  padding: 10px 14px;
+  border-radius: 12px;
+
+  &.success {
+    background: rgba($hunter-green, 0.12);
+    color: $hunter-green-deep;
+
+    &::before {
+      content: '✓';
+      margin-right: 8px;
+      font-weight: 700;
+    }
+  }
+
+  &.error {
+    background: rgba($crimson, 0.1);
+    color: $crimson-deep;
+  }
+}
+
 .btn {
   @include pill-button-sm('ghost');
 

@@ -12,6 +12,8 @@ export type StatusPillVariant =
   | 'shipped'
   | 'delivered'
   | 'flagged'
+  | 'expired'
+  | 'discarded'
   | 'soft';
 
 @Component({
