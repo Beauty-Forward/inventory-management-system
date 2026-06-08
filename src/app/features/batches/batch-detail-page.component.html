@@ -44,11 +44,6 @@
             </button>
           }
           <a class="btn ghost" [routerLink]="['/shelters', b.shelter.id]">view shelter</a>
-          @if (canDelete()) {
-            <button class="btn ghost danger" [disabled]="mutating()" (click)="deleteBatch()">
-              delete
-            </button>
-          }
         </div>
       </div>
     </div>
@@ -153,5 +148,13 @@
         }
       }
     </div>
+
+    @if (canDelete()) {
+      <div class="danger-zone">
+        <button class="btn ghost danger" [disabled]="mutating()" (click)="deleteBatch()">
+          delete batch
+        </button>
+      </div>
+    }
   }
 </section>
