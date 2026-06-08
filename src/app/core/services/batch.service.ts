@@ -5,9 +5,9 @@ import {
   deleteBatch,
   deliverBatch,
   finalizeBatch,
-  getBatch,
-  listAllBatches,
-  listBatches,
+  getBatchRef,
+  listAllBatchesRef,
+  listBatchesRef,
   markBatchProductsShipped,
   returnBatchProductsToStock,
   shipBatch,
@@ -27,18 +27,24 @@ export class BatchService {
   private readonly firebase = inject(FirebaseClientService);
 
   async listAll(): Promise<BatchListRow[]> {
-    const result = await listAllBatches(this.firebase.dataConnect);
-    return result.data.batches;
+    const data = await this.firebase.read(
+      listAllBatchesRef(this.firebase.dataConnect),
+    );
+    return data.batches;
   }
 
   async listByStatus(status: BatchStatus): Promise<BatchListRow[]> {
-    const result = await listBatches(this.firebase.dataConnect, { status });
-    return result.data.batches;
+    const data = await this.firebase.read(
+      listBatchesRef(this.firebase.dataConnect, { status }),
+    );
+    return data.batches;
   }
 
   async get(id: string): Promise<BatchDetail | null> {
-    const result = await getBatch(this.firebase.dataConnect, { id });
-    return result.data.batch ?? null;
+    const data = await this.firebase.read(
+      getBatchRef(this.firebase.dataConnect, { id }),
+    );
+    return data.batch ?? null;
   }
 
   async create(

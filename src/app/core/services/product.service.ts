@@ -1,12 +1,11 @@
 import { Injectable, inject } from '@angular/core';
-import { executeQuery, QueryFetchPolicy } from 'firebase/data-connect';
 import {
   deleteProduct,
-  getProduct,
-  listAvailableProductsForShelter,
-  listExpiringSoon,
+  getProductRef,
+  listAvailableProductsForShelterRef,
+  listExpiringSoonRef,
   listInventoryInStockRef,
-  listProductsInBatch,
+  listProductsInBatchRef,
   markProductDiscarded,
   markProductExpired,
   GetProductData,
@@ -32,53 +31,50 @@ export class ProductService {
   private readonly firebase = inject(FirebaseClientService);
 
   async listInStock(filter: InventoryFilter = {}): Promise<InventoryRow[]> {
-    // Call executeQuery directly with the query ref instead of the
-    // auto-generated `listInventoryInStock` wrapper. The wrapper has a
-    // bug — it passes `options.fetchPolicy` (a string) where executeQuery
-    // expects the full options object, so the SDK never sees SERVER_ONLY
-    // and silently falls back to PREFER_CACHE. Direct call preserves the
-    // policy so the Inventory tab always reflects the latest inserts.
-    const result = await executeQuery(
+    const data = await this.firebase.read(
       listInventoryInStockRef(this.firebase.dataConnect, {
         limit: filter.limit ?? 100,
         offset: filter.offset ?? 0,
       }),
-      { fetchPolicy: QueryFetchPolicy.SERVER_ONLY },
     );
-    return result.data.products;
+    return data.products;
   }
 
   async get(id: string): Promise<ProductDetail | null> {
-    const result = await getProduct(this.firebase.dataConnect, { id });
-    return result.data.product ?? null;
+    const data = await this.firebase.read(
+      getProductRef(this.firebase.dataConnect, { id }),
+    );
+    return data.product ?? null;
   }
 
   async listAvailableForShelter(
     types: string[],
     limit = 200,
   ): Promise<AvailableForShelterRow[]> {
-    const result = await listAvailableProductsForShelter(
-      this.firebase.dataConnect,
-      { types: types.length > 0 ? types : null, limit },
+    const data = await this.firebase.read(
+      listAvailableProductsForShelterRef(this.firebase.dataConnect, {
+        types: types.length > 0 ? types : null,
+        limit,
+      }),
     );
-    return result.data.products;
+    return data.products;
   }
 
   async listInBatch(batchId: string) {
-    const result = await listProductsInBatch(this.firebase.dataConnect, {
-      batchId,
-    });
-    return result.data.products;
+    const data = await this.firebase.read(
+      listProductsInBatchRef(this.firebase.dataConnect, { batchId }),
+    );
+    return data.products;
   }
 
   async listExpiringSoon(daysFromNow = 30): Promise<ExpiringRow[]> {
     const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() + daysFromNow);
     const before = cutoff.toISOString().slice(0, 10);
-    const result = await listExpiringSoon(this.firebase.dataConnect, {
-      beforeDate: before,
-    });
-    return result.data.products;
+    const data = await this.firebase.read(
+      listExpiringSoonRef(this.firebase.dataConnect, { beforeDate: before }),
+    );
+    return data.products;
   }
 
   async markExpired(id: string): Promise<void> {

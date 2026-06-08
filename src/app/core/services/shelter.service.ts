@@ -5,9 +5,9 @@ import {
   deactivateShelter,
   deleteShelter,
   reactivateShelter,
-  listAllShelters,
-  listShelters,
-  getShelter,
+  listAllSheltersRef,
+  listSheltersRef,
+  getShelterRef,
   ListAllSheltersData,
   GetShelterData,
 } from '../dataconnect';
@@ -22,18 +22,24 @@ export class ShelterService {
   private readonly firebase = inject(FirebaseClientService);
 
   async listAll(): Promise<ShelterListRow[]> {
-    const result = await listAllShelters(this.firebase.dataConnect);
-    return result.data.shelters;
+    const data = await this.firebase.read(
+      listAllSheltersRef(this.firebase.dataConnect),
+    );
+    return data.shelters;
   }
 
   async listByActive(isActive: boolean): Promise<ShelterListRow[]> {
-    const result = await listShelters(this.firebase.dataConnect, { isActive });
-    return result.data.shelters;
+    const data = await this.firebase.read(
+      listSheltersRef(this.firebase.dataConnect, { isActive }),
+    );
+    return data.shelters;
   }
 
   async get(id: string): Promise<ShelterDetail | null> {
-    const result = await getShelter(this.firebase.dataConnect, { id });
-    return result.data.shelter ?? null;
+    const data = await this.firebase.read(
+      getShelterRef(this.firebase.dataConnect, { id }),
+    );
+    return data.shelter ?? null;
   }
 
   async create(input: ShelterFormInput): Promise<string> {

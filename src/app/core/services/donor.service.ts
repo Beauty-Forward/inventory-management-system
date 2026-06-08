@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import {
   createDonor,
   decrementDonorDonationCount,
-  getDonorByEmail,
+  getDonorByEmailRef,
   incrementDonorDonationCount,
   updateDonor,
   GetDonorByEmailData,
@@ -17,10 +17,12 @@ export class DonorService {
   private readonly firebase = inject(FirebaseClientService);
 
   async findByEmail(email: string): Promise<DonorRow | null> {
-    const result = await getDonorByEmail(this.firebase.dataConnect, {
-      email: email.toLowerCase().trim(),
-    });
-    return result.data.donors[0] ?? null;
+    const data = await this.firebase.read(
+      getDonorByEmailRef(this.firebase.dataConnect, {
+        email: email.toLowerCase().trim(),
+      }),
+    );
+    return data.donors[0] ?? null;
   }
 
   /**
