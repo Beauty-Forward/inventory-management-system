@@ -49,8 +49,6 @@ type Donation @table @index(fields: ["createdAt"], order: [DESC]) {
   # pickup | shipping | dropoff | walk-in
   method: String!
   notes: String
-  # Firebase Auth UID of the warehouse manager who processed it
-  processedBy: String!
   # Mirrors delivery-app `donation_requests.status` for scheduled donations
   # (e.g. 'submitted', 'queued_for_dispatch', 'completed'). Walk-ins use
   # 'walk_in' since they never go through the delivery-app lifecycle.
@@ -89,8 +87,6 @@ type Batch
   shelter: Shelter!
   status: BatchStatus! @default(value: DRAFT)
   notes: String
-  # Firebase Auth UID of the creator
-  createdBy: String!
   finalizedAt: Timestamp
   shippedAt: Timestamp
   deliveredAt: Timestamp

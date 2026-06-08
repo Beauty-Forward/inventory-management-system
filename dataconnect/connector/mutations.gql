@@ -15,7 +15,7 @@ mutation CreateDonor(
   $smsOptIn: Boolean
   $instagramHandle: String
   $linkedRequestId: String
-) @auth(level: PUBLIC) {
+) @auth(level: USER) {
   donor_insert(
     data: {
       email: $email
@@ -39,7 +39,7 @@ mutation UpdateDonor(
   $smsOptIn: Boolean
   $instagramHandle: String
   $linkedRequestId: String
-) @auth(level: PUBLIC) {
+) @auth(level: USER) {
   donor_update(
     id: $id
     data: {
@@ -55,7 +55,7 @@ mutation UpdateDonor(
   )
 }
 
-mutation IncrementDonorDonationCount($id: UUID!) @auth(level: PUBLIC) {
+mutation IncrementDonorDonationCount($id: UUID!) @auth(level: USER) {
   donor_update(
     id: $id
     data: {
@@ -74,9 +74,8 @@ mutation CreateDonation(
   $date: Date!
   $method: String!
   $notes: String
-  $processedBy: String!
   $logisticsStatus: String
-) @auth(level: PUBLIC) {
+) @auth(level: USER) {
   donation_insert(
     data: {
       donorId: $donorId
@@ -85,7 +84,6 @@ mutation CreateDonation(
       date: $date
       method: $method
       notes: $notes
-      processedBy: $processedBy
       logisticsStatus: $logisticsStatus
     }
   )
@@ -99,7 +97,7 @@ mutation UpdateDonationLogistics(
   $logisticsStatus: String!
   $method: String
   $notes: String
-) @auth(level: PUBLIC) {
+) @auth(level: USER) {
   donation_update(
     id: $id
     data: {
@@ -126,7 +124,7 @@ mutation CreateProduct(
   $details: Any
   $expirationDate: Date
   $barcode: String
-) @auth(level: PUBLIC) {
+) @auth(level: USER) {
   product_insert(
     data: {
       donationId: $donationId
@@ -146,7 +144,7 @@ mutation CreateProduct(
 }
 
 mutation AllocateProductToBatch($productId: UUID!, $batchId: UUID!)
-  @auth(level: PUBLIC) {
+  @auth(level: USER) {
   product_update(
     id: $productId
     data: {
@@ -157,7 +155,7 @@ mutation AllocateProductToBatch($productId: UUID!, $batchId: UUID!)
   )
 }
 
-mutation UnallocateProduct($productId: UUID!) @auth(level: PUBLIC) {
+mutation UnallocateProduct($productId: UUID!) @auth(level: USER) {
   product_update(
     id: $productId
     data: {
@@ -168,21 +166,21 @@ mutation UnallocateProduct($productId: UUID!) @auth(level: PUBLIC) {
   )
 }
 
-mutation MarkBatchProductsShipped($batchId: UUID!) @auth(level: PUBLIC) {
+mutation MarkBatchProductsShipped($batchId: UUID!) @auth(level: USER) {
   product_updateMany(
     where: { batchId: { eq: $batchId } }
     data: { status: SHIPPED, updatedAt_expr: "request.time" }
   )
 }
 
-mutation MarkProductExpired($productId: UUID!) @auth(level: PUBLIC) {
+mutation MarkProductExpired($productId: UUID!) @auth(level: USER) {
   product_update(
     id: $productId
     data: { status: EXPIRED, updatedAt_expr: "request.time" }
   )
 }
 
-mutation MarkProductDiscarded($productId: UUID!) @auth(level: PUBLIC) {
+mutation MarkProductDiscarded($productId: UUID!) @auth(level: USER) {
   product_update(
     id: $productId
     data: { status: DISCARDED, updatedAt_expr: "request.time" }
@@ -206,7 +204,7 @@ mutation CreateShelter(
   $preferredBrands: [String!]
   $notes: String
   $capacityPerBatch: Int
-) @auth(level: PUBLIC) {
+) @auth(level: USER) {
   shelter_insert(
     data: {
       name: $name
@@ -243,7 +241,7 @@ mutation UpdateShelter(
   $preferredBrands: [String!]
   $notes: String
   $capacityPerBatch: Int
-) @auth(level: PUBLIC) {
+) @auth(level: USER) {
   shelter_update(
     id: $id
     data: {
@@ -266,14 +264,14 @@ mutation UpdateShelter(
   )
 }
 
-mutation DeactivateShelter($id: UUID!) @auth(level: PUBLIC) {
+mutation DeactivateShelter($id: UUID!) @auth(level: USER) {
   shelter_update(
     id: $id
     data: { isActive: false, updatedAt_expr: "request.time" }
   )
 }
 
-mutation ReactivateShelter($id: UUID!) @auth(level: PUBLIC) {
+mutation ReactivateShelter($id: UUID!) @auth(level: USER) {
   shelter_update(
     id: $id
     data: { isActive: true, updatedAt_expr: "request.time" }
@@ -284,19 +282,17 @@ mutation ReactivateShelter($id: UUID!) @auth(level: PUBLIC) {
 
 mutation CreateBatch(
   $shelterId: UUID!
-  $createdBy: String!
   $notes: String
-) @auth(level: PUBLIC) {
+) @auth(level: USER) {
   batch_insert(
     data: {
       shelterId: $shelterId
-      createdBy: $createdBy
       notes: $notes
     }
   )
 }
 
-mutation FinalizeBatch($id: UUID!) @auth(level: PUBLIC) {
+mutation FinalizeBatch($id: UUID!) @auth(level: USER) {
   batch_update(
     id: $id
     data: {
@@ -307,7 +303,7 @@ mutation FinalizeBatch($id: UUID!) @auth(level: PUBLIC) {
   )
 }
 
-mutation ShipBatch($id: UUID!) @auth(level: PUBLIC) {
+mutation ShipBatch($id: UUID!) @auth(level: USER) {
   batch_update(
     id: $id
     data: {
@@ -318,7 +314,7 @@ mutation ShipBatch($id: UUID!) @auth(level: PUBLIC) {
   )
 }
 
-mutation DeliverBatch($id: UUID!) @auth(level: PUBLIC) {
+mutation DeliverBatch($id: UUID!) @auth(level: USER) {
   batch_update(
     id: $id
     data: {
@@ -329,7 +325,7 @@ mutation DeliverBatch($id: UUID!) @auth(level: PUBLIC) {
   )
 }
 
-mutation UpdateBatchNotes($id: UUID!, $notes: String) @auth(level: PUBLIC) {
+mutation UpdateBatchNotes($id: UUID!, $notes: String) @auth(level: USER) {
   batch_update(
     id: $id
     data: { notes: $notes, updatedAt_expr: "request.time" }
@@ -347,7 +343,7 @@ mutation UpsertCatalogEntry(
   $color: String
   $keyIngredients: String
   $source: String!
-) @auth(level: PUBLIC) {
+) @auth(level: USER) {
   productCatalog_upsert(
     data: {
       barcode: $barcode
@@ -363,7 +359,7 @@ mutation UpsertCatalogEntry(
   )
 }
 
-mutation IncrementCatalogUsage($barcode: String!) @auth(level: PUBLIC) {
+mutation IncrementCatalogUsage($barcode: String!) @auth(level: USER) {
   productCatalog_update(
     key: { barcode: $barcode }
     data: {

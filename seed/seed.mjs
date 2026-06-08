@@ -19,7 +19,6 @@ import {
   upsertCatalogEntry,
 } from '../src/app/core/dataconnect/esm/index.esm.js';
 
-const FAKE_UID = 'seed-warehouse-manager';
 
 const app = initializeApp({
   projectId: 'beauty-forward',
@@ -134,7 +133,6 @@ async function run() {
       warehouseReference: warehouseRef,
       date,
       method,
-      processedBy: FAKE_UID,
       // Seed acts as if these donations have been received at the warehouse.
       // Walk-ins use 'walk_in'; scheduled donations get 'completed' (arrived).
       logisticsStatus: method === 'walk-in' ? 'walk_in' : 'completed',
@@ -205,7 +203,6 @@ async function run() {
   // Batch 1: DRAFT for Sunrise — allocate Naomi's CeraVe + Jordan's OGX
   const batch1 = (await createBatch(dc, {
     shelterId: shelter1,
-    createdBy: FAKE_UID,
     notes: 'Family shelter pickup, week of June 1.',
   })).data.batch_insert.id;
 
@@ -216,7 +213,6 @@ async function run() {
   // Batch 2: FINALIZED for Anchor House — Tasha's makeup donations
   const batch2 = (await createBatch(dc, {
     shelterId: shelter2,
-    createdBy: FAKE_UID,
     notes: 'Color cosmetics drop. Shipped via courier.',
   })).data.batch_insert.id;
 

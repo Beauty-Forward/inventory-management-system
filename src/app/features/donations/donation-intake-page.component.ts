@@ -10,7 +10,6 @@ import { CameraScannerComponent } from '../../shared/components/camera-scanner/c
 import { CapturedPhoto } from '../../shared/components/photo-capture/photo-capture.component';
 import { CrumbComponent } from '../../shared/components/crumb/crumb.component';
 import { StepperComponent, StepperStep } from '../../shared/components/stepper/stepper.component';
-import { AuthService } from '../../core/services/auth.service';
 import { BarcodeLookupService } from '../../core/services/barcode.service';
 import { DonationService } from '../../core/services/donation.service';
 import { generateWalkInReference } from '../../core/utils/warehouse-reference';
@@ -100,7 +99,6 @@ export class DonationIntakePageComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly donationService = inject(DonationService);
-  private readonly authService = inject(AuthService);
   private readonly barcodeService = inject(BarcodeLookupService);
 
   // When set, the intake skips the donor step and lands straight on
@@ -369,11 +367,7 @@ export class DonationIntakePageComponent implements OnInit {
     this.saving.set(true);
     this.step.set('saving');
     try {
-      const processedBy = this.authService.user()?.uid ?? 'unauthenticated';
-      const result = await this.donationService.processIntake(
-        parsed.data,
-        processedBy,
-      );
+      const result = await this.donationService.processIntake(parsed.data);
       await this.router.navigate(['/donations', result.donationId]);
     } catch (err) {
       console.error(err);

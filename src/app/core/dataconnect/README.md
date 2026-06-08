@@ -626,7 +626,6 @@ export interface GetDonationData {
     date: DateString;
     method: string;
     notes?: string | null;
-    processedBy: string;
     createdAt: TimestampString;
     donor: {
       id: UUIDString;
@@ -1981,7 +1980,6 @@ export interface GetBatchData {
     id: UUIDString;
     status: BatchStatus;
     notes?: string | null;
-    createdBy: string;
     finalizedAt?: TimestampString | null;
     shippedAt?: TimestampString | null;
     deliveredAt?: TimestampString | null;
@@ -2816,7 +2814,6 @@ export interface CreateDonationVariables {
   date: DateString;
   method: string;
   notes?: string | null;
-  processedBy: string;
   logisticsStatus?: string | null;
 }
 ```
@@ -2843,7 +2840,6 @@ const createDonationVars: CreateDonationVariables = {
   date: ..., 
   method: ..., 
   notes: ..., // optional
-  processedBy: ..., 
   logisticsStatus: ..., // optional
 };
 
@@ -2851,7 +2847,7 @@ const createDonationVars: CreateDonationVariables = {
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await createDonation(createDonationVars);
 // Variables can be defined inline as well.
-const { data } = await createDonation({ donorId: ..., donationRequestId: ..., warehouseReference: ..., date: ..., method: ..., notes: ..., processedBy: ..., logisticsStatus: ..., });
+const { data } = await createDonation({ donorId: ..., donationRequestId: ..., warehouseReference: ..., date: ..., method: ..., notes: ..., logisticsStatus: ..., });
 
 // You can also pass in a `DataConnect` instance to the action shortcut function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -2880,14 +2876,13 @@ const createDonationVars: CreateDonationVariables = {
   date: ..., 
   method: ..., 
   notes: ..., // optional
-  processedBy: ..., 
   logisticsStatus: ..., // optional
 };
 
 // Call the `createDonationRef()` function to get a reference to the mutation.
 const ref = createDonationRef(createDonationVars);
 // Variables can be defined inline as well.
-const ref = createDonationRef({ donorId: ..., donationRequestId: ..., warehouseReference: ..., date: ..., method: ..., notes: ..., processedBy: ..., logisticsStatus: ..., });
+const ref = createDonationRef({ donorId: ..., donationRequestId: ..., warehouseReference: ..., date: ..., method: ..., notes: ..., logisticsStatus: ..., });
 
 // You can also pass in a `DataConnect` instance to the `MutationRef` function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -4266,7 +4261,6 @@ The `CreateBatch` mutation requires an argument of type `CreateBatchVariables`, 
 ```typescript
 export interface CreateBatchVariables {
   shelterId: UUIDString;
-  createdBy: string;
   notes?: string | null;
 }
 ```
@@ -4288,7 +4282,6 @@ import { connectorConfig, createBatch, CreateBatchVariables } from '@bf-ims/data
 // The `CreateBatch` mutation requires an argument of type `CreateBatchVariables`:
 const createBatchVars: CreateBatchVariables = {
   shelterId: ..., 
-  createdBy: ..., 
   notes: ..., // optional
 };
 
@@ -4296,7 +4289,7 @@ const createBatchVars: CreateBatchVariables = {
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await createBatch(createBatchVars);
 // Variables can be defined inline as well.
-const { data } = await createBatch({ shelterId: ..., createdBy: ..., notes: ..., });
+const { data } = await createBatch({ shelterId: ..., notes: ..., });
 
 // You can also pass in a `DataConnect` instance to the action shortcut function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -4320,14 +4313,13 @@ import { connectorConfig, createBatchRef, CreateBatchVariables } from '@bf-ims/d
 // The `CreateBatch` mutation requires an argument of type `CreateBatchVariables`:
 const createBatchVars: CreateBatchVariables = {
   shelterId: ..., 
-  createdBy: ..., 
   notes: ..., // optional
 };
 
 // Call the `createBatchRef()` function to get a reference to the mutation.
 const ref = createBatchRef(createBatchVars);
 // Variables can be defined inline as well.
-const ref = createBatchRef({ shelterId: ..., createdBy: ..., notes: ..., });
+const ref = createBatchRef({ shelterId: ..., notes: ..., });
 
 // You can also pass in a `DataConnect` instance to the `MutationRef` function.
 const dataConnect = getDataConnect(connectorConfig);

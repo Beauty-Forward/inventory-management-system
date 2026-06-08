@@ -45,7 +45,6 @@ export interface CreateBatchData {
 
 export interface CreateBatchVariables {
   shelterId: UUIDString;
-  createdBy: string;
   notes?: string | null;
 }
 
@@ -60,7 +59,6 @@ export interface CreateDonationVariables {
   date: DateString;
   method: string;
   notes?: string | null;
-  processedBy: string;
   logisticsStatus?: string | null;
 }
 
@@ -176,7 +174,6 @@ export interface GetBatchData {
     id: UUIDString;
     status: BatchStatus;
     notes?: string | null;
-    createdBy: string;
     finalizedAt?: TimestampString | null;
     shippedAt?: TimestampString | null;
     deliveredAt?: TimestampString | null;
@@ -246,7 +243,6 @@ export interface GetDonationData {
     date: DateString;
     method: string;
     notes?: string | null;
-    processedBy: string;
     createdAt: TimestampString;
     donor: {
       id: UUIDString;

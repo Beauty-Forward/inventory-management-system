@@ -52,7 +52,6 @@ export class DonationService {
    */
   async processIntake(
     input: DonationIntakeInput,
-    processedBy: string,
   ): Promise<DonationIntakeResult> {
     const donorId = await this.donorService.upsertByEmail({
       ...input.donor,
@@ -66,7 +65,6 @@ export class DonationService {
       date: input.date,
       method: input.method,
       notes: input.notes ?? null,
-      processedBy,
       // Walk-in intake never goes through the delivery-app lifecycle.
       // Scheduled donations get their status set by the Firestore trigger.
       logisticsStatus: 'walk_in',
