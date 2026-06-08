@@ -41,12 +41,10 @@ export class BatchService {
 
   async create(
     shelterId: string,
-    createdBy: string,
     notes?: string,
   ): Promise<string> {
     const result = await createBatch(this.firebase.dataConnect, {
       shelterId,
-      createdBy,
       notes: notes || null,
     });
     return result.data.batch_insert.id;

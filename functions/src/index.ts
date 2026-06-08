@@ -598,8 +598,7 @@ export const onDonationRequestWrite = onDocumentWritten(
       return;
     }
 
-    // 3b. No IMS donation yet — insert one. processedBy is the sync's
-    // sentinel so a human UID isn't fabricated.
+    // 3b. No IMS donation yet — insert one.
     const warehouseRef = after.dropoff?.referenceCode || fallbackWarehouseRef(docId);
     interface DonationInsertResult {
       donation_insert: { id: string };
@@ -612,18 +611,16 @@ export const onDonationRequestWrite = onDocumentWritten(
         warehouseReference: string;
         date: string;
         method: string;
-        processedBy: string;
         logisticsStatus: string;
       }
     >(
-      `mutation M($donorId: UUID!, $donationRequestId: String!, $warehouseReference: String!, $date: Date!, $method: String!, $processedBy: String!, $logisticsStatus: String!) {
+      `mutation M($donorId: UUID!, $donationRequestId: String!, $warehouseReference: String!, $date: Date!, $method: String!, $logisticsStatus: String!) {
         donation_insert(data: {
           donorId: $donorId,
           donationRequestId: $donationRequestId,
           warehouseReference: $warehouseReference,
           date: $date,
           method: $method,
-          processedBy: $processedBy,
           logisticsStatus: $logisticsStatus
         })
       }`,
@@ -634,7 +631,6 @@ export const onDonationRequestWrite = onDocumentWritten(
           warehouseReference: warehouseRef,
           date: pickDate(after),
           method,
-          processedBy: 'delivery-app-sync',
           logisticsStatus: after.status,
         },
       },

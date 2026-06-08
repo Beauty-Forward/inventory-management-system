@@ -2,7 +2,6 @@ import { DatePipe } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { ALL_PRODUCT_TYPES } from '../../core/models/product-types';
-import { AuthService } from '../../core/services/auth.service';
 import { BatchService } from '../../core/services/batch.service';
 import {
   AvailableForShelterRow,
@@ -23,7 +22,6 @@ import { CrumbComponent } from '../../shared/components/crumb/crumb.component';
 })
 export class BatchFormPageComponent implements OnInit {
   private readonly router = inject(Router);
-  private readonly authService = inject(AuthService);
   private readonly batchService = inject(BatchService);
   private readonly shelterService = inject(ShelterService);
   private readonly productService = inject(ProductService);
@@ -115,10 +113,8 @@ export class BatchFormPageComponent implements OnInit {
     this.creating.set(true);
     this.error.set(null);
     try {
-      const createdBy = this.authService.user()?.uid ?? 'unauthenticated';
       const batchId = await this.batchService.create(
         shelter.id,
-        createdBy,
         this.notes() || undefined,
       );
 

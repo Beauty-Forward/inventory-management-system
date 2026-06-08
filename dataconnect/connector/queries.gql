@@ -1,12 +1,14 @@
 # ============================================================
 # Beauty Forward IMS — Queries
 # ============================================================
-# Auth is set to PUBLIC while the app is in development. When we
-# turn on auth, change these to @auth(level: USER).
+# All operations require an authenticated user (@auth(level: USER)).
+# The web client attaches the signed-in user's token automatically;
+# server-side callers (Cloud Functions) use the Admin SDK, which
+# bypasses these directives.
 
 # --- Donors ---
 
-query GetDonorByEmail($email: String!) @auth(level: PUBLIC) {
+query GetDonorByEmail($email: String!) @auth(level: USER) {
   donors(where: { email: { eq: $email } }, limit: 1) {
     id
     fullName
@@ -20,7 +22,7 @@ query GetDonorByEmail($email: String!) @auth(level: PUBLIC) {
   }
 }
 
-query GetDonor($id: UUID!) @auth(level: PUBLIC) {
+query GetDonor($id: UUID!) @auth(level: USER) {
   donor(id: $id) {
     id
     fullName
@@ -38,7 +40,7 @@ query GetDonor($id: UUID!) @auth(level: PUBLIC) {
 
 # --- Donations ---
 
-query ListRecentDonations($limit: Int) @auth(level: PUBLIC) {
+query ListRecentDonations($limit: Int) @auth(level: USER) {
   donations(orderBy: [{ createdAt: DESC }], limit: $limit) {
     id
     date
@@ -62,14 +64,14 @@ query ListRecentDonations($limit: Int) @auth(level: PUBLIC) {
 # Cross-app sync uses this to find an already-synced IMS donation when a
 # `donation_requests` Firestore doc fires a re-write, so we update in
 # place rather than inserting duplicates.
-query GetDonationByRequestId($donationRequestId: String!) @auth(level: PUBLIC) {
+query GetDonationByRequestId($donationRequestId: String!) @auth(level: USER) {
   donations(where: { donationRequestId: { eq: $donationRequestId } }, limit: 1) {
     id
     logisticsStatus
   }
 }
 
-query GetDonation($id: UUID!) @auth(level: PUBLIC) {
+query GetDonation($id: UUID!) @auth(level: USER) {
   donation(id: $id) {
     id
     donationRequestId
@@ -77,7 +79,6 @@ query GetDonation($id: UUID!) @auth(level: PUBLIC) {
     date
     method
     notes
-    processedBy
     createdAt
     donor {
       id
@@ -101,7 +102,7 @@ query GetDonation($id: UUID!) @auth(level: PUBLIC) {
 
 # --- Shelters ---
 
-query ListShelters($isActive: Boolean) @auth(level: PUBLIC) {
+query ListShelters($isActive: Boolean) @auth(level: USER) {
   shelters(
     where: { isActive: { eq: $isActive } }
     orderBy: [{ name: ASC }]
@@ -119,7 +120,7 @@ query ListShelters($isActive: Boolean) @auth(level: PUBLIC) {
   }
 }
 
-query ListAllShelters @auth(level: PUBLIC) {
+query ListAllShelters @auth(level: USER) {
   shelters(orderBy: [{ name: ASC }]) {
     id
     name
@@ -134,7 +135,7 @@ query ListAllShelters @auth(level: PUBLIC) {
   }
 }
 
-query GetShelter($id: UUID!) @auth(level: PUBLIC) {
+query GetShelter($id: UUID!) @auth(level: USER) {
   shelter(id: $id) {
     id
     name
@@ -168,7 +169,7 @@ query GetShelter($id: UUID!) @auth(level: PUBLIC) {
 query ListInventoryInStock(
   $limit: Int
   $offset: Int
-) @auth(level: PUBLIC) {
+) @auth(level: USER) {
   # Returns all in-stock products. The inventory page filters by category
   # client-side via CATEGORY_TYPES (a category covers multiple type values),
   # so a single-type server filter wouldn't match the UI anyway. The
@@ -205,7 +206,7 @@ query ListInventoryInStock(
   }
 }
 
-query GetProduct($id: UUID!) @auth(level: PUBLIC) {
+query GetProduct($id: UUID!) @auth(level: USER) {
   product(id: $id) {
     id
     name
@@ -245,7 +246,7 @@ query GetProduct($id: UUID!) @auth(level: PUBLIC) {
 query ListAvailableProductsForShelter(
   $types: [String!]
   $limit: Int
-) @auth(level: PUBLIC) {
+) @auth(level: USER) {
   products(
     where: {
       status: { eq: IN_STOCK }
@@ -264,7 +265,7 @@ query ListAvailableProductsForShelter(
   }
 }
 
-query ListProductsInBatch($batchId: UUID!) @auth(level: PUBLIC) {
+query ListProductsInBatch($batchId: UUID!) @auth(level: USER) {
   products(where: { batchId: { eq: $batchId } }) {
     id
     name
@@ -275,7 +276,7 @@ query ListProductsInBatch($batchId: UUID!) @auth(level: PUBLIC) {
   }
 }
 
-query ListExpiringSoon($beforeDate: Date!) @auth(level: PUBLIC) {
+query ListExpiringSoon($beforeDate: Date!) @auth(level: USER) {
   products(
     where: {
       status: { eq: IN_STOCK }
@@ -295,7 +296,7 @@ query ListExpiringSoon($beforeDate: Date!) @auth(level: PUBLIC) {
 
 # --- Batches ---
 
-query ListBatches($status: BatchStatus) @auth(level: PUBLIC) {
+query ListBatches($status: BatchStatus) @auth(level: USER) {
   batches(
     where: { status: { eq: $status } }
     orderBy: [{ createdAt: DESC }]
@@ -315,7 +316,7 @@ query ListBatches($status: BatchStatus) @auth(level: PUBLIC) {
   }
 }
 
-query ListAllBatches @auth(level: PUBLIC) {
+query ListAllBatches @auth(level: USER) {
   batches(orderBy: [{ createdAt: DESC }]) {
     id
     status
@@ -332,12 +333,11 @@ query ListAllBatches @auth(level: PUBLIC) {
   }
 }
 
-query GetBatch($id: UUID!) @auth(level: PUBLIC) {
+query GetBatch($id: UUID!) @auth(level: USER) {
   batch(id: $id) {
     id
     status
     notes
-    createdBy
     finalizedAt
     shippedAt
     deliveredAt
@@ -368,13 +368,13 @@ query GetBatch($id: UUID!) @auth(level: PUBLIC) {
 
 # --- Dashboard stats ---
 
-query DashboardInStockCount @auth(level: PUBLIC) {
+query DashboardInStockCount @auth(level: USER) {
   products(where: { status: { eq: IN_STOCK } }) {
     id
   }
 }
 
-query DashboardStats @auth(level: PUBLIC) {
+query DashboardStats @auth(level: USER) {
   inStock: products(where: { status: { eq: IN_STOCK } }) {
     id
   }
@@ -388,7 +388,7 @@ query DashboardStats @auth(level: PUBLIC) {
 
 # --- Product Catalog (Phase 7) ---
 
-query GetCatalogByBarcode($barcode: String!) @auth(level: PUBLIC) {
+query GetCatalogByBarcode($barcode: String!) @auth(level: USER) {
   productCatalog(key: { barcode: $barcode }) {
     barcode
     name

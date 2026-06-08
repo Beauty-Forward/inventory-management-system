@@ -8,7 +8,6 @@ export interface Batch {
   productCount: number;
   productSummary: Record<string, number>;
   notes?: string;
-  createdBy: string;
   finalizedAt?: Date;
   shippedAt?: Date;
   deliveredAt?: Date;

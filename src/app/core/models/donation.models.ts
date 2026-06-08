@@ -7,7 +7,6 @@ export interface Donation {
   date: Date;
   method: DonationMethod;
   notes?: string;
-  processedBy: string;
   createdAt: Date;
   updatedAt: Date;
 }
