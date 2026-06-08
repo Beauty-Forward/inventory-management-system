@@ -338,6 +338,12 @@ $mobile-breakpoint: 768px;
   } @else if $variant == 'flagged' {
     background: $crimson-deep;
     color: $porcelain;
+  } @else if $variant == 'expired' {
+    background: $border-color;
+    color: $muted-ink;
+  } @else if $variant == 'discarded' {
+    background: $double-espresso;
+    color: $porcelain;
   } @else if $variant == 'soft' {
     background: $panel-bg;
     color: $double-espresso;

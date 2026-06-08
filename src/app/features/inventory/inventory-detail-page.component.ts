@@ -49,6 +49,11 @@ export class InventoryDetailPageComponent implements OnInit {
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
   readonly mutating = signal(false);
+  // Which status change is in flight, so the button can show progress.
+  readonly pendingAction = signal<'expired' | 'discarded' | null>(null);
+  // Inline feedback shown after a status change succeeds or fails.
+  readonly actionMessage = signal<string | null>(null);
+  readonly actionError = signal<string | null>(null);
 
   readonly category = computed(() => {
     const p = this.product();
@@ -66,7 +71,8 @@ export class InventoryDetailPageComponent implements OnInit {
     if (!p) return 'soft';
     if (p.status === 'IN_STOCK') return 'ready-strong';
     if (p.status === 'ALLOCATED') return 'route';
-    if (p.status === 'EXPIRED') return 'expiring-strong';
+    if (p.status === 'EXPIRED') return 'expired';
+    if (p.status === 'DISCARDED') return 'discarded';
     if (p.status === 'SHIPPED') return 'shipped';
     return 'soft';
   });
@@ -152,33 +158,40 @@ export class InventoryDetailPageComponent implements OnInit {
     return p.quantity === 1 ? 'unit' : 'units';
   }
 
-  async markExpired(): Promise<void> {
-    const p = this.product();
-    if (!p) return;
-    if (!confirm(`Mark "${p.name}" as expired? It will be removed from inventory.`)) {
-      return;
-    }
-    this.mutating.set(true);
-    try {
-      await this.productService.markExpired(p.id);
-      await this.load(p.id);
-    } finally {
-      this.mutating.set(false);
-    }
+  markExpired(): Promise<void> {
+    return this.applyStatus('expired', (id) => this.productService.markExpired(id));
   }
 
-  async markDiscarded(): Promise<void> {
+  markDiscarded(): Promise<void> {
+    return this.applyStatus('discarded', (id) => this.productService.markDiscarded(id));
+  }
+
+  // Shared flow for the "mark expired"/"mark discarded" actions: confirm,
+  // run the mutation with in-flight state, reload, then surface inline
+  // success or error feedback so the action never completes silently.
+  private async applyStatus(
+    action: 'expired' | 'discarded',
+    run: (id: string) => Promise<void>,
+  ): Promise<void> {
     const p = this.product();
     if (!p) return;
-    if (!confirm(`Mark "${p.name}" as discarded? It will be removed from inventory.`)) {
+    if (!confirm(`Mark "${p.name}" as ${action}? It will be removed from inventory.`)) {
       return;
     }
+    this.actionMessage.set(null);
+    this.actionError.set(null);
+    this.pendingAction.set(action);
     this.mutating.set(true);
     try {
-      await this.productService.markDiscarded(p.id);
+      await run(p.id);
       await this.load(p.id);
+      this.actionMessage.set(`Marked as ${action} — removed from inventory.`);
+    } catch (err) {
+      console.error(err);
+      this.actionError.set(`Couldn't mark "${p.name}" as ${action}. Please try again.`);
     } finally {
       this.mutating.set(false);
+      this.pendingAction.set(null);
     }
   }
 

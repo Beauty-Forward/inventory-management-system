@@ -64,9 +64,20 @@
         @if (p.batch) { view batch → } @else { assign to batch → }
       </button>
       <button class="btn ghost" (click)="goToDonation()">view donation</button>
-      <button class="btn ghost" (click)="markExpired()" [disabled]="mutating()">mark expired</button>
-      <button class="btn ghost" (click)="markDiscarded()" [disabled]="mutating()">mark discarded</button>
+      <button class="btn ghost" (click)="markExpired()" [disabled]="mutating()">
+        {{ pendingAction() === 'expired' ? 'expiring…' : 'mark expired' }}
+      </button>
+      <button class="btn ghost" (click)="markDiscarded()" [disabled]="mutating()">
+        {{ pendingAction() === 'discarded' ? 'discarding…' : 'mark discarded' }}
+      </button>
     </div>
+
+    @if (actionMessage()) {
+      <div class="action-feedback success" role="status">{{ actionMessage() }}</div>
+    }
+    @if (actionError()) {
+      <div class="action-feedback error" role="alert">{{ actionError() }}</div>
+    }
 
     <div class="cols">
       <div class="panel">

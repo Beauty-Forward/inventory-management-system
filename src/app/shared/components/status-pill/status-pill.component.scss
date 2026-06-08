@@ -12,5 +12,7 @@
   &[data-variant='shipped'] { @include status-pill('shipped'); }
   &[data-variant='delivered'] { @include status-pill('delivered'); }
   &[data-variant='flagged'] { @include status-pill('flagged'); }
+  &[data-variant='expired'] { @include status-pill('expired'); }
+  &[data-variant='discarded'] { @include status-pill('discarded'); }
   &[data-variant='soft'] { @include status-pill('soft'); }
 }
