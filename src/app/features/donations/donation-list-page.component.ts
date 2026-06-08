@@ -67,15 +67,22 @@ export class DonationListPageComponent implements OnInit {
   ];
 
   // Logistics buckets:
-  //   incoming  — still in flight from the delivery app (logisticsStatus
-  //               is neither 'completed' nor 'walk_in')
+  //   incoming  — still in flight from the delivery app (not yet here). The
+  //               "Mark arrived" CTA shows here.
   //   arrived   — physically here, no products attached yet; needs the
   //               manager's attention. The "Process" CTA shows here.
   //   processed — has products attached
-  // Walk-ins skip Incoming since the intake flow creates the donation and
-  // its products in one shot, so they land as Processed.
+  // A donation counts as "here" when the delivery app marked it 'completed'
+  // (pickups, via payment verification), when a walk-in created it locally,
+  // or when the manager manually marked it 'arrived'. The manual path covers
+  // shipping and drop-off donations, which never reach 'completed' on their
+  // own and would otherwise sit in Incoming forever.
   isHere(d: DonationListRow): boolean {
-    return d.logisticsStatus === 'completed' || d.logisticsStatus === 'walk_in';
+    return (
+      d.logisticsStatus === 'completed' ||
+      d.logisticsStatus === 'walk_in' ||
+      d.logisticsStatus === 'arrived'
+    );
   }
   isProcessed(d: DonationListRow): boolean {
     return (d.products?.length ?? 0) > 0;
@@ -138,6 +145,33 @@ export class DonationListPageComponent implements OnInit {
     this.router.navigate(['/donations/new'], {
       queryParams: { donationId },
     });
+  }
+
+  // Tracks which donation rows are mid-flight on a "Mark arrived" click so the
+  // button can disable itself and we don't double-submit.
+  readonly marking = signal<ReadonlySet<string>>(new Set());
+
+  // Click handler on the "Mark arrived" button shown on Incoming rows. Flips
+  // the donation to 'arrived' so it moves into the Arrived bucket, then
+  // reloads. Used for shipping/drop-off donations that never auto-complete.
+  async markArrived(donationId: string, event: Event): Promise<void> {
+    event.preventDefault();
+    event.stopPropagation();
+    if (this.marking().has(donationId)) return;
+    this.marking.update((s) => new Set(s).add(donationId));
+    try {
+      await this.donationService.markArrived(donationId);
+      await this.load();
+    } catch (err) {
+      console.error(err);
+      this.error.set('Could not mark the donation as arrived.');
+    } finally {
+      this.marking.update((s) => {
+        const next = new Set(s);
+        next.delete(donationId);
+        return next;
+      });
+    }
   }
 
   readonly buckets = computed<DayBucket[]>(() => {

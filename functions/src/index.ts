@@ -448,7 +448,10 @@ const DC_CONNECTOR = {
 interface DeliveryAppDonationDoc {
   donationType?: 'pickup' | 'shipping' | 'dropoff';
   status?: string;
-  createdAt?: string;
+  // Firestore Timestamp on the callable write path (admin SDK .data() returns
+  // Timestamp instances), or an ISO string on the delivery app's direct-write
+  // fallback path. Coerced via toIsoDay — never assume it's a string.
+  createdAt?: unknown;
   donor?: {
     fullName?: string;
     email?: string;
@@ -459,11 +462,25 @@ interface DeliveryAppDonationDoc {
   shipping?: Record<string, unknown>;
 }
 
+// Coerce a delivery-app `createdAt` to a YYYY-MM-DD string. It arrives as a
+// Firestore Timestamp (callable path) or an ISO string (fallback path).
+// Calling .slice() on a Timestamp threw and aborted the whole sync — and
+// since shipping donations have no preferredDate to short-circuit pickDate,
+// they hit this path every time and never reached the IMS. See
+// donation-delivery-app#91.
+function toIsoDay(value: unknown): string | undefined {
+  if (typeof value === 'string') return value.slice(0, 10);
+  if (value && typeof (value as { toDate?: () => Date }).toDate === 'function') {
+    return (value as { toDate: () => Date }).toDate().toISOString().slice(0, 10);
+  }
+  return undefined;
+}
+
 function pickDate(doc: DeliveryAppDonationDoc): string {
   return (
     doc.dropoff?.preferredDate ||
     doc.pickup?.preferredDate ||
-    doc.createdAt?.slice(0, 10) ||
+    toIsoDay(doc.createdAt) ||
     new Date().toISOString().slice(0, 10)
   );
 }

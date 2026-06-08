@@ -73,6 +73,15 @@
             <button type="button" class="process-cta" (click)="processArrived(d.id, $event)">
               process →
             </button>
+          } @else if (isIncoming(d)) {
+            <button
+              type="button"
+              class="arrive-cta"
+              [disabled]="marking().has(d.id)"
+              (click)="markArrived(d.id, $event)"
+            >
+              mark arrived
+            </button>
           } @else {
             <app-status-pill [variant]="variant(d)">{{ d.method }}</app-status-pill>
           }
