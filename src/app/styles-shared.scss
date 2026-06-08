@@ -379,6 +379,30 @@ $mobile-breakpoint: 768px;
   border: 1px solid $panel-border;
   border-radius: 999px;
   background: $white;
+
+  // On mobile the chips wrap to several rows; a full pill radius curves
+  // inward and clips the corner content (e.g. "skincare"). Switch to a
+  // rounded rectangle and give the search its own row so the chips get
+  // clean, untruncated lines below it.
+  @media (max-width: $mobile-breakpoint) {
+    border-radius: 22px;
+    padding: 10px;
+    gap: 8px;
+
+    .search-field {
+      flex: 1 1 100%;
+      min-width: 0;
+      padding: 6px 8px 10px;
+      border-bottom: 1px solid $panel-border;
+
+      input { font-size: 16px; } // 16px avoids iOS zoom-on-focus
+    }
+
+    .filter-chip {
+      padding: 8px 14px;
+      font-size: 12px;
+    }
+  }
 }
 
 @mixin search-field {

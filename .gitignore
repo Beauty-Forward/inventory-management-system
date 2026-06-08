@@ -54,3 +54,4 @@ firebase-debug.*.log
 .firebaserc.local
 seed/snapshot/
 dataconnect/.dataconnect/
+.gstack/
