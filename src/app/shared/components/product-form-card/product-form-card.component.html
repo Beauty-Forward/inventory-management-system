@@ -2,7 +2,12 @@
   <header class="card-head">
     <span class="index-label">Product {{ index + 1 }}</span>
     <div class="head-actions">
-      <button type="button" class="identify-btn" (click)="onIdentify()" title="Scan a barcode or photograph the product">
+      <button
+        type="button"
+        class="identify-btn"
+        (click)="onIdentify()"
+        title="Scan a barcode or photograph the product"
+      >
         📷 Identify
       </button>
       @if (canRemove) {
@@ -21,7 +26,9 @@
         (input)="updateField('name', $any($event.target).value)"
         placeholder="e.g. Moisture Milk Conditioner"
       />
-      @if (errors['name']) {<p class="field-error">{{ errors['name'] }}</p>}
+      @if (errors['name']) {
+        <p class="field-error">{{ errors['name'] }}</p>
+      }
     </div>
 
     <div class="form-field" [class.needs-verify]="lowConfidenceFields.includes('brand')">
@@ -33,7 +40,9 @@
         (input)="updateField('brand', $any($event.target).value)"
         placeholder="e.g. Pattern Beauty"
       />
-      @if (errors['brand']) {<p class="field-error">{{ errors['brand'] }}</p>}
+      @if (errors['brand']) {
+        <p class="field-error">{{ errors['brand'] }}</p>
+      }
     </div>
 
     <div class="form-field" [class.needs-verify]="lowConfidenceFields.includes('type')">
@@ -55,7 +64,9 @@
           <option [value]="t.value">{{ t.label }}</option>
         }
       </select>
-      @if (errors['type']) {<p class="field-error">{{ errors['type'] }}</p>}
+      @if (errors['type']) {
+        <p class="field-error">{{ errors['type'] }}</p>
+      }
     </div>
 
     <div class="form-field">
@@ -67,17 +78,9 @@
         [value]="model.quantity"
         (input)="updateField('quantity', $any($event.target).valueAsNumber || 1)"
       />
-      @if (errors['quantity']) {<p class="field-error">{{ errors['quantity'] }}</p>}
-    </div>
-
-    <div class="form-field">
-      <label>Expires</label>
-      <input
-        type="date"
-        class="text-input"
-        [value]="model.expirationDate"
-        (input)="updateField('expirationDate', $any($event.target).value)"
-      />
+      @if (errors['quantity']) {
+        <p class="field-error">{{ errors['quantity'] }}</p>
+      }
     </div>
   </div>
 
@@ -129,7 +132,10 @@
         />
       </div>
 
-      <div class="form-field full" [class.needs-verify]="lowConfidenceFields.includes('keyIngredients')">
+      <div
+        class="form-field full"
+        [class.needs-verify]="lowConfidenceFields.includes('keyIngredients')"
+      >
         <label>Key Ingredients</label>
         <input
           type="text"
