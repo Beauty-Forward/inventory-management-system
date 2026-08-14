@@ -1,14 +1,8 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import {
-  BatchListRow,
-  BatchService,
-} from '../../core/services/batch.service';
-import {
-  DonationListRow,
-  DonationService,
-} from '../../core/services/donation.service';
+import { BatchListRow, BatchService } from '../../core/services/batch.service';
+import { DonationListRow, DonationService } from '../../core/services/donation.service';
 import { ProductService } from '../../core/services/product.service';
 import { AuthService } from '../../core/services/auth.service';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
@@ -21,13 +15,7 @@ type SwatchKey = 'rose' | 'butter' | 'dust' | 'eucalyptus' | 'apricot' | 'cobalt
 @Component({
   selector: 'app-dashboard-page',
   standalone: true,
-  imports: [
-    RouterLink,
-    DatePipe,
-    PageHeaderComponent,
-    StatTileComponent,
-    StatusPillComponent,
-  ],
+  imports: [RouterLink, DatePipe, PageHeaderComponent, StatTileComponent, StatusPillComponent],
   templateUrl: './dashboard-page.component.html',
   styleUrl: './dashboard-page.component.scss',
 })
@@ -80,8 +68,7 @@ export class DashboardPageComponent implements OnInit {
   });
 
   readonly title = computed(() => {
-    const name = this.firstName();
-    return name ? `${this.greeting()}, ${name}` : this.greeting();
+    return this.greeting();
   });
 
   async ngOnInit(): Promise<void> {
@@ -106,26 +93,18 @@ export class DashboardPageComponent implements OnInit {
       this.expiringSoonCount.set(expiring.length);
       this.recentDonations.set(recent.slice(0, 4));
 
-      this.receivedThisWeek.set(
-        recent.filter((d) => new Date(d.createdAt) >= weekAgo).length,
-      );
+      this.receivedThisWeek.set(recent.filter((d) => new Date(d.createdAt) >= weekAgo).length);
 
       this.shippedThisWeek.set(
-        batches.filter(
-          (b) => b.shippedAt && new Date(b.shippedAt) >= weekAgo,
-        ).length,
+        batches.filter((b) => b.shippedAt && new Date(b.shippedAt) >= weekAgo).length,
       );
 
       this.pendingBatches.set(
-        batches
-          .filter((b) => b.status === 'DRAFT' || b.status === 'FINALIZED')
-          .slice(0, 4),
+        batches.filter((b) => b.status === 'DRAFT' || b.status === 'FINALIZED').slice(0, 4),
       );
     } catch (err) {
       console.error(err);
-      this.error.set(
-        'Could not load dashboard data. Confirm Data Connect is deployed.',
-      );
+      this.error.set('Could not load dashboard data. Confirm Data Connect is deployed.');
     } finally {
       this.loading.set(false);
     }

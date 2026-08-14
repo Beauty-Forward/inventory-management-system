@@ -38,6 +38,7 @@ testem.log
 /typings
 __screenshots__/
 .claude
+.gstack/
 
 # System files
 .DS_Store
@@ -54,4 +55,4 @@ firebase-debug.*.log
 .firebaserc.local
 seed/snapshot/
 dataconnect/.dataconnect/
-.gstack/
+firebase-export*

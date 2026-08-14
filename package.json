@@ -9,7 +9,9 @@
     "test": "ng test",
     "emulators": "firebase emulators:start --only auth,dataconnect,firestore,functions --project beauty-forward --import=./seed/snapshot --export-on-exit=./seed/snapshot",
     "seed": "node seed/seed.mjs",
-    "reset-dc-sdk": "git checkout -- src/app/core/dataconnect/"
+    "reset-dc-sdk": "git checkout -- src/app/core/dataconnect/",
+    "check-emulators": "lsof -nP -iTCP:8080 -iTCP:9399 -iTCP:9099 -iTCP:5001 -sTCP:LISTEN",
+    "start-with-seed": "npm run emulators && npm run seed && npm run start"
   },
   "prettier": {
     "printWidth": 100,
