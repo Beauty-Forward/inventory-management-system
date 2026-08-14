@@ -20,15 +20,7 @@
   <!-- Step 1: donor info -->
   @if (step() === 'donor') {
     <div class="form">
-      <div class="explain">
-        <div class="explain-ic">i</div>
-        <div>
-          Walk-in donations create a matching record so every donation has a single source of truth.
-          We'll use the email to send a thank-you and tax receipt.
-        </div>
-      </div>
-
-      <div class="section-title">basics</div>
+      <div class="section-title">information</div>
       <div class="full field">
         <span class="lbl-s">full name <span class="req-mark">*</span></span>
         <input
@@ -36,12 +28,12 @@
           class="inp"
           [value]="donor().fullName"
           (input)="updateDonor('fullName', $any($event.target).value)"
-          placeholder="Naomi Campbell"
+          placeholder="Beauty Forward"
         />
       </div>
       <div class="grid-2">
         <div class="field">
-          <span class="lbl-s">email <span class="req-mark">*</span></span>
+          <span class="lbl-s">email</span>
           <input
             type="email"
             class="inp"
@@ -51,13 +43,13 @@
           />
         </div>
         <div class="field">
-          <span class="lbl-s">phone <span class="req-mark">*</span></span>
+          <span class="lbl-s">phone</span>
           <input
             type="tel"
             class="inp"
             [value]="donor().phone"
             (input)="updateDonor('phone', $any($event.target).value)"
-            placeholder="(347) 555-0104"
+            placeholder="(212) 555-0101"
           />
         </div>
       </div>

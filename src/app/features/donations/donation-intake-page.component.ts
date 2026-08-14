@@ -86,12 +86,7 @@ function normalizeName(value: string | undefined): string | undefined {
 @Component({
   selector: 'app-donation-intake-page',
   standalone: true,
-  imports: [
-    ProductFormCardComponent,
-    CameraScannerComponent,
-    CrumbComponent,
-    StepperComponent,
-  ],
+  imports: [ProductFormCardComponent, CameraScannerComponent, CrumbComponent, StepperComponent],
   templateUrl: './donation-intake-page.component.html',
   styleUrl: './donation-intake-page.component.scss',
 })
@@ -127,9 +122,7 @@ export class DonationIntakePageComponent implements OnInit {
 
   readonly donationRequestId = signal('');
   readonly warehouseReference = signal('');
-  readonly donationMethod = signal<'pickup' | 'shipping' | 'dropoff' | 'walk-in'>(
-    'walk-in',
-  );
+  readonly donationMethod = signal<'pickup' | 'shipping' | 'dropoff' | 'walk-in'>('walk-in');
   readonly donationDate = signal(TODAY());
   readonly donationNotes = signal('');
 
@@ -148,10 +141,7 @@ export class DonationIntakePageComponent implements OnInit {
 
   readonly productCount = computed(() => this.products().length);
 
-  readonly stepperSteps: StepperStep[] = [
-    { label: 'donor' },
-    { label: 'products' },
-  ];
+  readonly stepperSteps: StepperStep[] = [{ label: 'donor' }, { label: 'products' }];
 
   readonly currentStepNum = computed(() => (this.step() === 'donor' ? 1 : 2));
 
@@ -214,10 +204,7 @@ export class DonationIntakePageComponent implements OnInit {
 
   // --- Step 1: donor info (walk-in only) ---
 
-  updateDonor<K extends keyof DonorFormState>(
-    key: K,
-    value: DonorFormState[K],
-  ): void {
+  updateDonor<K extends keyof DonorFormState>(key: K, value: DonorFormState[K]): void {
     this.donor.update((d) => ({ ...d, [key]: value }));
   }
 
@@ -226,8 +213,8 @@ export class DonationIntakePageComponent implements OnInit {
     // we mint a local BFW reference and proceed to products. The donation row
     // is created in Data Connect when the manager clicks "Complete Donation".
     const d = this.donor();
-    if (!d.fullName || !d.email || !d.phone) {
-      this.fieldErrors.set({ donor: 'Name, email, and phone are required' });
+    if (!d.fullName) {
+      this.fieldErrors.set({ donor: 'Name is required' });
       return;
     }
     this.fieldErrors.set({});
@@ -303,23 +290,14 @@ export class DonationIntakePageComponent implements OnInit {
     const preLoadedId = this.preLoadedDonationId();
     if (preLoadedId) {
       const productInputs = this.products().map(toProductFormInput);
-      if (
-        productInputs.some(
-          (p) => !p.name || !p.brand || !p.type || !p.quantity,
-        )
-      ) {
-        this.savingError.set(
-          'Each product needs a name, brand, type, and quantity.',
-        );
+      if (productInputs.some((p) => !p.name || !p.brand || !p.type || !p.quantity)) {
+        this.savingError.set('Each product needs a name, brand, type, and quantity.');
         return;
       }
       this.saving.set(true);
       this.step.set('saving');
       try {
-        await this.donationService.addProductsToDonation(
-          preLoadedId,
-          productInputs,
-        );
+        await this.donationService.addProductsToDonation(preLoadedId, productInputs);
         await this.router.navigate(['/donations', preLoadedId]);
       } catch (err) {
         console.error(err);
@@ -427,8 +405,7 @@ export class DonationIntakePageComponent implements OnInit {
     this.lookupMessage.set(`Looking up ${barcode}…`);
     const result = await this.barcodeService.lookup(barcode);
 
-    const isLowConf =
-      result.confidence === 'medium' || result.confidence === 'low';
+    const isLowConf = result.confidence === 'medium' || result.confidence === 'low';
     const flagged: string[] = [];
     this.products.update((list) => {
       const next = [...list];
@@ -500,10 +477,7 @@ export class DonationIntakePageComponent implements OnInit {
     this.identifyError.set('');
     this.lookupMessage.set('Identifying product from photo…');
 
-    const result = await this.barcodeService.identifyFromImage(
-      photo.base64,
-      photo.mimeType,
-    );
+    const result = await this.barcodeService.identifyFromImage(photo.base64, photo.mimeType);
 
     if (!result.found) {
       // Re-open the camera modal with the error overlay so retake / scan
@@ -519,8 +493,7 @@ export class DonationIntakePageComponent implements OnInit {
 
     // Success — modal stays closed, message goes inline.
 
-    const isLowConf =
-      result.confidence === 'medium' || result.confidence === 'low';
+    const isLowConf = result.confidence === 'medium' || result.confidence === 'low';
     const flagged: string[] = [];
     this.products.update((list) => {
       const next = [...list];
