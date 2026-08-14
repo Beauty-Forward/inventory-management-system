@@ -2,10 +2,7 @@ import { DatePipe } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { ALL_PRODUCT_TYPES, PRODUCT_TYPE_CATEGORIES } from '../../core/models/product-types';
-import {
-  InventoryRow,
-  ProductService,
-} from '../../core/services/product.service';
+import { InventoryRow, ProductService } from '../../core/services/product.service';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
 import { StatTileComponent } from '../../shared/components/stat-tile/stat-tile.component';
 import {
@@ -16,7 +13,10 @@ import {
   StatusPillComponent,
   StatusPillVariant,
 } from '../../shared/components/status-pill/status-pill.component';
-import { SwatchCardComponent, SwatchVariant } from '../../shared/components/swatch-card/swatch-card.component';
+import {
+  SwatchCardComponent,
+  SwatchVariant,
+} from '../../shared/components/swatch-card/swatch-card.component';
 import { sessionPersistedSignal } from '../../shared/utils/session-persisted-signal';
 
 type CategoryKey =
@@ -46,8 +46,25 @@ const CATEGORY_FILTER_KEYS: readonly CategoryKey[] = [
 const CATEGORY_TYPES: Record<Exclude<CategoryKey, 'all' | 'expiring'>, string[]> = {
   hair: ['shampoo', 'conditioner', 'hair_oil', 'hair_mask', 'styling_product'],
   skin: ['moisturizer', 'cleanser', 'serum', 'sunscreen', 'toner', 'balm'],
-  makeup: ['lipstick', 'lip_gloss', 'foundation', 'concealer', 'eyeshadow', 'mascara', 'blush', 'bronzer'],
-  hygiene: ['soap', 'body_wash', 'lotion', 'deodorant', 'toothpaste', 'toothbrush', 'feminine_products'],
+  makeup: [
+    'lipstick',
+    'lip_gloss',
+    'foundation',
+    'concealer',
+    'eyeshadow',
+    'mascara',
+    'blush',
+    'bronzer',
+  ],
+  hygiene: [
+    'soap',
+    'body_wash',
+    'lotion',
+    'deodorant',
+    'toothpaste',
+    'toothbrush',
+    'feminine_products',
+  ],
   nail: ['nail_polish', 'nail_polish_remover', 'nail_tools'],
   fragrance: ['perfume', 'body_spray'],
   other: ['other'],
@@ -99,11 +116,10 @@ export class InventoryListPageComponent implements OnInit {
     { key: 'all', label: 'all' },
     { key: 'skin', label: 'skincare' },
     { key: 'hair', label: 'hair' },
-    { key: 'makeup', label: 'color' },
+    { key: 'makeup', label: 'makeup' },
     { key: 'hygiene', label: 'hygiene' },
     { key: 'fragrance', label: 'fragrance' },
     { key: 'other', label: 'other' },
-    { key: 'expiring', label: 'expiring', variant: 'warn' },
   ];
 
   readonly filtered = computed(() => {
@@ -128,18 +144,12 @@ export class InventoryListPageComponent implements OnInit {
     });
   });
 
-  readonly readyProducts = computed(() =>
-    this.filtered().filter((p) => !this.isExpiring(p)),
-  );
+  readonly readyProducts = computed(() => this.filtered().filter((p) => !this.isExpiring(p)));
 
-  readonly flaggedProducts = computed(() =>
-    this.filtered().filter((p) => this.isExpiring(p)),
-  );
+  readonly flaggedProducts = computed(() => this.filtered().filter((p) => this.isExpiring(p)));
 
   readonly totalCount = computed(() => this.products().length);
-  readonly expiringCount = computed(
-    () => this.products().filter((p) => this.isExpiring(p)).length,
-  );
+  readonly expiringCount = computed(() => this.products().filter((p) => this.isExpiring(p)).length);
 
   async ngOnInit(): Promise<void> {
     await this.load();

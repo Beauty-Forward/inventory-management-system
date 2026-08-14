@@ -2,7 +2,6 @@
   <app-page-header eyebrow="stock" title="inventory">
     <div class="mini-stats">
       <app-stat-tile variant="butter" size="sm" label="on hand" [value]="totalCount()" />
-      <app-stat-tile variant="rose" size="sm" label="exp < 30d" [value]="expiringCount()" />
     </div>
   </app-page-header>
 
@@ -21,8 +20,11 @@
     <div class="error-banner">{{ error() }}</div>
   } @else if (filtered().length === 0) {
     <p class="empty-state">
-      @if (totalCount() === 0) { No products in stock yet. }
-      @else { No products match your filters. }
+      @if (totalCount() === 0) {
+        No products in stock yet.
+      } @else {
+        No products match your filters.
+      }
     </p>
   } @else {
     @if (readyProducts().length > 0) {
@@ -76,7 +78,9 @@
               </div>
               <div class="dest">
                 <b>route ASAP</b>
-                @if (p.expirationDate) { exp {{ p.expirationDate | date: 'MMM d' }} }
+                @if (p.expirationDate) {
+                  exp {{ p.expirationDate | date: 'MMM d' }}
+                }
               </div>
             </div>
           </app-swatch-card>

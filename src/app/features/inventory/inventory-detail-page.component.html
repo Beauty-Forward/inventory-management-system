@@ -15,7 +15,9 @@
         <h1 class="title">{{ p.name }}</h1>
         <div class="brand-line">
           {{ p.brand }}
-          @if (volumeText()) { · {{ volumeText() }} }
+          @if (volumeText()) {
+            · {{ volumeText() }}
+          }
         </div>
         <div class="status-row">
           <app-status-pill [variant]="statusVariant()">{{ statusLabel() }}</app-status-pill>
@@ -38,22 +40,14 @@
             <div class="fact-value">
               @if (retailValue() !== null) {
                 ${{ retailValue() | number }}
-              } @else { — }
+              } @else {
+                —
+              }
             </div>
           </div>
           <div class="fact">
             <div class="fact-label">on hand</div>
-            <div class="fact-value">
-              {{ daysOnHand() }}<span class="fact-unit">days</span>
-            </div>
-          </div>
-          <div class="fact">
-            <div class="fact-label">expires in</div>
-            <div class="fact-value">
-              @if (daysToExpiry() !== null) {
-                {{ daysToExpiry() }}<span class="fact-unit">days</span>
-              } @else { — }
-            </div>
+            <div class="fact-value">{{ daysOnHand() }}<span class="fact-unit">days</span></div>
           </div>
         </div>
       </div>
@@ -61,12 +55,13 @@
 
     <div class="actions">
       <button class="btn primary" (click)="goToBatch()">
-        @if (p.batch) { view batch → } @else { assign to batch → }
+        @if (p.batch) {
+          view batch →
+        } @else {
+          assign to batch →
+        }
       </button>
       <button class="btn ghost" (click)="goToDonation()">view donation</button>
-      <button class="btn ghost" (click)="markExpired()" [disabled]="mutating()">
-        {{ pendingAction() === 'expired' ? 'expiring…' : 'mark expired' }}
-      </button>
       <button class="btn ghost" (click)="markDiscarded()" [disabled]="mutating()">
         {{ pendingAction() === 'discarded' ? 'discarding…' : 'mark discarded' }}
       </button>
