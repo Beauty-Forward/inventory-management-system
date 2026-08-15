@@ -30,10 +30,8 @@ export class DonorService {
    * primary key, we do the two-step lookup-then-insert-or-update here.
    * Returns the donor ID in either case.
    */
-  async upsertByEmail(
-    input: DonorFormInput & { linkedRequestId?: string },
-  ): Promise<string> {
-    const existing = await this.findByEmail(input.email);
+  async upsertByEmail(input: DonorFormInput & { linkedRequestId?: string }): Promise<string> {
+    const existing = input.email ? await this.findByEmail(input.email) : null;
 
     if (existing) {
       await updateDonor(this.firebase.dataConnect, {
@@ -50,9 +48,9 @@ export class DonorService {
     }
 
     const created = await createDonor(this.firebase.dataConnect, {
-      email: input.email,
+      email: input.email ?? '',
       fullName: input.fullName,
-      phone: input.phone,
+      phone: input.phone ?? '',
       city: input.city,
       state: input.state,
       smsOptIn: input.smsOptIn,

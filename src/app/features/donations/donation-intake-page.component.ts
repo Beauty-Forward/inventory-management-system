@@ -313,8 +313,8 @@ export class DonationIntakePageComponent implements OnInit {
     const candidate: DonationIntakeInput = {
       donor: {
         fullName: donorForm.fullName,
-        email: donorForm.email,
-        phone: donorForm.phone,
+        email: donorForm.email || undefined,
+        phone: donorForm.phone || undefined,
         smsOptIn: donorForm.smsOptIn,
         city: donorForm.city || 'Unknown',
         state: donorForm.state || 'NY',
@@ -337,7 +337,7 @@ export class DonationIntakePageComponent implements OnInit {
       }
       this.fieldErrors.set(errs);
       this.savingError.set(
-        'Please fix the errors above. Each product needs a name, brand, type, and quantity.',
+        parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join(' • '),
       );
       return;
     }
