@@ -48,7 +48,7 @@ export class DonorService {
     }
 
     const created = await createDonor(this.firebase.dataConnect, {
-      email: input.email ?? '',
+      email: input.email || `walkin-${crypto.randomUUID()}@no-email.local`,
       fullName: input.fullName,
       phone: input.phone ?? '',
       city: input.city,
