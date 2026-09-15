@@ -289,11 +289,20 @@ export class DonationListPageComponent implements OnInit {
   }
 
   meta(d: DonationListRow): string {
-    const time = new Date(d.createdAt).toLocaleTimeString([], {
-      hour: 'numeric',
-      minute: '2-digit',
-    });
-    return `${d.method} · ${time.toLowerCase()}`;
+    const time = new Date(d.createdAt)
+      .toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+      .toLowerCase();
+    return `${d.method} · ${this.dateLabel(d.date)} · ${time}`;
+  }
+
+  // 'sep 15' from a 'YYYY-MM-DD' date string. Parsed as local (not via
+  // new Date(str), which treats date-only strings as UTC and can shift the
+  // month/day back a day in western timezones).
+  private dateLabel(dateStr: string): string {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const date = new Date(y, (m ?? 1) - 1, d ?? 1);
+    const month = date.toLocaleDateString([], { month: 'short' }).toLowerCase();
+    return `${month} ${date.getDate()}`;
   }
 
   startNew(): void {
