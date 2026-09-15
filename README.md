@@ -1,59 +1,61 @@
-# InventoryManagementSystem
+# Beauty Forward — Inventory Management System (IMS)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.1.
+The warehouse tool in the Beauty Forward ecosystem (alongside the
+[donation-delivery-app](https://github.com/Beauty-Forward/donation-delivery-app) and the
+[data-dashboard](https://github.com/Beauty-Forward/data-dashboard)). Staff sign in to
+catalog donated products (barcode scan or AI photo capture), track stock, group items into
+**batches**, and ship them to **shelters**. Donations arranged in the public app **sync in
+automatically**.
 
-## Development server
+## 📚 Documentation
 
-To start a local development server, run:
+Team & maintainer docs live in [`docs/`](docs/):
 
-```bash
-ng serve
-```
+- **[Architecture](docs/architecture-ims.md)** — the pieces and how they connect _([quick](docs/architecture-ims-simple.md))_
+- **[Inventory Lifecycle & State Machine](docs/inventory-lifecycle-state-machine.md)** — Product + Batch statuses, and troubleshooting _([quick](docs/inventory-lifecycle-simple.md))_
+- **[Internal User Guide](docs/user-guide-internal.md)** — running the warehouse day to day _([quick](docs/user-guide-internal-simple.md))_
+- **[Accounts & Services](docs/accounts-and-services.md)** — every account & key, shared across all three apps _([quick](docs/accounts-and-services-simple.md))_
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Whole-system map: the [System Overview](https://github.com/Beauty-Forward/donation-delivery-app/blob/main/docs/system-overview.md).
 
-## Code scaffolding
+## Stack
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+- **Frontend:** Angular 21 (standalone, SCSS); barcode scanning via `@zxing`
+- **Data:** **Firebase Data Connect → Postgres** (Cloud SQL `beauty-forward-fdc`) — the system of record for inventory
+- **Backend:** Firebase Cloud Functions v2 (codebase `ims`, region `us-central1`) — barcode lookup, Gemini photo/AI extraction, and the donation sync
+- **AI:** Gemini (`gemini-2.5-flash`) via Vertex AI
+- **Auth:** Firebase Auth (staff sign-in required)
+- **Hosting:** Firebase App Hosting (backend `inventory-management-system`)
+- Shares the `beauty-forward` Firebase project with the sibling apps.
 
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## Local development
 
 ```bash
-ng test
+npm install
+npm --prefix functions install
+
+# Emulators (auth + dataconnect Postgres + firestore + functions), seed, then serve:
+npm run start-with-seed
+
+# …or individually:
+npm run emulators      # firebase emulators (imports/exports ./seed/snapshot)
+npm run seed           # node seed/seed.mjs
+npm run start          # ng serve -> http://localhost:4200
 ```
 
-## Running end-to-end tests
+> The Data Connect emulator's Postgres is in-memory — re-run `npm run seed` after
+> restarting. `npm run reset-dc-sdk` restores the generated Data Connect SDK under
+> `src/app/core/dataconnect/`.
 
-For end-to-end (e2e) testing, run:
+## Tests
 
 ```bash
-ng e2e
+npm test               # ng test (Vitest)
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## Data model
 
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+`Donor`, `Donation`, `Product`, `Batch`, `Shelter` (see
+`dataconnect/schema/schema.gql`). Product and Batch lifecycles, and the cross-app donation
+sync, are documented in the
+**[Inventory Lifecycle](docs/inventory-lifecycle-state-machine.md)** doc.
