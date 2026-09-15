@@ -31,9 +31,9 @@ export class DonationService {
   private readonly firebase = inject(FirebaseClientService);
   private readonly donorService = inject(DonorService);
 
-  async listRecent(limit = 20): Promise<DonationListRow[]> {
+  async listRecent(limit = 20, offset = 0): Promise<DonationListRow[]> {
     const data = await this.firebase.read(
-      listRecentDonationsRef(this.firebase.dataConnect, { limit }),
+      listRecentDonationsRef(this.firebase.dataConnect, { limit, offset }),
     );
     return data.donations;
   }

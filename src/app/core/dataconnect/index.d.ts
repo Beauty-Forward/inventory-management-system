@@ -291,6 +291,7 @@ export interface GetDonationData {
     date: DateString;
     method: string;
     notes?: string | null;
+    logisticsStatus: string;
     createdAt: TimestampString;
     donor: {
       id: UUIDString;
@@ -593,6 +594,7 @@ export interface ListRecentDonationsData {
 
 export interface ListRecentDonationsVariables {
   limit?: number | null;
+  offset?: number | null;
 }
 
 export interface ListSheltersData {

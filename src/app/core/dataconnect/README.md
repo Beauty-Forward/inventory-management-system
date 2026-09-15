@@ -378,6 +378,7 @@ The `ListRecentDonations` query has an optional argument of type `ListRecentDona
 ```typescript
 export interface ListRecentDonationsVariables {
   limit?: number | null;
+  offset?: number | null;
 }
 ```
 ### Return Type
@@ -413,13 +414,14 @@ import { connectorConfig, listRecentDonations, ListRecentDonationsVariables } fr
 // The `ListRecentDonations` query has an optional argument of type `ListRecentDonationsVariables`:
 const listRecentDonationsVars: ListRecentDonationsVariables = {
   limit: ..., // optional
+  offset: ..., // optional
 };
 
 // Call the `listRecentDonations()` function to execute the query.
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await listRecentDonations(listRecentDonationsVars);
 // Variables can be defined inline as well.
-const { data } = await listRecentDonations({ limit: ..., });
+const { data } = await listRecentDonations({ limit: ..., offset: ..., });
 // Since all variables are optional for this query, you can omit the `ListRecentDonationsVariables` argument.
 const { data } = await listRecentDonations();
 
@@ -445,12 +447,13 @@ import { connectorConfig, listRecentDonationsRef, ListRecentDonationsVariables }
 // The `ListRecentDonations` query has an optional argument of type `ListRecentDonationsVariables`:
 const listRecentDonationsVars: ListRecentDonationsVariables = {
   limit: ..., // optional
+  offset: ..., // optional
 };
 
 // Call the `listRecentDonationsRef()` function to get a reference to the query.
 const ref = listRecentDonationsRef(listRecentDonationsVars);
 // Variables can be defined inline as well.
-const ref = listRecentDonationsRef({ limit: ..., });
+const ref = listRecentDonationsRef({ limit: ..., offset: ..., });
 // Since all variables are optional for this query, you can omit the `ListRecentDonationsVariables` argument.
 const ref = listRecentDonationsRef();
 
@@ -633,6 +636,7 @@ export interface GetDonationData {
     date: DateString;
     method: string;
     notes?: string | null;
+    logisticsStatus: string;
     createdAt: TimestampString;
     donor: {
       id: UUIDString;
