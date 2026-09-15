@@ -11,14 +11,21 @@ import {
   PillFilter,
   PillToolbarComponent,
 } from '../../shared/components/pill-toolbar/pill-toolbar.component';
-import {
-  StatusPillComponent,
-  StatusPillVariant,
-} from '../../shared/components/status-pill/status-pill.component';
+import { StatusPillComponent } from '../../shared/components/status-pill/status-pill.component';
 import { sessionPersistedSignal } from '../../shared/utils/session-persisted-signal';
+import {
+  DonationBucket,
+  LifecycleView,
+  bucketOf,
+  deriveLifecycle,
+} from '../../core/models/donation-lifecycle';
 
 type SwatchKey = 'rose' | 'butter' | 'dust' | 'eucalyptus' | 'apricot' | 'cobalt';
 
+// Buckets trace the donation's trip to the warehouse and its catalogue state:
+//   incoming  — inbound from the delivery app (awaiting pickup / on the way)
+//   arrived   — physically here, no products catalogued yet (needs processing)
+//   processed — catalogued into inventory; stays visible, doesn't disappear
 const DONATION_FILTERS = ['incoming', 'arrived', 'processed', 'all'] as const;
 type DonationFilter = (typeof DONATION_FILTERS)[number];
 
@@ -59,40 +66,48 @@ export class DonationListPageComponent implements OnInit {
     DONATION_FILTERS,
   );
 
-  readonly filters: PillFilter[] = [
-    { key: 'incoming', label: 'incoming' },
-    { key: 'arrived', label: 'arrived' },
-    { key: 'processed', label: 'processed' },
-    { key: 'all', label: 'all' },
-  ];
+  // Live counts per bucket are rendered as chip badges so the manager can see
+  // the whole pipeline at a glance without switching tabs.
+  readonly filters = computed<PillFilter[]>(() => {
+    const counts = this.bucketCounts();
+    return [
+      { key: 'incoming', label: 'incoming', count: counts.incoming },
+      { key: 'arrived', label: 'arrived', count: counts.arrived },
+      { key: 'processed', label: 'processed', count: counts.processed },
+      { key: 'all', label: 'all' },
+    ];
+  });
 
-  // Logistics buckets:
-  //   incoming  — still in flight from the delivery app (not yet here). The
-  //               "Mark arrived" CTA shows here.
-  //   arrived   — physically here, no products attached yet; needs the
-  //               manager's attention. The "Process" CTA shows here.
-  //   processed — has products attached
-  // A donation counts as "here" when the delivery app marked it 'completed'
-  // (pickups, via payment verification), when a walk-in created it locally,
-  // or when the manager manually marked it 'arrived'. The manual path covers
-  // shipping and drop-off donations, which never reach 'completed' on their
-  // own and would otherwise sit in Incoming forever.
-  isHere(d: DonationListRow): boolean {
-    return (
-      d.logisticsStatus === 'completed' ||
-      d.logisticsStatus === 'walk_in' ||
-      d.logisticsStatus === 'arrived'
-    );
+  // deriveLifecycle is the single source of truth for where a donation sits;
+  // it's memoized per row so the list, buckets, counts, and pills all agree.
+  private readonly lifecycleCache = new WeakMap<DonationListRow, LifecycleView>();
+  lifecycle(d: DonationListRow): LifecycleView {
+    let view = this.lifecycleCache.get(d);
+    if (!view) {
+      view = deriveLifecycle(d);
+      this.lifecycleCache.set(d, view);
+    }
+    return view;
   }
-  isProcessed(d: DonationListRow): boolean {
-    return (d.products?.length ?? 0) > 0;
+
+  bucket(d: DonationListRow): DonationBucket {
+    return bucketOf(this.lifecycle(d).phase);
   }
+
+  // "incoming" rows can be nudged in with "mark arrived"; "arrived" rows get
+  // the "process" CTA. Processed rows just show their lifecycle pill.
   isIncoming(d: DonationListRow): boolean {
-    return !this.isHere(d) && !this.isProcessed(d);
+    return this.bucket(d) === 'incoming';
   }
   isArrived(d: DonationListRow): boolean {
-    return this.isHere(d) && !this.isProcessed(d);
+    return this.bucket(d) === 'arrived';
   }
+
+  readonly bucketCounts = computed(() => {
+    const counts = { incoming: 0, arrived: 0, processed: 0 };
+    for (const d of this.donations()) counts[this.bucket(d)]++;
+    return counts;
+  });
 
   readonly thisWeekCount = computed(() => {
     const weekAgo = new Date();
@@ -121,9 +136,7 @@ export class DonationListPageComponent implements OnInit {
     const q = this.searchQuery().toLowerCase().trim();
     const f = this.activeFilter();
     return this.donations().filter((d) => {
-      if (f === 'incoming' && !this.isIncoming(d)) return false;
-      if (f === 'arrived' && !this.isArrived(d)) return false;
-      if (f === 'processed' && !this.isProcessed(d)) return false;
+      if (f !== 'all' && this.bucket(d) !== f) return false;
       if (q) {
         const hay = `${d.donor.fullName} ${d.donor.email} ${d.id}`.toLowerCase();
         if (!hay.includes(q)) return false;
@@ -131,10 +144,6 @@ export class DonationListPageComponent implements OnInit {
       return true;
     });
   });
-
-  readonly arrivedCount = computed(
-    () => this.donations().filter((d) => this.isArrived(d)).length,
-  );
 
   // Click handler on the Process button shown on Arrived rows — drops
   // the manager into the products step of intake with the donation
@@ -151,7 +160,7 @@ export class DonationListPageComponent implements OnInit {
   // button can disable itself and we don't double-submit.
   readonly marking = signal<ReadonlySet<string>>(new Set());
 
-  // Click handler on the "Mark arrived" button shown on Incoming rows. Flips
+  // Click handler on the "Mark arrived" button shown on Coming rows. Flips
   // the donation to 'arrived' so it moves into the Arrived bucket, then
   // reloads. Used for shipping/drop-off donations that never auto-complete.
   async markArrived(donationId: string, event: Event): Promise<void> {
@@ -207,6 +216,14 @@ export class DonationListPageComponent implements OnInit {
     return result;
   });
 
+  // Newest-first pagination. Incoming/arrived cluster at the top (they're the
+  // most recent), so they land on the first page; processed history is reached
+  // by loading further pages rather than a hard 50-row cap that silently
+  // dropped older donations. Bucket counts reflect what's loaded so far.
+  private static readonly PAGE_SIZE = 25;
+  readonly loadingMore = signal(false);
+  readonly hasMore = signal(false);
+
   async ngOnInit(): Promise<void> {
     await this.load();
   }
@@ -215,13 +232,36 @@ export class DonationListPageComponent implements OnInit {
     this.loading.set(true);
     this.error.set(null);
     try {
-      const rows = await this.donationService.listRecent(50);
+      const rows = await this.donationService.listRecent(
+        DonationListPageComponent.PAGE_SIZE,
+      );
       this.donations.set(rows);
+      this.hasMore.set(rows.length === DonationListPageComponent.PAGE_SIZE);
     } catch (err) {
       console.error(err);
       this.error.set('Could not load donations.');
     } finally {
       this.loading.set(false);
+    }
+  }
+
+  async loadMore(): Promise<void> {
+    if (this.loadingMore() || !this.hasMore()) return;
+    this.loadingMore.set(true);
+    this.error.set(null);
+    try {
+      const size = DonationListPageComponent.PAGE_SIZE;
+      const next = await this.donationService.listRecent(size, this.donations().length);
+      // De-dupe by id in case a new donation shifted the window between pages.
+      const seen = new Set(this.donations().map((d) => d.id));
+      const fresh = next.filter((d) => !seen.has(d.id));
+      this.donations.update((rows) => [...rows, ...fresh]);
+      this.hasMore.set(next.length === size);
+    } catch (err) {
+      console.error(err);
+      this.error.set('Could not load more donations.');
+    } finally {
+      this.loadingMore.set(false);
     }
   }
 
@@ -238,12 +278,6 @@ export class DonationListPageComponent implements OnInit {
     const cycle: SwatchKey[] = ['rose', 'dust', 'butter', 'eucalyptus', 'apricot', 'cobalt'];
     const hash = (d.donor.fullName + d.id).split('').reduce((a, c) => a + c.charCodeAt(0), 0);
     return cycle[hash % cycle.length];
-  }
-
-  variant(d: DonationListRow): StatusPillVariant {
-    if (d.method === 'walk-in') return 'walk';
-    if (d.method === 'pickup') return 'route';
-    return 'intake';
   }
 
   shortRef(d: DonationListRow): string {

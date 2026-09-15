@@ -234,3 +234,35 @@
 .prod-meta {
   @include meta;
 }
+
+// --- Lifecycle timeline ------------------------------------------------
+
+.lifecycle-panel {
+  margin-bottom: 12px;
+}
+
+.lifecycle-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.lifecycle-now {
+  @include body-sm;
+  font-size: 12px;
+
+  b {
+    font-weight: 600;
+    text-transform: lowercase;
+  }
+}
+
+.lifecycle-note {
+  @include meta;
+  margin: 12px 0 0;
+  line-height: 1.45;
+  color: $muted-ink;
+}

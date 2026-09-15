@@ -40,8 +40,8 @@ query GetDonor($id: UUID!) @auth(level: USER) {
 
 # --- Donations ---
 
-query ListRecentDonations($limit: Int) @auth(level: USER) {
-  donations(orderBy: [{ createdAt: DESC }], limit: $limit) {
+query ListRecentDonations($limit: Int, $offset: Int) @auth(level: USER) {
+  donations(orderBy: [{ createdAt: DESC }], limit: $limit, offset: $offset) {
     id
     date
     method
@@ -53,8 +53,8 @@ query ListRecentDonations($limit: Int) @auth(level: USER) {
       fullName
       email
     }
-    # Just the IDs — used client-side to determine whether the donation
-    # is still Incoming (no products yet) or Processed (has products).
+    # Just the IDs — used client-side to determine whether the donation is
+    # still inbound/arrived (no products yet) or Processed (has products).
     products: products_on_donation {
       id
     }
@@ -79,6 +79,9 @@ query GetDonation($id: UUID!) @auth(level: USER) {
     date
     method
     notes
+    # Drives the inbound half of the lifecycle timeline (awaiting → on the way
+    # → arrived). Was missing, so the detail page couldn't show in-flight state.
+    logisticsStatus
     createdAt
     donor {
       id

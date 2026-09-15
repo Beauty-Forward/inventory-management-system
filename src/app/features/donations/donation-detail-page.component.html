@@ -18,6 +18,9 @@
           @if (d.donor.phone) { · {{ d.donor.phone }} }
         </div>
         <div class="status-row">
+          @if (lifecycle(); as lc) {
+            <app-status-pill [variant]="lc.variant">{{ lc.label }}</app-status-pill>
+          }
           <app-status-pill [variant]="methodVariant()">{{ d.method }}</app-status-pill>
           <app-status-pill variant="soft">{{ d.createdAt | date: 'MMM d, h:mm a' }}</app-status-pill>
         </div>
@@ -41,6 +44,29 @@
         </div>
       </div>
     </div>
+
+    @if (lifecycle(); as lc) {
+      <div class="panel lifecycle-panel">
+        <div class="lifecycle-head">
+          <div class="panel-title">lifecycle</div>
+          <div class="lifecycle-now">
+            <b>{{ lc.label }}</b>
+          </div>
+        </div>
+        <app-stepper [steps]="railSteps" [currentStep]="railStep()" />
+        @if (lc.phase === 'awaiting' || lc.phase === 'in_transit') {
+          <p class="lifecycle-note">
+            On its way from the delivery app — not yet at the warehouse. Mark it
+            arrived from the donations list once it's physically here.
+          </p>
+        } @else if (lc.phase === 'arrived') {
+          <p class="lifecycle-note">
+            Received at the warehouse — ready to catalogue. Use “process” to add
+            its products to inventory.
+          </p>
+        }
+      </div>
+    }
 
     <div class="cols">
       <div class="panel">

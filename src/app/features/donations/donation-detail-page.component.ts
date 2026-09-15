@@ -11,12 +11,20 @@ import {
   StatusPillComponent,
   StatusPillVariant,
 } from '../../shared/components/status-pill/status-pill.component';
+import { StepperComponent, StepperStep } from '../../shared/components/stepper/stepper.component';
 import { SwatchVariant } from '../../shared/components/swatch-card/swatch-card.component';
+import {
+  LIFECYCLE_RAIL,
+  LifecycleView,
+  RAIL_LABELS,
+  deriveLifecycle,
+  railIndexOf,
+} from '../../core/models/donation-lifecycle';
 
 @Component({
   selector: 'app-donation-detail-page',
   standalone: true,
-  imports: [RouterLink, DatePipe, CrumbComponent, StatusPillComponent],
+  imports: [RouterLink, DatePipe, CrumbComponent, StatusPillComponent, StepperComponent],
   templateUrl: './donation-detail-page.component.html',
   styleUrl: './donation-detail-page.component.scss',
 })
@@ -44,6 +52,24 @@ export class DonationDetailPageComponent implements OnInit {
     if (d.method === 'walk-in') return 'walk';
     if (d.method === 'pickup') return 'route';
     return 'intake';
+  });
+
+  // Where the donation sits in its lifecycle — same derivation the list uses.
+  readonly lifecycle = computed<LifecycleView | null>(() => {
+    const d = this.donation();
+    return d ? deriveLifecycle(d) : null;
+  });
+
+  // The lifecycle rail (awaiting → in transit → arrived → processed) as
+  // stepper steps, with the current phase highlighted.
+  readonly railSteps: StepperStep[] = LIFECYCLE_RAIL.map((phase) => ({
+    label: RAIL_LABELS[phase],
+  }));
+
+  readonly railStep = computed(() => {
+    const view = this.lifecycle();
+    if (!view) return 0;
+    return railIndexOf(view.phase) + 1; // stepper currentStep is 1-indexed
   });
 
   readonly swatch = computed<SwatchVariant>(() => {

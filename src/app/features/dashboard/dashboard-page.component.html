@@ -59,8 +59,8 @@
               <div class="row-name">{{ d.donor.fullName }}</div>
               <div class="row-meta">{{ donationMeta(d) }}</div>
             </div>
-            <app-status-pill [variant]="donationVariant(d)">
-              {{ d.method }}
+            <app-status-pill [variant]="lifecycle(d).variant">
+              {{ lifecycle(d).label }}
             </app-status-pill>
           </a>
         }

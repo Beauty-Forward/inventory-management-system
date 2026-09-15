@@ -8,6 +8,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
 import { StatTileComponent } from '../../shared/components/stat-tile/stat-tile.component';
 import { StatusPillComponent } from '../../shared/components/status-pill/status-pill.component';
+import { LifecycleView, deriveLifecycle } from '../../core/models/donation-lifecycle';
 
 type Greeting = 'good morning' | 'good afternoon' | 'good evening';
 type SwatchKey = 'rose' | 'butter' | 'dust' | 'eucalyptus' | 'apricot' | 'cobalt';
@@ -131,9 +132,8 @@ export class DashboardPageComponent implements OnInit {
     return cycle[hash % cycle.length];
   }
 
-  donationVariant(d: DonationListRow): 'walk' | 'intake' | 'ready' {
-    if (d.method === 'walk-in') return 'walk';
-    return 'intake';
+  lifecycle(d: DonationListRow): LifecycleView {
+    return deriveLifecycle(d);
   }
 
   batchVariant(b: BatchListRow): 'route' | 'draft' {

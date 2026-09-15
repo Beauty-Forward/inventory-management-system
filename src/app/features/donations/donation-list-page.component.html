@@ -31,7 +31,7 @@
     searchPlaceholder="search donor, reference, method"
     [searchValue]="searchQuery()"
     (searchChange)="searchQuery.set($event)"
-    [filters]="filters"
+    [filters]="filters()"
     [activeKey]="activeFilter()"
     (filterChange)="activeFilter.set($any($event))"
   />
@@ -44,6 +44,8 @@
     <p class="empty-state">
       @if (donations().length === 0) {
         No donations yet.
+      } @else if (hasMore()) {
+        None loaded match this filter — try “load more” below.
       } @else {
         No donations match your filters.
       }
@@ -81,19 +83,33 @@
               process →
             </button>
           } @else if (isIncoming(d)) {
-            <button
-              type="button"
-              class="arrive-cta"
-              [disabled]="marking().has(d.id)"
-              (click)="markArrived(d.id, $event)"
-            >
-              mark arrived
-            </button>
+            <div class="row-status">
+              <app-status-pill [variant]="lifecycle(d).variant">{{ lifecycle(d).label }}</app-status-pill>
+              <button
+                type="button"
+                class="arrive-cta"
+                [disabled]="marking().has(d.id)"
+                (click)="markArrived(d.id, $event)"
+              >
+                mark arrived
+              </button>
+            </div>
           } @else {
-            <app-status-pill [variant]="variant(d)">{{ d.method }}</app-status-pill>
+            <app-status-pill [variant]="lifecycle(d).variant">{{ lifecycle(d).label }}</app-status-pill>
           }
         </a>
       }
     }
+  }
+
+  @if (!loading() && !error() && hasMore()) {
+    <button
+      type="button"
+      class="load-more"
+      [disabled]="loadingMore()"
+      (click)="loadMore()"
+    >
+      {{ loadingMore() ? 'loading…' : 'load more' }}
+    </button>
   }
 </section>
