@@ -1,7 +1,7 @@
-<div class="overlay" role="dialog" aria-label="Identify product">
+<div class="overlay" role="dialog" [attr.aria-label]="heading">
   <div class="viewport">
     <header class="head">
-      <span class="title">Identify product</span>
+      <span class="title">{{ heading }}</span>
       <button type="button" class="close-btn" (click)="onCancel()" aria-label="Close">×</button>
     </header>
 
@@ -44,7 +44,7 @@
       }
     </div>
 
-    @if (cameraStatus() === 'ready' && identifyState === 'idle') {
+    @if (cameraStatus() === 'ready' && identifyState === 'idle' && !barcodeOnly) {
       <div class="actions">
         @if (mode() === 'photo') {
           <button type="button" class="mode-btn" (click)="toggleMode()">

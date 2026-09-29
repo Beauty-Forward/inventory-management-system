@@ -6,6 +6,9 @@
   } @else if (error()) {
     <div class="error-banner">{{ error() }}</div>
   } @else if (batch(); as b) {
+    @if (notice(); as n) {
+      <div class="notice" role="status">{{ n }}</div>
+    }
     <div class="hero">
       <div class="hero-swatch" [attr.data-swatch]="swatch()">
         <span class="swatch-tag">batch #{{ b.id.slice(0, 6).toUpperCase() }}</span>
@@ -123,7 +126,14 @@
     }
 
     <div class="panel products-panel">
-      <div class="panel-title">products in batch</div>
+      <div class="panel-head">
+        <div class="panel-title">products in batch</div>
+        @if (b.status === 'DRAFT') {
+          <button type="button" class="btn ghost small" [disabled]="mutating()" (click)="addingProducts.set(true)">
+            + add products
+          </button>
+        }
+      </div>
       @if (b.products.length === 0) {
         <p class="empty-state">No products in this batch yet.</p>
       } @else {
@@ -148,6 +158,16 @@
         }
       }
     </div>
+
+    @if (addingProducts()) {
+      <app-add-products-dialog
+        [batchId]="b.id"
+        [shelterName]="b.shelter.name"
+        [acceptedTypes]="b.shelter.acceptedTypes ?? []"
+        (added)="onProductsAdded($event)"
+        (cancelled)="addingProducts.set(false)"
+      />
+    }
 
     @if (canDelete()) {
       <div class="danger-zone">

@@ -1,0 +1,106 @@
+@use '../../../styles-shared' as *;
+
+.toolbar-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+
+  .toolbar { flex: 1; min-width: 0; }
+}
+
+.scan-btn {
+  @include pill-button-sm('ghost');
+  flex-shrink: 0;
+  height: 40px;
+}
+
+.scan-note {
+  @include body-sm;
+  margin: 10px 0 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba($hunter-green, 0.1);
+  color: $hunter-green-deep;
+
+  &.warn {
+    background: rgba($crimson, 0.1);
+    color: $crimson-deep;
+  }
+}
+
+.empty-state {
+  @include body-sm;
+  color: $muted-ink;
+  text-align: center;
+  padding: 24px 0;
+  margin: 0;
+}
+
+.list-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 12px 2px 6px;
+
+  .hint { @include meta-mid; }
+}
+
+.check-all {
+  @include body-sm;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  accent-color: $hunter-green;
+  flex-shrink: 0;
+}
+
+.product-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  // Shift-click would otherwise highlight the text between the two rows.
+  user-select: none;
+}
+
+.product-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: $white;
+  border: 1px solid $panel-border;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+
+  &:hover { border-color: rgba($double-espresso, 0.35); }
+  &:focus-visible { outline: 2px solid $hunter-green; outline-offset: 2px; }
+
+  &.selected {
+    background: rgba($hunter-green, 0.08);
+    border-color: $hunter-green;
+  }
+
+  // The row owns the click; the checkbox is a visual indicator.
+  input[type='checkbox'] { pointer-events: none; }
+}
+
+.row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.product-name { @include body-sm; font-weight: 600; }
+.product-meta { @include meta-mid; }
+.product-expiry { @include meta-mid; color: $crimson-deep; }

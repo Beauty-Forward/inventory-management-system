@@ -42,6 +42,10 @@ export class CameraScannerComponent implements AfterViewInit, OnDestroy {
   // inline message in donation-intake handles that feedback.)
   @Input() identifyState: 'idle' | 'failed' = 'idle';
   @Input() errorMessage = '';
+  // Barcode-only use (e.g. picking products for a batch): opens straight into
+  // barcode detection and hides the photo-capture path.
+  @Input() barcodeOnly = false;
+  @Input() heading = 'Identify product';
 
   @Output() scanned = new EventEmitter<string>();
   @Output() captured = new EventEmitter<CapturedPhoto>();
@@ -82,6 +86,10 @@ export class CameraScannerComponent implements AfterViewInit, OnDestroy {
       video.srcObject = this.mediaStream;
       await video.play();
       this.cameraStatus.set('ready');
+      if (this.barcodeOnly) {
+        this.mode.set('barcode');
+        await this.startBarcodeDetection();
+      }
     } catch (err) {
       console.error('Camera setup failed', err);
       this.debugLastError.set(`setup: ${String(err).slice(0, 60)}`);

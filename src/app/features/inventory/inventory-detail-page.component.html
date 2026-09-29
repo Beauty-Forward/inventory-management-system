@@ -54,13 +54,15 @@
     </div>
 
     <div class="actions">
-      <button class="btn primary" (click)="goToBatch()">
-        @if (p.batch) {
-          view batch →
-        } @else {
-          assign to batch →
-        }
-      </button>
+      @if (p.batch || p.status === 'IN_STOCK') {
+        <button class="btn primary" [disabled]="mutating()" (click)="assignOrViewBatch()">
+          @if (p.batch) {
+            view batch →
+          } @else {
+            assign to batch →
+          }
+        </button>
+      }
       <button class="btn ghost" (click)="goToDonation()">view donation</button>
       <button class="btn ghost" (click)="markDiscarded()" [disabled]="mutating()">
         {{ pendingAction() === 'discarded' ? 'discarding…' : 'mark discarded' }}
@@ -149,5 +151,13 @@
         }
       </div>
     </div>
+
+    @if (pickingBatch()) {
+      <app-add-to-batch-dialog
+        [products]="[{ id: p.id, type: p.type }]"
+        (done)="onAssigned($event)"
+        (cancelled)="pickingBatch.set(false)"
+      />
+    }
   }
 </section>

@@ -12,6 +12,71 @@
 .mini-stats {
   display: flex;
   gap: 6px;
+  align-items: center;
+}
+
+.select-btn {
+  @include pill-button-sm('ghost');
+  &.on { @include pill-button-sm('primary'); }
+}
+
+.notice {
+  @include body-sm;
+  background: rgba($hunter-green, 0.1);
+  color: $hunter-green-deep;
+  padding: 12px 14px;
+  border-radius: 12px;
+  margin: 14px 0;
+
+  a { color: inherit; font-weight: 700; margin-left: 6px; }
+}
+
+.select-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 14px 2px 0;
+
+  .hint { @include meta-mid; }
+}
+
+.check-all {
+  @include body-sm;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  accent-color: $hunter-green;
+}
+
+app-swatch-card {
+  position: relative;
+
+  // Shift-click would otherwise highlight text between the two cards.
+  &.selecting { user-select: none; }
+
+  &.selected ::ng-deep .swatch-card {
+    border-color: $hunter-green;
+    box-shadow: 0 0 0 2px $hunter-green;
+  }
+
+  .pick {
+    position: absolute;
+    top: 46px;
+    left: 10px;
+    z-index: 1;
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
+  }
 }
 
 .error-banner {

@@ -1,0 +1,66 @@
+<app-dialog heading="Add to batch" (closed)="cancelled.emit()">
+  @if (loading()) {
+    <p class="empty">Loading…</p>
+  } @else {
+    <h3 class="group">Existing drafts</h3>
+    @if (drafts().length === 0) {
+      <p class="empty">No draft batches right now.</p>
+    } @else {
+      <div class="options" role="radiogroup" aria-label="Existing draft batches">
+        @for (b of drafts(); track b.id) {
+          <button
+            type="button"
+            class="option"
+            role="radio"
+            [class.on]="isDraftChosen(b.id)"
+            [attr.aria-checked]="isDraftChosen(b.id)"
+            (click)="choice.set({ kind: 'draft', batchId: b.id })"
+          >
+            <span class="name">an existing draft for {{ b.shelter.name }}</span>
+            <span class="meta">
+              #{{ b.id.slice(0, 6).toUpperCase() }} · started {{ b.createdAt | date: 'MMM d' }}
+            </span>
+            @if (mismatchHint(b.shelter.id); as hint) {
+              <span class="warn">{{ hint }}</span>
+            }
+          </button>
+        }
+      </div>
+    }
+
+    <h3 class="group">A new batch</h3>
+    @if (activeShelters().length === 0) {
+      <p class="empty">No active shelters.</p>
+    } @else {
+      <div class="options" role="radiogroup" aria-label="Shelter for a new batch">
+        @for (s of activeShelters(); track s.id) {
+          <button
+            type="button"
+            class="option"
+            role="radio"
+            [class.on]="isShelterChosen(s.id)"
+            [attr.aria-checked]="isShelterChosen(s.id)"
+            (click)="choice.set({ kind: 'new', shelterId: s.id })"
+          >
+            <span class="name">a new batch for {{ s.name }}</span>
+            <span class="meta">{{ s.city }}, {{ s.state }}</span>
+            @if (mismatchHint(s.id); as hint) {
+              <span class="warn">{{ hint }}</span>
+            }
+          </button>
+        }
+      </div>
+    }
+  }
+
+  @if (error()) {
+    <div class="error-banner">{{ error() }}</div>
+  }
+
+  <ng-container dialog-footer>
+    <button type="button" class="btn ghost" (click)="cancelled.emit()">cancel</button>
+    <button type="button" class="btn primary" [disabled]="saving() || !choice()" (click)="confirm()">
+      {{ saving() ? 'adding…' : 'add ' + products().length + (products().length === 1 ? ' product' : ' products') }}
+    </button>
+  </ng-container>
+</app-dialog>

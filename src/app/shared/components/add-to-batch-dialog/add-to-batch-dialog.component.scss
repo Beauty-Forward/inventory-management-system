@@ -1,0 +1,41 @@
+@use '../../../styles-shared' as *;
+
+.group { @include subtitle-eyebrow; margin: 12px 0 8px; }
+
+.empty { @include body-sm; color: $muted-ink; margin: 0 0 8px; }
+
+.options { display: flex; flex-direction: column; gap: 6px; }
+
+.option {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+  padding: 10px 14px;
+  background: $white;
+  border: 1px solid $panel-border;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+
+  &:hover { border-color: rgba($double-espresso, 0.35); }
+  &.on { background: rgba($hunter-green, 0.08); border-color: $hunter-green; }
+
+  .name { @include body-sm; font-weight: 600; }
+  .meta { @include meta-mid; }
+  .warn { @include meta-mid; color: $crimson-deep; }
+}
+
+.error-banner {
+  @include body-sm;
+  background: rgba($crimson, 0.1);
+  color: $crimson-deep;
+  padding: 10px 14px;
+  border-radius: 12px;
+  margin: 12px 0 0;
+}
+
+.btn {
+  @include pill-button-sm('primary');
+  &.ghost { @include pill-button-sm('ghost'); }
+}

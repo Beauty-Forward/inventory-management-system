@@ -155,6 +155,29 @@ mutation AllocateProductToBatch($productId: UUID!, $batchId: UUID!)
   )
 }
 
+# Bulk allocate: one request for many products. The IN_STOCK filter is the
+# double-allocation guard — anything already allocated, shipped, expired or
+# discarded (e.g. grabbed by another batch a moment ago) is silently skipped,
+# and the returned count says how many rows actually moved.
+mutation AllocateProductsToBatch($productIds: [UUID!]!, $batchId: UUID!)
+  @auth(level: USER)
+  @transaction {
+  # Only draft batches can take products; finalized/shipped ones are locked.
+  query @redact {
+    batch(id: $batchId) @check(expr: "this != null", message: "Batch not found") {
+      status @check(expr: "this == 'DRAFT'", message: "Batch is no longer a draft")
+    }
+  }
+  product_updateMany(
+    where: { id: { in: $productIds }, status: { eq: IN_STOCK } }
+    data: {
+      batchId: $batchId
+      status: ALLOCATED
+      updatedAt_expr: "request.time"
+    }
+  )
+}
+
 mutation UnallocateProduct($productId: UUID!) @auth(level: USER) {
   product_update(
     id: $productId

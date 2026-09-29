@@ -14,7 +14,7 @@ If a user is not using a supported framework, they can use the generated SDK dir
 Here's an example of how to use it with the first 5 operations:
 
 ```js
-import { createDonor, updateDonor, incrementDonorDonationCount, createDonation, updateDonationLogistics, createProduct, allocateProductToBatch, unallocateProduct, markBatchProductsShipped, markProductExpired } from '@bf-ims/dataconnect';
+import { createDonor, updateDonor, incrementDonorDonationCount, createDonation, updateDonationLogistics, createProduct, allocateProductToBatch, allocateProductsToBatch, unallocateProduct, markBatchProductsShipped } from '@bf-ims/dataconnect';
 
 
 // Operation CreateDonor:  For variables, look at type CreateDonorVars in ../index.d.ts
@@ -38,14 +38,14 @@ const { data } = await CreateProduct(dataConnect, createProductVars);
 // Operation AllocateProductToBatch:  For variables, look at type AllocateProductToBatchVars in ../index.d.ts
 const { data } = await AllocateProductToBatch(dataConnect, allocateProductToBatchVars);
 
+// Operation AllocateProductsToBatch:  For variables, look at type AllocateProductsToBatchVars in ../index.d.ts
+const { data } = await AllocateProductsToBatch(dataConnect, allocateProductsToBatchVars);
+
 // Operation UnallocateProduct:  For variables, look at type UnallocateProductVars in ../index.d.ts
 const { data } = await UnallocateProduct(dataConnect, unallocateProductVars);
 
 // Operation MarkBatchProductsShipped:  For variables, look at type MarkBatchProductsShippedVars in ../index.d.ts
 const { data } = await MarkBatchProductsShipped(dataConnect, markBatchProductsShippedVars);
-
-// Operation MarkProductExpired:  For variables, look at type MarkProductExpiredVars in ../index.d.ts
-const { data } = await MarkProductExpired(dataConnect, markProductExpiredVars);
 
 
 ```
