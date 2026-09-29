@@ -35,6 +35,7 @@ This README will guide you through the process of using the generated JavaScript
   - [*UpdateDonationLogistics*](#updatedonationlogistics)
   - [*CreateProduct*](#createproduct)
   - [*AllocateProductToBatch*](#allocateproducttobatch)
+  - [*AllocateProductsToBatch*](#allocateproductstobatch)
   - [*UnallocateProduct*](#unallocateproduct)
   - [*MarkBatchProductsShipped*](#markbatchproductsshipped)
   - [*MarkProductExpired*](#markproductexpired)
@@ -1410,6 +1411,7 @@ export interface ListAvailableProductsForShelterData {
     quantity: number;
     color?: string | null;
     expirationDate?: DateString | null;
+    barcode?: string | null;
   } & Product_Key)[];
 }
 ```
@@ -3281,6 +3283,118 @@ console.log(data.product_update);
 executeMutation(ref).then((response) => {
   const data = response.data;
   console.log(data.product_update);
+});
+```
+
+## AllocateProductsToBatch
+You can execute the `AllocateProductsToBatch` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+allocateProductsToBatch(vars: AllocateProductsToBatchVariables): MutationPromise<AllocateProductsToBatchData, AllocateProductsToBatchVariables>;
+
+interface AllocateProductsToBatchRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: AllocateProductsToBatchVariables): MutationRef<AllocateProductsToBatchData, AllocateProductsToBatchVariables>;
+}
+export const allocateProductsToBatchRef: AllocateProductsToBatchRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+allocateProductsToBatch(dc: DataConnect, vars: AllocateProductsToBatchVariables): MutationPromise<AllocateProductsToBatchData, AllocateProductsToBatchVariables>;
+
+interface AllocateProductsToBatchRef {
+  ...
+  (dc: DataConnect, vars: AllocateProductsToBatchVariables): MutationRef<AllocateProductsToBatchData, AllocateProductsToBatchVariables>;
+}
+export const allocateProductsToBatchRef: AllocateProductsToBatchRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the allocateProductsToBatchRef:
+```typescript
+const name = allocateProductsToBatchRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `AllocateProductsToBatch` mutation requires an argument of type `AllocateProductsToBatchVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface AllocateProductsToBatchVariables {
+  productIds: UUIDString[];
+  batchId: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `AllocateProductsToBatch` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `AllocateProductsToBatchData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface AllocateProductsToBatchData {
+  product_updateMany: number;
+}
+```
+### Using `AllocateProductsToBatch`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, allocateProductsToBatch, AllocateProductsToBatchVariables } from '@bf-ims/dataconnect';
+
+// The `AllocateProductsToBatch` mutation requires an argument of type `AllocateProductsToBatchVariables`:
+const allocateProductsToBatchVars: AllocateProductsToBatchVariables = {
+  productIds: ..., 
+  batchId: ..., 
+};
+
+// Call the `allocateProductsToBatch()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await allocateProductsToBatch(allocateProductsToBatchVars);
+// Variables can be defined inline as well.
+const { data } = await allocateProductsToBatch({ productIds: ..., batchId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await allocateProductsToBatch(dataConnect, allocateProductsToBatchVars);
+
+console.log(data.product_updateMany);
+
+// Or, you can use the `Promise` API.
+allocateProductsToBatch(allocateProductsToBatchVars).then((response) => {
+  const data = response.data;
+  console.log(data.product_updateMany);
+});
+```
+
+### Using `AllocateProductsToBatch`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, allocateProductsToBatchRef, AllocateProductsToBatchVariables } from '@bf-ims/dataconnect';
+
+// The `AllocateProductsToBatch` mutation requires an argument of type `AllocateProductsToBatchVariables`:
+const allocateProductsToBatchVars: AllocateProductsToBatchVariables = {
+  productIds: ..., 
+  batchId: ..., 
+};
+
+// Call the `allocateProductsToBatchRef()` function to get a reference to the mutation.
+const ref = allocateProductsToBatchRef(allocateProductsToBatchVars);
+// Variables can be defined inline as well.
+const ref = allocateProductsToBatchRef({ productIds: ..., batchId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = allocateProductsToBatchRef(dataConnect, allocateProductsToBatchVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.product_updateMany);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.product_updateMany);
 });
 ```
 

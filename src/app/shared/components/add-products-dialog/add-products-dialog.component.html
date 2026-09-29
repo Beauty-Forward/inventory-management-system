@@ -1,0 +1,25 @@
+<app-dialog heading="Add products" (closed)="cancelled.emit()">
+  <p class="help">
+    In-stock products
+    @if (acceptedTypes().length > 0) { matching {{ shelterName() }}'s accepted types }
+    @else { — {{ shelterName() }} has no type restrictions }.
+  </p>
+
+  <app-product-picker
+    [products]="available()"
+    [loading]="loading()"
+    emptyMessage="No in-stock products match this shelter's accepted types."
+    [(selectedIds)]="selected"
+  />
+
+  @if (error()) {
+    <div class="error-banner">{{ error() }}</div>
+  }
+
+  <ng-container dialog-footer>
+    <button type="button" class="btn ghost" (click)="cancelled.emit()">cancel</button>
+    <button type="button" class="btn primary" [disabled]="saving() || selected().size === 0" (click)="save()">
+      {{ saving() ? 'adding…' : 'add ' + selected().size + ' to batch' }}
+    </button>
+  </ng-container>
+</app-dialog>

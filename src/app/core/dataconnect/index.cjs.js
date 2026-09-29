@@ -122,6 +122,20 @@ exports.allocateProductToBatch = function allocateProductToBatch(dcOrVars, vars)
 }
 ;
 
+const allocateProductsToBatchRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'AllocateProductsToBatch', inputVars);
+}
+allocateProductsToBatchRef.operationName = 'AllocateProductsToBatch';
+exports.allocateProductsToBatchRef = allocateProductsToBatchRef;
+
+exports.allocateProductsToBatch = function allocateProductsToBatch(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(allocateProductsToBatchRef(dcInstance, inputVars));
+}
+;
+
 const unallocateProductRef = (dcOrVars, vars) => {
   const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
   dcInstance._useGeneratedSdk();

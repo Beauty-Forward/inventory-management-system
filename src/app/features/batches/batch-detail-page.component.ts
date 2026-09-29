@@ -3,9 +3,11 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ALL_PRODUCT_TYPES } from '../../core/models/product-types';
 import {
+  AllocationResult,
   BatchDetail,
   BatchService,
 } from '../../core/services/batch.service';
+import { AddProductsDialogComponent } from '../../shared/components/add-products-dialog/add-products-dialog.component';
 import { CrumbComponent, CrumbItem } from '../../shared/components/crumb/crumb.component';
 import {
   StatusPillComponent,
@@ -16,7 +18,7 @@ import { SwatchVariant } from '../../shared/components/swatch-card/swatch-card.c
 @Component({
   selector: 'app-batch-detail-page',
   standalone: true,
-  imports: [RouterLink, DatePipe, CrumbComponent, StatusPillComponent],
+  imports: [RouterLink, DatePipe, CrumbComponent, StatusPillComponent, AddProductsDialogComponent],
   templateUrl: './batch-detail-page.component.html',
   styleUrl: './batch-detail-page.component.scss',
 })
@@ -29,6 +31,11 @@ export class BatchDetailPageComponent implements OnInit {
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
   readonly mutating = signal(false);
+  readonly addingProducts = signal(false);
+  // One-off message, e.g. handed over by the new-batch form after a create.
+  readonly notice = signal<string | null>(
+    (history.state as { notice?: string } | null)?.notice ?? null,
+  );
 
   readonly productCount = computed(() => this.batch()?.products.length ?? 0);
 
@@ -124,6 +131,22 @@ export class BatchDetailPageComponent implements OnInit {
 
   typeLabel(value: string): string {
     return ALL_PRODUCT_TYPES.find((t) => t.value === value)?.label ?? value;
+  }
+
+  async onProductsAdded(result: AllocationResult): Promise<void> {
+    this.addingProducts.set(false);
+    const b = this.batch();
+    if (!b) return;
+    this.notice.set(this.allocationNotice(result));
+    await this.load(b.id);
+  }
+
+  private allocationNotice(r: AllocationResult): string {
+    const s = (n: number) => (n === 1 ? '' : 's');
+    const added = `Added ${r.allocated} product${s(r.allocated)}.`;
+    return r.skipped > 0
+      ? `${added} ${r.skipped} couldn't be added — no longer in stock.`
+      : added;
   }
 
   async removeProduct(productId: string): Promise<void> {

@@ -133,73 +133,12 @@
   gap: 0;
 }
 
-.product-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin-top: 4px;
-}
-
-.product-row {
-  background: $white;
-  border: 1px solid $panel-border;
-  border-radius: 10px;
-  padding: 10px 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  text-align: left;
-  font-family: $font-body;
-  transition: border-color 0.15s ease, background 0.15s ease;
-
-  &:hover { border-color: rgba(26, 26, 26, 0.35); }
-
-  &.selected {
-    border-color: $hunter-green;
-    background: rgba($eucalyptus, 0.4);
-  }
-}
-
-.row-main {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  flex: 1;
-  min-width: 0;
-}
-
-.product-name {
-  @include body-sm;
-  font-weight: 500;
-}
-
-.product-meta,
-.product-expiry {
-  @include meta;
-}
-
-.product-expiry { color: $crimson-deep; }
-
-.check {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: 1px solid $panel-border;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: $font-heading;
-  font-weight: 700;
-  font-size: 13px;
-  color: $muted-ink;
-  flex-shrink: 0;
-
-  .product-row.selected & {
-    background: $hunter-green;
-    border-color: $hunter-green;
-    color: $porcelain;
+// Keep the summary + create button in view while the product list scrolls.
+.pane-right {
+  @media (min-width: #{$mobile-breakpoint + 1}) {
+    align-self: start;
+    position: sticky;
+    top: 16px;
   }
 }
 

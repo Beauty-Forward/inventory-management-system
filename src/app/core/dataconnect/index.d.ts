@@ -34,6 +34,15 @@ export interface AllocateProductToBatchVariables {
   batchId: UUIDString;
 }
 
+export interface AllocateProductsToBatchData {
+  product_updateMany: number;
+}
+
+export interface AllocateProductsToBatchVariables {
+  productIds: UUIDString[];
+  batchId: UUIDString;
+}
+
 export interface Batch_Key {
   id: UUIDString;
   __typename?: 'Batch_Key';
@@ -486,6 +495,7 @@ export interface ListAvailableProductsForShelterData {
     quantity: number;
     color?: string | null;
     expirationDate?: DateString | null;
+    barcode?: string | null;
   } & Product_Key)[];
 }
 
@@ -842,6 +852,18 @@ export const allocateProductToBatchRef: AllocateProductToBatchRef;
 
 export function allocateProductToBatch(vars: AllocateProductToBatchVariables): MutationPromise<AllocateProductToBatchData, AllocateProductToBatchVariables>;
 export function allocateProductToBatch(dc: DataConnect, vars: AllocateProductToBatchVariables): MutationPromise<AllocateProductToBatchData, AllocateProductToBatchVariables>;
+
+interface AllocateProductsToBatchRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: AllocateProductsToBatchVariables): MutationRef<AllocateProductsToBatchData, AllocateProductsToBatchVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: AllocateProductsToBatchVariables): MutationRef<AllocateProductsToBatchData, AllocateProductsToBatchVariables>;
+  operationName: string;
+}
+export const allocateProductsToBatchRef: AllocateProductsToBatchRef;
+
+export function allocateProductsToBatch(vars: AllocateProductsToBatchVariables): MutationPromise<AllocateProductsToBatchData, AllocateProductsToBatchVariables>;
+export function allocateProductsToBatch(dc: DataConnect, vars: AllocateProductsToBatchVariables): MutationPromise<AllocateProductsToBatchData, AllocateProductsToBatchVariables>;
 
 interface UnallocateProductRef {
   /* Allow users to create refs without passing in DataConnect */

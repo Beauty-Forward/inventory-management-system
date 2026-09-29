@@ -1,0 +1,57 @@
+@use '../../../styles-shared' as *;
+
+:host {
+  display: block;
+  position: sticky;
+  bottom: var(--selection-bar-bottom, 12px);
+  z-index: 50;
+  pointer-events: none;
+
+  @media (max-width: $mobile-breakpoint) {
+    // Clear the fixed 64px bottom nav.
+    bottom: var(--selection-bar-bottom, 76px);
+  }
+}
+
+.bar {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  padding: 10px 12px 10px 18px;
+  border-radius: 999px;
+  background: $double-espresso;
+  color: $porcelain;
+  box-shadow: 0 6px 20px rgba($double-espresso, 0.25);
+}
+
+.count {
+  font-family: $font-heading;
+  font-size: 12px;
+  font-weight: 700;
+
+  b { font-size: 15px; margin-right: 2px; }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+
+  ::ng-deep button {
+    @include pill-button-sm('ghost');
+    color: $porcelain;
+    border-color: rgba($porcelain, 0.4);
+    padding: 8px 14px;
+
+    &.primary {
+      background: $porcelain;
+      color: $double-espresso;
+      border-color: $porcelain;
+    }
+  }
+}

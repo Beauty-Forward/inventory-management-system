@@ -1,4 +1,3 @@
-import { DatePipe } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { ALL_PRODUCT_TYPES } from '../../core/models/product-types';
@@ -12,11 +11,12 @@ import {
   ShelterService,
 } from '../../core/services/shelter.service';
 import { CrumbComponent } from '../../shared/components/crumb/crumb.component';
+import { ProductPickerComponent } from '../../shared/components/product-picker/product-picker.component';
 
 @Component({
   selector: 'app-batch-form-page',
   standalone: true,
-  imports: [RouterLink, DatePipe, CrumbComponent],
+  imports: [RouterLink, CrumbComponent, ProductPickerComponent],
   templateUrl: './batch-form-page.component.html',
   styleUrl: './batch-form-page.component.scss',
 })
@@ -81,19 +81,6 @@ export class BatchFormPageComponent implements OnInit {
     }
   }
 
-  toggleSelected(id: string): void {
-    this.selected.update((set) => {
-      const next = new Set(set);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }
-
-  isSelected(id: string): boolean {
-    return this.selected().has(id);
-  }
-
   typeLabel(value: string): string {
     return ALL_PRODUCT_TYPES.find((t) => t.value === value)?.label ?? value;
   }
@@ -113,16 +100,19 @@ export class BatchFormPageComponent implements OnInit {
     this.creating.set(true);
     this.error.set(null);
     try {
-      const batchId = await this.batchService.create(
+      const { batchId, skipped } = await this.batchService.createWithProducts(
         shelter.id,
+        [...this.selected()],
         this.notes() || undefined,
       );
 
-      for (const productId of this.selected()) {
-        await this.batchService.addProduct(productId, batchId);
-      }
-
-      await this.router.navigate(['/batches', batchId]);
+      // Products another batch grabbed since the picker loaded are skipped by
+      // the server; say so on the batch page rather than dropping them quietly.
+      const notice =
+        skipped > 0
+          ? `Batch created. ${skipped} selected product${skipped === 1 ? ' was' : 's were'} no longer in stock and left out.`
+          : undefined;
+      await this.router.navigate(['/batches', batchId], { state: { notice } });
     } catch (err) {
       console.error(err);
       this.error.set('Could not create batch.');

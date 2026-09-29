@@ -1,0 +1,17 @@
+@use '../../../styles-shared' as *;
+
+.help { @include meta-mid; margin: 0 0 10px; line-height: 1.5; }
+
+.error-banner {
+  @include body-sm;
+  background: rgba($crimson, 0.1);
+  color: $crimson-deep;
+  padding: 10px 14px;
+  border-radius: 12px;
+  margin: 12px 0 0;
+}
+
+.btn {
+  @include pill-button-sm('primary');
+  &.ghost { @include pill-button-sm('ghost'); }
+}

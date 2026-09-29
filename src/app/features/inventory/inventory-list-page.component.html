@@ -2,6 +2,13 @@
   <app-page-header eyebrow="stock" title="inventory">
     <div class="mini-stats">
       <app-stat-tile variant="butter" size="sm" label="on hand" [value]="totalCount()" />
+      @if (selecting()) {
+        <button type="button" class="select-btn on" (click)="stopSelecting()">done</button>
+      } @else {
+        <button type="button" class="select-btn" [disabled]="totalCount() === 0" (click)="startSelecting()">
+          select
+        </button>
+      }
     </div>
   </app-page-header>
 
@@ -13,6 +20,23 @@
     [activeKey]="activeCategory()"
     (filterChange)="activeCategory.set($any($event))"
   />
+
+  @if (addResult(); as r) {
+    <div class="notice" role="status">
+      {{ r.text }}
+      <a [routerLink]="['/batches', r.batchId]">view batch →</a>
+    </div>
+  }
+
+  @if (selecting() && filtered().length > 0) {
+    <div class="select-head">
+      <label class="check-all">
+        <input type="checkbox" [checked]="allDisplayedSelected()" (change)="toggleAllDisplayed()" />
+        select all visible ({{ displayed().length }})
+      </label>
+      <span class="hint">shift-click to select a range</span>
+    </div>
+  }
 
   @if (loading()) {
     <p class="empty-state">Loading inventory…</p>
@@ -34,7 +58,21 @@
       </div>
       <div class="grid">
         @for (p of readyProducts(); track p.id) {
-          <app-swatch-card [swatch]="swatch(p)" (click)="open(p)">
+          <app-swatch-card
+            [swatch]="swatch(p)"
+            [class.selected]="isSelected(p)"
+            [class.selecting]="selecting()"
+            (click)="onCardClick($event, p)"
+          >
+            @if (selecting()) {
+              <input
+                type="checkbox"
+                class="pick"
+                tabindex="-1"
+                aria-hidden="true"
+                [checked]="isSelected(p)"
+              />
+            }
             <ng-container swatch-top>
               <span class="cat-pill">{{ categoryLabel(p) }}</span>
               <app-status-pill [variant]="cardStatus(p)">
@@ -63,7 +101,21 @@
       </div>
       <div class="grid">
         @for (p of flaggedProducts(); track p.id) {
-          <app-swatch-card [swatch]="swatch(p)" (click)="open(p)">
+          <app-swatch-card
+            [swatch]="swatch(p)"
+            [class.selected]="isSelected(p)"
+            [class.selecting]="selecting()"
+            (click)="onCardClick($event, p)"
+          >
+            @if (selecting()) {
+              <input
+                type="checkbox"
+                class="pick"
+                tabindex="-1"
+                aria-hidden="true"
+                [checked]="isSelected(p)"
+              />
+            }
             <ng-container swatch-top>
               <span class="cat-pill">{{ categoryLabel(p) }}</span>
               <app-status-pill [variant]="cardStatus(p)">
@@ -87,5 +139,20 @@
         }
       </div>
     }
+  }
+
+  @if (selecting() && selectedCount() > 0) {
+    <app-selection-bar [count]="selectedCount()">
+      <button type="button" (click)="clearSelection()">clear</button>
+      <button type="button" class="primary" (click)="pickingBatch.set(true)">add to batch…</button>
+    </app-selection-bar>
+  }
+
+  @if (pickingBatch()) {
+    <app-add-to-batch-dialog
+      [products]="selectedProducts()"
+      (done)="onAddedToBatch($event)"
+      (cancelled)="pickingBatch.set(false)"
+    />
   }
 </section>

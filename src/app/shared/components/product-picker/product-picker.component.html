@@ -1,0 +1,85 @@
+<div class="picker">
+  <div class="toolbar-row">
+    <app-pill-toolbar
+      class="toolbar"
+      searchPlaceholder="search name, brand, type, or barcode"
+      [searchValue]="searchQuery()"
+      (searchChange)="searchQuery.set($event)"
+      [filters]="typeFilters()"
+      [activeKey]="activeType()"
+      (filterChange)="activeType.set($event)"
+    />
+    <button type="button" class="scan-btn" (click)="openScanner()">
+      <span aria-hidden="true">║║</span> scan
+    </button>
+  </div>
+
+  @if (scanNote(); as note) {
+    <div class="scan-note" [class.warn]="note.kind === 'warn'" role="status">{{ note.text }}</div>
+  }
+
+  @if (loading()) {
+    <p class="empty-state">Loading…</p>
+  } @else if (products().length === 0) {
+    <p class="empty-state">{{ emptyMessage() }}</p>
+  } @else {
+    <div class="list-head">
+      <label class="check-all">
+        <input
+          type="checkbox"
+          [checked]="allVisibleSelected()"
+          [indeterminate]="someVisibleSelected()"
+          [disabled]="visible().length === 0"
+          (change)="toggleAllVisible()"
+        />
+        select all visible ({{ visible().length }})
+      </label>
+      <span class="hint">shift-click to select a range</span>
+    </div>
+
+    @if (visible().length === 0) {
+      <p class="empty-state">No products match your search.</p>
+    } @else {
+      <div class="product-list" role="group" aria-label="Available products">
+        @for (p of visible(); track p.id) {
+          <div
+            class="product-row"
+            role="checkbox"
+            tabindex="0"
+            [class.selected]="isSelected(p.id)"
+            [attr.aria-checked]="isSelected(p.id)"
+            (click)="onRowClick($event, p)"
+            (keydown.space)="$event.preventDefault(); onRowClick($any($event), p)"
+          >
+            <input type="checkbox" tabindex="-1" aria-hidden="true" [checked]="isSelected(p.id)" />
+            <div class="row-main">
+              <span class="product-name">{{ p.name }}</span>
+              <span class="product-meta">
+                {{ p.brand }} · {{ typeLabel(p.type) }} · Qty {{ p.quantity }}
+              </span>
+              @if (p.expirationDate) {
+                <span class="product-expiry">Expires {{ p.expirationDate | date: 'MMM yyyy' }}</span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+
+  @if (selectedCount() > 0) {
+    <app-selection-bar [count]="selectedCount()">
+      <button type="button" (click)="clear()">clear</button>
+      <ng-content select="[picker-actions]"></ng-content>
+    </app-selection-bar>
+  }
+</div>
+
+@if (scanning()) {
+  <app-camera-scanner
+    heading="Scan to add"
+    [barcodeOnly]="true"
+    (scanned)="onScanned($event)"
+    (cancelled)="scanning.set(false)"
+  />
+}

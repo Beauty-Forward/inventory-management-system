@@ -1,8 +1,13 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ALL_PRODUCT_TYPES, PRODUCT_TYPE_CATEGORIES } from '../../core/models/product-types';
 import { InventoryRow, ProductService } from '../../core/services/product.service';
+import {
+  AddToBatchDialogComponent,
+  AddToBatchResult,
+} from '../../shared/components/add-to-batch-dialog/add-to-batch-dialog.component';
+import { SelectionBarComponent } from '../../shared/components/selection-bar/selection-bar.component';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
 import { StatTileComponent } from '../../shared/components/stat-tile/stat-tile.component';
 import {
@@ -85,6 +90,9 @@ const SWATCH_BY_CATEGORY: Record<Exclude<CategoryKey, 'all' | 'expiring'>, Swatc
   standalone: true,
   imports: [
     DatePipe,
+    RouterLink,
+    AddToBatchDialogComponent,
+    SelectionBarComponent,
     PageHeaderComponent,
     StatTileComponent,
     PillToolbarComponent,
@@ -148,6 +156,27 @@ export class InventoryListPageComponent implements OnInit {
 
   readonly flaggedProducts = computed(() => this.filtered().filter((p) => this.isExpiring(p)));
 
+  // --- Selection mode (bulk "add to batch…") ---
+  readonly selecting = signal(false);
+  readonly selectedIds = signal<Set<string>>(new Set());
+  readonly pickingBatch = signal(false);
+  readonly addResult = signal<{ text: string; batchId: string } | null>(null);
+  // Anchor for shift-click range selection.
+  private anchorId: string | null = null;
+
+  // Cards in the order they're drawn (ready first, then flagged), which is
+  // the order a shift-click range follows.
+  readonly displayed = computed(() => [...this.readyProducts(), ...this.flaggedProducts()]);
+  readonly selectedCount = computed(() => this.selectedIds().size);
+  readonly selectedProducts = computed(() =>
+    this.products().filter((p) => this.selectedIds().has(p.id)),
+  );
+  readonly allDisplayedSelected = computed(() => {
+    const sel = this.selectedIds();
+    const shown = this.displayed();
+    return shown.length > 0 && shown.every((p) => sel.has(p.id));
+  });
+
   readonly totalCount = computed(() => this.products().length);
   readonly expiringCount = computed(() => this.products().filter((p) => this.isExpiring(p)).length);
 
@@ -161,6 +190,9 @@ export class InventoryListPageComponent implements OnInit {
     try {
       const rows = await this.productService.listInStock({ limit: 500 });
       this.products.set(rows);
+      // Drop selections for products that have since left stock.
+      const live = new Set(rows.map((p) => p.id));
+      this.selectedIds.update((set) => new Set([...set].filter((id) => live.has(id))));
     } catch (err) {
       console.error(err);
       this.error.set('Could not load inventory.');
@@ -220,6 +252,78 @@ export class InventoryListPageComponent implements OnInit {
 
   open(p: InventoryRow): void {
     this.router.navigate(['/inventory', p.id]);
+  }
+
+  // Card click: opens the product normally; in selection mode it toggles the
+  // card, and shift-click applies the new state to every card in between.
+  onCardClick(event: MouseEvent, p: InventoryRow): void {
+    if (!this.selecting()) {
+      this.open(p);
+      return;
+    }
+    const select = !this.selectedIds().has(p.id);
+    const shown = this.displayed();
+    const from =
+      event.shiftKey && this.anchorId ? shown.findIndex((x) => x.id === this.anchorId) : -1;
+    const to = shown.findIndex((x) => x.id === p.id);
+    this.selectedIds.update((set) => {
+      const next = new Set(set);
+      const apply = (id: string) => (select ? next.add(id) : next.delete(id));
+      if (from >= 0 && to >= 0) {
+        const [lo, hi] = from < to ? [from, to] : [to, from];
+        for (let i = lo; i <= hi; i++) apply(shown[i].id);
+      } else {
+        apply(p.id);
+      }
+      return next;
+    });
+    this.anchorId = p.id;
+  }
+
+  isSelected(p: InventoryRow): boolean {
+    return this.selectedIds().has(p.id);
+  }
+
+  startSelecting(): void {
+    this.addResult.set(null);
+    this.selecting.set(true);
+  }
+
+  stopSelecting(): void {
+    this.selecting.set(false);
+    this.clearSelection();
+  }
+
+  clearSelection(): void {
+    this.selectedIds.set(new Set());
+    this.anchorId = null;
+  }
+
+  toggleAllDisplayed(): void {
+    const deselect = this.allDisplayedSelected();
+    const shown = this.displayed();
+    this.selectedIds.update((set) => {
+      const next = new Set(set);
+      for (const p of shown) {
+        if (deselect) next.delete(p.id);
+        else next.add(p.id);
+      }
+      return next;
+    });
+  }
+
+  async onAddedToBatch(result: AddToBatchResult): Promise<void> {
+    this.pickingBatch.set(false);
+    const s = (n: number) => (n === 1 ? '' : 's');
+    let text = `${result.allocated} product${s(result.allocated)} ${
+      result.createdBatch ? 'added to a new batch' : 'added to the draft'
+    } for ${result.shelterName}.`;
+    if (result.skipped > 0) {
+      text += ` ${result.skipped} couldn't be added — no longer in stock.`;
+    }
+    this.addResult.set({ text, batchId: result.batchId });
+    this.stopSelecting();
+    await this.load();
   }
 
   unitLabel(p: InventoryRow): string {

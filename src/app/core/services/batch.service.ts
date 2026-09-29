@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import {
-  allocateProductToBatch,
+  allocateProductsToBatch,
   createBatch,
   deleteBatch,
   deliverBatch,
@@ -20,6 +20,12 @@ import {
 import { FirebaseClientService } from './firebase-client.service';
 
 export type BatchListRow = ListAllBatchesData['batches'][number];
+export interface AllocationResult {
+  requested: number;
+  allocated: number;
+  skipped: number;
+}
+
 export type BatchDetail = NonNullable<GetBatchData['batch']>;
 
 @Injectable({ providedIn: 'root' })
@@ -58,11 +64,28 @@ export class BatchService {
     return result.data.batch_insert.id;
   }
 
-  async addProduct(productId: string, batchId: string): Promise<void> {
-    await allocateProductToBatch(this.firebase.dataConnect, {
-      productId,
+  // Allocate many products in one request. The mutation only moves rows that
+  // are still IN_STOCK, so anything taken in the meantime is skipped rather
+  // than double-allocated; `skipped` reports how many that was.
+  async addProducts(productIds: string[], batchId: string): Promise<AllocationResult> {
+    const ids = Array.from(new Set(productIds));
+    if (ids.length === 0) return { requested: 0, allocated: 0, skipped: 0 };
+    const result = await allocateProductsToBatch(this.firebase.dataConnect, {
+      productIds: ids,
       batchId,
     });
+    const allocated = result.data.product_updateMany;
+    return { requested: ids.length, allocated, skipped: ids.length - allocated };
+  }
+
+  // Create a draft batch for a shelter and fill it in one go.
+  async createWithProducts(
+    shelterId: string,
+    productIds: string[],
+    notes?: string,
+  ): Promise<{ batchId: string } & AllocationResult> {
+    const batchId = await this.create(shelterId, notes);
+    return { batchId, ...(await this.addProducts(productIds, batchId)) };
   }
 
   async removeProduct(productId: string): Promise<void> {

@@ -300,3 +300,22 @@
     color: $crimson-deep;
   }
 }
+
+.notice {
+  @include body-sm;
+  background: rgba($hunter-green, 0.1);
+  color: $hunter-green-deep;
+  padding: 12px 14px;
+  border-radius: 12px;
+  margin: 16px 0;
+}
+
+.panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+
+  .panel-title { margin-bottom: 10px; }
+  .btn.small { padding: 7px 14px; }
+}

@@ -6,6 +6,10 @@ import {
   ProductDetail,
   ProductService,
 } from '../../core/services/product.service';
+import {
+  AddToBatchDialogComponent,
+  AddToBatchResult,
+} from '../../shared/components/add-to-batch-dialog/add-to-batch-dialog.component';
 import { CrumbComponent, CrumbItem } from '../../shared/components/crumb/crumb.component';
 import {
   StatusPillComponent,
@@ -36,7 +40,7 @@ const SWATCH_BY_CATEGORY: Record<string, SwatchVariant> = {
 @Component({
   selector: 'app-inventory-detail-page',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, CrumbComponent, StatusPillComponent],
+  imports: [DatePipe, DecimalPipe, CrumbComponent, StatusPillComponent, AddToBatchDialogComponent],
   templateUrl: './inventory-detail-page.component.html',
   styleUrl: './inventory-detail-page.component.scss',
 })
@@ -54,6 +58,7 @@ export class InventoryDetailPageComponent implements OnInit {
   // Inline feedback shown after a status change succeeds or fails.
   readonly actionMessage = signal<string | null>(null);
   readonly actionError = signal<string | null>(null);
+  readonly pickingBatch = signal(false);
 
   readonly category = computed(() => {
     const p = this.product();
@@ -219,10 +224,28 @@ export class InventoryDetailPageComponent implements OnInit {
     }
   }
 
-  goToBatch(): void {
+  // Already in a batch: jump to it. Otherwise open the batch chooser, which
+  // lists existing drafts before offering a new batch.
+  assignOrViewBatch(): void {
     const p = this.product();
-    if (p?.batch) this.router.navigate(['/batches', p.batch.id]);
-    else this.router.navigate(['/batches/new']);
+    if (!p) return;
+    if (p.batch) this.router.navigate(['/batches', p.batch.id]);
+    else this.pickingBatch.set(true);
+  }
+
+  async onAssigned(result: AddToBatchResult): Promise<void> {
+    this.pickingBatch.set(false);
+    const p = this.product();
+    if (!p) return;
+    this.actionError.set(null);
+    if (result.allocated === 0) {
+      this.actionError.set(`"${p.name}" is no longer in stock, so it wasn't added to the batch.`);
+    } else {
+      this.actionMessage.set(
+        `Added to ${result.createdBatch ? 'a new batch' : 'the draft'} for ${result.shelterName}.`,
+      );
+    }
+    await this.load(p.id);
   }
 
   goToDonation(): void {
