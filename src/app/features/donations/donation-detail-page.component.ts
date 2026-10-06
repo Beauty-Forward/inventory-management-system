@@ -6,6 +6,7 @@ import {
   DonationDetail,
   DonationService,
 } from '../../core/services/donation.service';
+import { formatUsd, parsePrice, retailValue } from '../../shared/utils/retail-value';
 import { CrumbComponent, CrumbItem } from '../../shared/components/crumb/crumb.component';
 import {
   StatusPillComponent,
@@ -45,6 +46,18 @@ export class DonationDetailPageComponent implements OnInit {
   readonly totalUnits = computed(() =>
     (this.donation()?.products ?? []).reduce((acc, p) => acc + (p.quantity ?? 0), 0),
   );
+
+  readonly value = computed(() => retailValue(this.donation()?.products ?? []));
+  readonly valueLabel = computed(() => formatUsd(this.value().total));
+
+  readonly routedCount = computed(
+    () => (this.donation()?.products ?? []).filter((p) => !!p.batch).length,
+  );
+
+  unitPrice(price: string | null | undefined): string | null {
+    const n = parsePrice(price);
+    return n === null ? null : formatUsd(n);
+  }
 
   readonly methodVariant = computed<StatusPillVariant>(() => {
     const d = this.donation();

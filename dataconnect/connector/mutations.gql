@@ -12,8 +12,6 @@ mutation CreateDonor(
   $phone: String!
   $city: String!
   $state: String!
-  $smsOptIn: Boolean
-  $instagramHandle: String
   $linkedRequestId: String
 ) @auth(level: USER) {
   donor_insert(
@@ -23,8 +21,6 @@ mutation CreateDonor(
       phone: $phone
       city: $city
       state: $state
-      smsOptIn: $smsOptIn
-      instagramHandle: $instagramHandle
       linkedRequestId: $linkedRequestId
     }
   )
@@ -36,8 +32,6 @@ mutation UpdateDonor(
   $phone: String
   $city: String
   $state: String
-  $smsOptIn: Boolean
-  $instagramHandle: String
   $linkedRequestId: String
 ) @auth(level: USER) {
   donor_update(
@@ -47,8 +41,6 @@ mutation UpdateDonor(
       phone: $phone
       city: $city
       state: $state
-      smsOptIn: $smsOptIn
-      instagramHandle: $instagramHandle
       linkedRequestId: $linkedRequestId
       updatedAt_expr: "request.time"
     }

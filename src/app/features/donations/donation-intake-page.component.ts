@@ -22,10 +22,8 @@ type DonorFormState = {
   fullName: string;
   email: string;
   phone: string;
-  smsOptIn: boolean;
   city: string;
   state: string;
-  instagramHandle: string;
 };
 
 type Step = 'donor' | 'products' | 'saving';
@@ -34,10 +32,8 @@ const EMPTY_DONOR = (): DonorFormState => ({
   fullName: '',
   email: '',
   phone: '',
-  smsOptIn: false,
   city: '',
   state: '',
-  instagramHandle: '',
 });
 
 const TODAY = (): string => {
@@ -193,10 +189,8 @@ export class DonationIntakePageComponent implements OnInit {
       fullName: donation.donor.fullName,
       email: donation.donor.email,
       phone: donation.donor.phone,
-      smsOptIn: false,
       city: donation.donor.city,
       state: donation.donor.state,
-      instagramHandle: '',
     });
     this.donorLocked.set(true);
     this.step.set('products');
@@ -230,6 +224,16 @@ export class DonationIntakePageComponent implements OnInit {
   addProduct(): void {
     this.products.update((list) => [...list, EMPTY_PRODUCT_CARD()]);
   }
+
+  private isBlankCard(p: ProductFormCardModel): boolean {
+    return !p.name.trim() && !p.brand.trim() && !p.barcode.trim() && !p.price.trim();
+  }
+
+  // Only shown on a new donation (not when adding to an existing one) when no
+  // card has any content, so the button can say it will create it empty.
+  readonly creatingEmpty = computed(
+    () => !this.preLoadedDonationId() && this.products().every((p) => this.isBlankCard(p)),
+  );
 
   removeProduct(index: number): void {
     this.products.update((list) => list.filter((_, i) => i !== index));
@@ -315,17 +319,19 @@ export class DonationIntakePageComponent implements OnInit {
         fullName: donorForm.fullName,
         email: donorForm.email || undefined,
         phone: donorForm.phone || undefined,
-        smsOptIn: donorForm.smsOptIn,
         city: donorForm.city || 'Unknown',
         state: donorForm.state || 'NY',
-        instagramHandle: donorForm.instagramHandle || undefined,
       },
       donationRequestId: this.donationRequestId() || undefined,
       warehouseReference: this.warehouseReference(),
       date: this.donationDate(),
       method: this.donationMethod(),
       notes: this.donationNotes() || undefined,
-      products: this.products().map(toProductFormInput),
+      // Untouched cards are dropped, so leaving only a blank card creates the
+      // donation with no products.
+      products: this.products()
+        .filter((p) => !this.isBlankCard(p))
+        .map(toProductFormInput),
     };
 
     const parsed = donationIntakeSchema.safeParse(candidate);
@@ -516,6 +522,13 @@ export class DonationIntakePageComponent implements OnInit {
         colorCategory: fill('colorCategory', result.colorCategory),
         keyIngredients: fill('keyIngredients', result.keyIngredients),
         size: fill('size', result.size),
+        // Photo prices are estimates by name + brand, so always ring them
+        // for verification regardless of the product-ID confidence.
+        price: (() => {
+          if (current.price || !result.price) return current.price;
+          flagged.push('price');
+          return result.price;
+        })(),
       };
       return next;
     });

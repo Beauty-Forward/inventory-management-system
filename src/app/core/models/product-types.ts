@@ -86,3 +86,26 @@ export const ALL_PRODUCT_TYPES: ProductTypeOption[] = [
 
 export const PRODUCT_TYPE_VALUES: string[] =
   ALL_PRODUCT_TYPES.map((t) => t.value);
+
+// Extra words a person might type for a category, beyond its label.
+const CATEGORY_ALIASES: Record<string, string[]> = {
+  'Hair Care': ['hair', 'haircare'],
+  'Skin Care': ['skin', 'skincare'],
+  Makeup: ['make up', 'cosmetics', 'cosmetic'],
+  Hygiene: ['personal care', 'bath', 'body'],
+  'Nail Care': ['nail', 'nails', 'nailcare'],
+  Fragrance: ['scent', 'cologne'],
+};
+
+export function productCategoryLabel(type: string): string | undefined {
+  return PRODUCT_TYPE_CATEGORIES.find((c) => c.types.some((t) => t.value === type))?.label;
+}
+
+// Lowercased text a product's type/category search should match against, so
+// "skincare", "makeup", "shampoo" or "deodorant" all find the right products.
+export function productTypeSearchText(type: string): string {
+  const label = ALL_PRODUCT_TYPES.find((t) => t.value === type)?.label ?? type;
+  const category = productCategoryLabel(type);
+  const aliases = category ? [category, ...(CATEGORY_ALIASES[category] ?? [])] : [];
+  return [type.replace(/_/g, ' '), label, ...aliases].join(' ').toLowerCase();
+}

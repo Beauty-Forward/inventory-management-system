@@ -5,14 +5,12 @@ export const donorFormSchema = z.object({
   fullName: z.string().trim().min(1, 'Full name is required'),
   email: z.string().trim().toLowerCase().email('Valid email required').optional(),
   phone: z.string().trim().min(7, 'Phone is required').optional(),
-  smsOptIn: z.boolean().default(false),
   city: z.string().trim().min(1, 'City is required'),
   state: z
     .string()
     .trim()
     .toUpperCase()
     .regex(/^[A-Z]{2}$/, 'Use 2-letter state code'),
-  instagramHandle: z.string().trim().optional(),
 });
 
 export type DonorFormInput = z.infer<typeof donorFormSchema>;
@@ -51,7 +49,9 @@ export const donationIntakeSchema = z.object({
   date: z.string().trim().min(1, 'Date is required'),
   method: z.enum(['pickup', 'shipping', 'dropoff', 'walk-in']),
   notes: z.string().trim().optional(),
-  products: z.array(productFormSchema).min(1, 'Add at least one product'),
+  // May be empty: a donation can be opened first and have products added later
+  // from its detail page (e.g. a company drop that volunteers sort over days).
+  products: z.array(productFormSchema),
 });
 
 export type DonationIntakeInput = z.infer<typeof donationIntakeSchema>;

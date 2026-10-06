@@ -10,6 +10,7 @@ import {
   AddToBatchDialogComponent,
   AddToBatchResult,
 } from '../../shared/components/add-to-batch-dialog/add-to-batch-dialog.component';
+import { formatUsd, parsePrice } from '../../shared/utils/retail-value';
 import { CrumbComponent, CrumbItem } from '../../shared/components/crumb/crumb.component';
 import {
   StatusPillComponent,
@@ -103,9 +104,14 @@ export class InventoryDetailPageComponent implements OnInit {
   readonly retailValue = computed(() => {
     const p = this.product();
     if (!p) return null;
-    const price = p.price ? Number(p.price) : null;
-    if (!price || isNaN(price)) return null;
+    const price = parsePrice(p.price);
+    if (!price) return null;
     return price * p.quantity;
+  });
+
+  readonly priceLabel = computed(() => {
+    const price = parsePrice(this.product()?.price);
+    return price === null ? '' : formatUsd(price);
   });
 
   readonly crumbs = computed<CrumbItem[]>(() => {

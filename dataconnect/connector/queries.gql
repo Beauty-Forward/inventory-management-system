@@ -14,10 +14,8 @@ query GetDonorByEmail($email: String!) @auth(level: USER) {
     fullName
     email
     phone
-    smsOptIn
     city
     state
-    instagramHandle
     donationCount
   }
 }
@@ -28,10 +26,8 @@ query GetDonor($id: UUID!) @auth(level: USER) {
     fullName
     email
     phone
-    smsOptIn
     city
     state
-    instagramHandle
     linkedRequestId
     donationCount
     createdAt
@@ -97,8 +93,20 @@ query GetDonation($id: UUID!) @auth(level: USER) {
       brand
       type
       quantity
+      price
+      barcode
       status
       expirationDate
+      # Where the product went — lets the donation folder trace each item on
+      # to its outgoing batch and shelter.
+      batch {
+        id
+        status
+        shelter {
+          id
+          name
+        }
+      }
     }
   }
 }
@@ -193,6 +201,7 @@ query ListInventoryInStock(
     brand
     type
     quantity
+    price
     color
     colorCategory
     expirationDate
@@ -263,6 +272,7 @@ query ListAvailableProductsForShelter(
     brand
     type
     quantity
+    price
     color
     expirationDate
     barcode
@@ -364,8 +374,19 @@ query GetBatch($id: UUID!) @auth(level: USER) {
       brand
       type
       quantity
+      price
       status
       expirationDate
+      # Origin of each product, so a batch traces back to its donor(s).
+      donation {
+        id
+        date
+        warehouseReference
+        donor {
+          id
+          fullName
+        }
+      }
     }
   }
 }

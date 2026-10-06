@@ -2,7 +2,7 @@
   <div class="toolbar-row">
     <app-pill-toolbar
       class="toolbar"
-      searchPlaceholder="search name, brand, type, or barcode"
+      searchPlaceholder="search name, brand, type, category, or barcode"
       [searchValue]="searchQuery()"
       (searchChange)="searchQuery.set($event)"
       [filters]="typeFilters()"

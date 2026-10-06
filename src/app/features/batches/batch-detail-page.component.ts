@@ -8,6 +8,7 @@ import {
   BatchService,
 } from '../../core/services/batch.service';
 import { AddProductsDialogComponent } from '../../shared/components/add-products-dialog/add-products-dialog.component';
+import { formatUsd, parsePrice, retailValue } from '../../shared/utils/retail-value';
 import { CrumbComponent, CrumbItem } from '../../shared/components/crumb/crumb.component';
 import {
   StatusPillComponent,
@@ -42,6 +43,20 @@ export class BatchDetailPageComponent implements OnInit {
   readonly totalUnits = computed(() =>
     (this.batch()?.products ?? []).reduce((acc, p) => acc + (p.quantity ?? 0), 0),
   );
+
+  readonly valueLabel = computed(() => formatUsd(retailValue(this.batch()?.products ?? []).total));
+
+  // Distinct donors whose products are in this batch (for donor reporting).
+  readonly donorSummary = computed(() => {
+    const names = new Set<string>();
+    for (const p of this.batch()?.products ?? []) names.add(p.donation.donor.fullName);
+    return [...names].sort();
+  });
+
+  unitPrice(price: string | null | undefined): string | null {
+    const n = parsePrice(price);
+    return n === null ? null : formatUsd(n);
+  }
 
   readonly typeSummary = computed(() => {
     const products = this.batch()?.products ?? [];

@@ -79,27 +79,6 @@
         </div>
       </div>
 
-      <div class="section-title">optional</div>
-      <div class="field">
-        <span class="lbl-s">instagram</span>
-        <input
-          type="text"
-          class="inp"
-          [value]="donor().instagramHandle"
-          (input)="updateDonor('instagramHandle', $any($event.target).value)"
-          placeholder="@handle — so we can tag you in thank-yous"
-        />
-      </div>
-
-      <label class="checkbox-row">
-        <input
-          type="checkbox"
-          [checked]="donor().smsOptIn"
-          (change)="updateDonor('smsOptIn', $any($event.target).checked)"
-        />
-        <span class="cb-label"> Donor opted in to SMS updates about where their items go </span>
-      </label>
-
       @if (fieldErrors()['donor']) {
         <p class="error-text">{{ fieldErrors()['donor'] }}</p>
       }
@@ -165,7 +144,7 @@
           [index]="i"
           [model]="product"
           [errors]="productErrorsAt(i)"
-          [canRemove]="products().length > 1"
+          [canRemove]="products().length > 1 || !preLoadedDonationId()"
           [lowConfidenceFields]="flagsFor(i)"
           (modelChange)="updateProduct(i, $event)"
           (remove)="removeProduct(i)"
@@ -215,7 +194,13 @@
         (click)="completeDonation()"
         [disabled]="saving()"
       >
-        {{ saving() ? 'saving…' : 'complete donation →' }}
+        {{
+          saving()
+            ? 'saving…'
+            : creatingEmpty()
+              ? 'create donation without products →'
+              : 'complete donation →'
+        }}
       </button>
     </div>
   }

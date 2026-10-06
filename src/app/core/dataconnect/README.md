@@ -152,10 +152,8 @@ export interface GetDonorByEmailData {
     fullName: string;
     email: string;
     phone: string;
-    smsOptIn: boolean;
     city: string;
     state: string;
-    instagramHandle?: string | null;
     donationCount: number;
   } & Donor_Key)[];
 }
@@ -271,10 +269,8 @@ export interface GetDonorData {
     fullName: string;
     email: string;
     phone: string;
-    smsOptIn: boolean;
     city: string;
     state: string;
-    instagramHandle?: string | null;
     linkedRequestId?: string | null;
     donationCount: number;
     createdAt: TimestampString;
@@ -653,8 +649,18 @@ export interface GetDonationData {
         brand: string;
         type: string;
         quantity: number;
+        price?: string | null;
+        barcode?: string | null;
         status: ProductStatus;
         expirationDate?: DateString | null;
+        batch?: {
+          id: UUIDString;
+          status: BatchStatus;
+          shelter: {
+            id: UUIDString;
+            name: string;
+          } & Shelter_Key;
+        } & Batch_Key;
       } & Product_Key)[];
   } & Donation_Key;
 }
@@ -1132,6 +1138,7 @@ export interface ListInventoryInStockData {
     brand: string;
     type: string;
     quantity: number;
+    price?: string | null;
     color?: string | null;
     colorCategory?: string | null;
     expirationDate?: DateString | null;
@@ -1409,6 +1416,7 @@ export interface ListAvailableProductsForShelterData {
     brand: string;
     type: string;
     quantity: number;
+    price?: string | null;
     color?: string | null;
     expirationDate?: DateString | null;
     barcode?: string | null;
@@ -2015,8 +2023,18 @@ export interface GetBatchData {
         brand: string;
         type: string;
         quantity: number;
+        price?: string | null;
         status: ProductStatus;
         expirationDate?: DateString | null;
+        donation: {
+          id: UUIDString;
+          date: DateString;
+          warehouseReference: string;
+          donor: {
+            id: UUIDString;
+            fullName: string;
+          } & Donor_Key;
+        } & Donation_Key;
       } & Product_Key)[];
   } & Batch_Key;
 }
@@ -2457,8 +2475,6 @@ export interface CreateDonorVariables {
   phone: string;
   city: string;
   state: string;
-  smsOptIn?: boolean | null;
-  instagramHandle?: string | null;
   linkedRequestId?: string | null;
 }
 ```
@@ -2484,8 +2500,6 @@ const createDonorVars: CreateDonorVariables = {
   phone: ..., 
   city: ..., 
   state: ..., 
-  smsOptIn: ..., // optional
-  instagramHandle: ..., // optional
   linkedRequestId: ..., // optional
 };
 
@@ -2493,7 +2507,7 @@ const createDonorVars: CreateDonorVariables = {
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await createDonor(createDonorVars);
 // Variables can be defined inline as well.
-const { data } = await createDonor({ email: ..., fullName: ..., phone: ..., city: ..., state: ..., smsOptIn: ..., instagramHandle: ..., linkedRequestId: ..., });
+const { data } = await createDonor({ email: ..., fullName: ..., phone: ..., city: ..., state: ..., linkedRequestId: ..., });
 
 // You can also pass in a `DataConnect` instance to the action shortcut function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -2521,15 +2535,13 @@ const createDonorVars: CreateDonorVariables = {
   phone: ..., 
   city: ..., 
   state: ..., 
-  smsOptIn: ..., // optional
-  instagramHandle: ..., // optional
   linkedRequestId: ..., // optional
 };
 
 // Call the `createDonorRef()` function to get a reference to the mutation.
 const ref = createDonorRef(createDonorVars);
 // Variables can be defined inline as well.
-const ref = createDonorRef({ email: ..., fullName: ..., phone: ..., city: ..., state: ..., smsOptIn: ..., instagramHandle: ..., linkedRequestId: ..., });
+const ref = createDonorRef({ email: ..., fullName: ..., phone: ..., city: ..., state: ..., linkedRequestId: ..., });
 
 // You can also pass in a `DataConnect` instance to the `MutationRef` function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -2587,8 +2599,6 @@ export interface UpdateDonorVariables {
   phone?: string | null;
   city?: string | null;
   state?: string | null;
-  smsOptIn?: boolean | null;
-  instagramHandle?: string | null;
   linkedRequestId?: string | null;
 }
 ```
@@ -2614,8 +2624,6 @@ const updateDonorVars: UpdateDonorVariables = {
   phone: ..., // optional
   city: ..., // optional
   state: ..., // optional
-  smsOptIn: ..., // optional
-  instagramHandle: ..., // optional
   linkedRequestId: ..., // optional
 };
 
@@ -2623,7 +2631,7 @@ const updateDonorVars: UpdateDonorVariables = {
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await updateDonor(updateDonorVars);
 // Variables can be defined inline as well.
-const { data } = await updateDonor({ id: ..., fullName: ..., phone: ..., city: ..., state: ..., smsOptIn: ..., instagramHandle: ..., linkedRequestId: ..., });
+const { data } = await updateDonor({ id: ..., fullName: ..., phone: ..., city: ..., state: ..., linkedRequestId: ..., });
 
 // You can also pass in a `DataConnect` instance to the action shortcut function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -2651,15 +2659,13 @@ const updateDonorVars: UpdateDonorVariables = {
   phone: ..., // optional
   city: ..., // optional
   state: ..., // optional
-  smsOptIn: ..., // optional
-  instagramHandle: ..., // optional
   linkedRequestId: ..., // optional
 };
 
 // Call the `updateDonorRef()` function to get a reference to the mutation.
 const ref = updateDonorRef(updateDonorVars);
 // Variables can be defined inline as well.
-const ref = updateDonorRef({ id: ..., fullName: ..., phone: ..., city: ..., state: ..., smsOptIn: ..., instagramHandle: ..., linkedRequestId: ..., });
+const ref = updateDonorRef({ id: ..., fullName: ..., phone: ..., city: ..., state: ..., linkedRequestId: ..., });
 
 // You can also pass in a `DataConnect` instance to the `MutationRef` function.
 const dataConnect = getDataConnect(connectorConfig);

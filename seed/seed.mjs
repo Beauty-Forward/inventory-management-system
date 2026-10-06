@@ -118,8 +118,6 @@ async function run() {
     phone: '917-555-0101',
     city: 'New York',
     state: 'NY',
-    smsOptIn: true,
-    instagramHandle: '@naomi.beauty',
   })).data.donor_insert.id;
 
   const donor2 = (await createDonor(dc, {
@@ -136,7 +134,6 @@ async function run() {
     phone: '718-555-0303',
     city: 'Queens',
     state: 'NY',
-    smsOptIn: true,
   })).data.donor_insert.id;
 
   const donor4 = (await createDonor(dc, {

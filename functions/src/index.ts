@@ -109,6 +109,77 @@ function getGenAI(): GoogleGenAI {
   return _genai;
 }
 
+// Estimated unit retail price (USD, as a string) from a UPCitemdb item: the
+// median of current offers when there are any, otherwise the midpoint of the
+// recorded low/high. Undefined when UPCitemdb has no usable price.
+function estimateRetailPrice(item: {
+  lowest_recorded_price?: number;
+  highest_recorded_price?: number;
+  offers?: Array<{ price?: number }>;
+}): string | undefined {
+  const offers = (item.offers ?? [])
+    .map((o) => o.price)
+    .filter((p): p is number => typeof p === 'number' && p > 0)
+    .sort((a, b) => a - b);
+  let value: number | undefined;
+  if (offers.length > 0) {
+    const mid = Math.floor(offers.length / 2);
+    value = offers.length % 2 ? offers[mid] : (offers[mid - 1] + offers[mid]) / 2;
+  } else {
+    const lo = item.lowest_recorded_price;
+    const hi = item.highest_recorded_price;
+    if (lo && lo > 0 && hi && hi > 0) value = (lo + hi) / 2;
+    else value = lo && lo > 0 ? lo : hi && hi > 0 ? hi : undefined;
+  }
+  return value === undefined ? undefined : value.toFixed(2);
+}
+
+// Price for a product identified from a photo (no barcode): a Gemini estimate
+// of typical US retail price from brand + name. It's an approximation, so
+// callers must flag the price for the volunteer to verify.
+async function estimatePriceFromNameBrand(
+  name: string,
+  brand: string,
+): Promise<{ price: string; source: 'gemini_estimate' } | null> {
+  const log = (outcome: 'hit' | 'miss' | 'error', extras: Record<string, unknown> = {}) =>
+    console.log(JSON.stringify({ fn: 'estimatePriceFromNameBrand', outcome, name: name.slice(0, 60), brand, ...extras }));
+
+  try {
+    const result = await getGenAI().models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            {
+              text:
+                `Estimate the typical US retail price in USD for one unit of this beauty product: "${brand} ${name}". ` +
+                'Return price as a number, or omit it if you have no idea. Do not guess wildly.',
+            },
+          ],
+        },
+      ],
+      config: {
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: { price: { type: Type.NUMBER, description: 'USD per unit' } },
+        },
+        temperature: 0.1,
+      },
+    });
+    const parsed = JSON.parse(result.text ?? '{}') as { price?: number };
+    if (typeof parsed.price === 'number' && parsed.price > 0 && parsed.price < 1000) {
+      log('hit', { price: parsed.price });
+      return { price: parsed.price.toFixed(2), source: 'gemini_estimate' };
+    }
+    log('miss');
+  } catch (err) {
+    log('error', { err: String(err).slice(0, 200) });
+  }
+  return null;
+}
+
 // Multi-tier barcode lookup. Cascade order is empirical: UPCitemdb has the best
 // US-retail beauty coverage in practice, so it runs first. OBF/OFF are
 // crowdsourced and uneven; they backstop for international products. Gemini is
@@ -179,6 +250,9 @@ export const lookupProductByBarcode = onCall(
             brand?: string;
             category?: string;
             images?: string[];
+            lowest_recorded_price?: number;
+            highest_recorded_price?: number;
+            offers?: Array<{ price?: number }>;
           }>;
         };
         const item = body.items?.[0];
@@ -198,6 +272,7 @@ export const lookupProductByBarcode = onCall(
             ingredients: '',
             categories: item.category ?? '',
             imageUrl: item.images?.[0] ?? null,
+            price: estimateRetailPrice(item),
             source: 'upcitemdb',
           };
         }
@@ -410,10 +485,22 @@ export const extractProductFromImage = onCall(
         return { found: false, reason: 'invalid JSON', raw: text };
       }
 
+      // Price the identified product by name + brand (photos rarely show a
+      // price or barcode). Best-effort: never fail the extraction over it.
+      let priceFields: { price?: string; priceSource?: string } = {};
+      if (typeof parsed['name'] === 'string' && parsed['name']) {
+        const est = await estimatePriceFromNameBrand(
+          parsed['name'],
+          typeof parsed['brand'] === 'string' ? parsed['brand'] : '',
+        );
+        if (est) priceFields = { price: est.price, priceSource: est.source };
+      }
+
       return {
         found: true,
         source: 'gemini_vision',
         ...parsed,
+        ...priceFields,
       };
     } catch (err) {
       console.error('Gemini image extraction failed', err);

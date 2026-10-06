@@ -102,27 +102,6 @@ app-stepper {
   color: $crimson-deep;
 }
 
-.checkbox-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 0;
-  font-family: $font-body;
-  font-size: 12px;
-  cursor: pointer;
-
-  input[type='checkbox'] {
-    width: 18px;
-    height: 18px;
-    accent-color: $double-espresso;
-    flex-shrink: 0;
-  }
-}
-
-.cb-label {
-  line-height: 1.4;
-}
-
 // --- Step 2: products ---
 
 .donor-strip {

@@ -37,6 +37,7 @@ interface RemoteLookupResult {
   ingredients?: string;
   categories?: string;
   imageUrl?: string | null;
+  price?: string;
   confidence?: 'high' | 'medium' | 'low';
   source?: Exclude<BarcodeLookupSource, 'catalog'>;
 }
@@ -91,6 +92,7 @@ export class BarcodeLookupService {
           brand: data.brand,
           type: data.type,
           keyIngredients: data.ingredients,
+          price: data.price,
           confidence: data.confidence,
           source: data.source,
         };
@@ -180,6 +182,9 @@ export interface PhotoExtractionResult {
   colorCategory?: string;
   keyIngredients?: string;
   size?: string;
+  // Estimated from name + brand, not read off the package — always verify.
+  price?: string;
+  priceSource?: 'gemini_estimate';
   reason?: string;
   raw?: string;
 }

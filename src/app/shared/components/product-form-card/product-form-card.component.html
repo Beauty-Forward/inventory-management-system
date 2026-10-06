@@ -101,13 +101,13 @@
       </div>
 
       <div class="form-field" [class.needs-verify]="lowConfidenceFields.includes('price')">
-        <label>Price</label>
+        <label>Retail price (USD, per unit)</label>
         <input
           type="text"
           class="text-input"
           [value]="model.price"
           (input)="updateField('price', $any($event.target).value)"
-          placeholder="e.g. $24"
+          placeholder="e.g. 24.00"
         />
       </div>
 
