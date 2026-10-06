@@ -34,6 +34,16 @@
             <div class="fact-value">{{ totalUnits() }}</div>
           </div>
           <div class="fact">
+            <div class="fact-label">est. retail value</div>
+            <div class="fact-value">
+              {{ valueLabel() }}@if (value().unpriced > 0) {<span title="{{ value().unpriced }} product(s) have no price">*</span>}
+            </div>
+          </div>
+          <div class="fact">
+            <div class="fact-label">routed to batches</div>
+            <div class="fact-value">{{ routedCount() }} / {{ productCount() }}</div>
+          </div>
+          <div class="fact">
             <div class="fact-label">date</div>
             <div class="fact-value">{{ d.date }}</div>
           </div>
@@ -112,7 +122,16 @@
     </div>
 
     <div class="panel products-panel">
-      <div class="panel-title">products in donation</div>
+      <div class="panel-head">
+        <div class="panel-title">
+          products in this donation · {{ productCount() }}
+        </div>
+        <a
+          class="btn ghost small"
+          routerLink="/donations/new"
+          [queryParams]="{ donationId: d.id }"
+        >+ add products</a>
+      </div>
       @if (d.products.length === 0) {
         <p class="empty-state">No products in this donation.</p>
       } @else {
@@ -122,7 +141,13 @@
               <div class="prod-name">{{ p.name }}</div>
               <div class="prod-meta">
                 {{ p.brand }} · {{ typeLabel(p.type) }} · qty {{ p.quantity }}
+                @if (unitPrice(p.price); as price) { · {{ price }} ea }
               </div>
+              @if (p.batch; as b) {
+                <div class="prod-meta">
+                  → batch #{{ b.id.slice(0, 6).toUpperCase() }} · {{ b.shelter.name }} · {{ b.status.toLowerCase() }}
+                </div>
+              }
             </div>
             <app-status-pill [variant]="productVariant(p.status)">
               {{ p.status.toLowerCase().replace('_', ' ') }}

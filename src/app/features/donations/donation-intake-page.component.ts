@@ -231,6 +231,16 @@ export class DonationIntakePageComponent implements OnInit {
     this.products.update((list) => [...list, EMPTY_PRODUCT_CARD()]);
   }
 
+  private isBlankCard(p: ProductFormCardModel): boolean {
+    return !p.name.trim() && !p.brand.trim() && !p.barcode.trim() && !p.price.trim();
+  }
+
+  // Only shown on a new donation (not when adding to an existing one) when no
+  // card has any content, so the button can say it will create it empty.
+  readonly creatingEmpty = computed(
+    () => !this.preLoadedDonationId() && this.products().every((p) => this.isBlankCard(p)),
+  );
+
   removeProduct(index: number): void {
     this.products.update((list) => list.filter((_, i) => i !== index));
     // Re-key the flags map so it stays aligned with the new array indices.
@@ -325,7 +335,11 @@ export class DonationIntakePageComponent implements OnInit {
       date: this.donationDate(),
       method: this.donationMethod(),
       notes: this.donationNotes() || undefined,
-      products: this.products().map(toProductFormInput),
+      // Untouched cards are dropped, so leaving only a blank card creates the
+      // donation with no products.
+      products: this.products()
+        .filter((p) => !this.isBlankCard(p))
+        .map(toProductFormInput),
     };
 
     const parsed = donationIntakeSchema.safeParse(candidate);
@@ -516,6 +530,13 @@ export class DonationIntakePageComponent implements OnInit {
         colorCategory: fill('colorCategory', result.colorCategory),
         keyIngredients: fill('keyIngredients', result.keyIngredients),
         size: fill('size', result.size),
+        // Photo prices are estimates by name + brand, so always ring them
+        // for verification regardless of the product-ID confidence.
+        price: (() => {
+          if (current.price || !result.price) return current.price;
+          flagged.push('price');
+          return result.price;
+        })(),
       };
       return next;
     });

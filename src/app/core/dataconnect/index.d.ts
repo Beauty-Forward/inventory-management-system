@@ -253,8 +253,18 @@ export interface GetBatchData {
         brand: string;
         type: string;
         quantity: number;
+        price?: string | null;
         status: ProductStatus;
         expirationDate?: DateString | null;
+        donation: {
+          id: UUIDString;
+          date: DateString;
+          warehouseReference: string;
+          donor: {
+            id: UUIDString;
+            fullName: string;
+          } & Donor_Key;
+        } & Donation_Key;
       } & Product_Key)[];
   } & Batch_Key;
 }
@@ -316,8 +326,18 @@ export interface GetDonationData {
         brand: string;
         type: string;
         quantity: number;
+        price?: string | null;
+        barcode?: string | null;
         status: ProductStatus;
         expirationDate?: DateString | null;
+        batch?: {
+          id: UUIDString;
+          status: BatchStatus;
+          shelter: {
+            id: UUIDString;
+            name: string;
+          } & Shelter_Key;
+        } & Batch_Key;
       } & Product_Key)[];
   } & Donation_Key;
 }
@@ -493,6 +513,7 @@ export interface ListAvailableProductsForShelterData {
     brand: string;
     type: string;
     quantity: number;
+    price?: string | null;
     color?: string | null;
     expirationDate?: DateString | null;
     barcode?: string | null;
@@ -547,6 +568,7 @@ export interface ListInventoryInStockData {
     brand: string;
     type: string;
     quantity: number;
+    price?: string | null;
     color?: string | null;
     colorCategory?: string | null;
     expirationDate?: DateString | null;

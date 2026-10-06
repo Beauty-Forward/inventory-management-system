@@ -51,7 +51,9 @@ export const donationIntakeSchema = z.object({
   date: z.string().trim().min(1, 'Date is required'),
   method: z.enum(['pickup', 'shipping', 'dropoff', 'walk-in']),
   notes: z.string().trim().optional(),
-  products: z.array(productFormSchema).min(1, 'Add at least one product'),
+  // May be empty: a donation can be opened first and have products added later
+  // from its detail page (e.g. a company drop that volunteers sort over days).
+  products: z.array(productFormSchema),
 });
 
 export type DonationIntakeInput = z.infer<typeof donationIntakeSchema>;

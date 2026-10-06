@@ -1,7 +1,11 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { ALL_PRODUCT_TYPES, PRODUCT_TYPE_CATEGORIES } from '../../core/models/product-types';
+import {
+  ALL_PRODUCT_TYPES,
+  PRODUCT_TYPE_CATEGORIES,
+  productTypeSearchText,
+} from '../../core/models/product-types';
 import { InventoryRow, ProductService } from '../../core/services/product.service';
 import {
   AddToBatchDialogComponent,
@@ -22,6 +26,7 @@ import {
   SwatchCardComponent,
   SwatchVariant,
 } from '../../shared/components/swatch-card/swatch-card.component';
+import { formatUsd, parsePrice, retailValue } from '../../shared/utils/retail-value';
 import { sessionPersistedSignal } from '../../shared/utils/session-persisted-signal';
 
 type CategoryKey =
@@ -43,6 +48,7 @@ const CATEGORY_FILTER_KEYS: readonly CategoryKey[] = [
   'hair',
   'makeup',
   'hygiene',
+  'nail',
   'fragrance',
   'other',
   'expiring',
@@ -126,6 +132,7 @@ export class InventoryListPageComponent implements OnInit {
     { key: 'hair', label: 'hair' },
     { key: 'makeup', label: 'makeup' },
     { key: 'hygiene', label: 'hygiene' },
+    { key: 'nail', label: 'nails' },
     { key: 'fragrance', label: 'fragrance' },
     { key: 'other', label: 'other' },
   ];
@@ -145,7 +152,8 @@ export class InventoryListPageComponent implements OnInit {
         if (!types.includes(p.type)) return false;
       }
       if (q) {
-        const hay = `${p.name} ${p.brand} ${p.type}`.toLowerCase();
+        const hay =
+          `${p.name} ${p.brand} ${productTypeSearchText(p.type)} ${p.barcode ?? ''}`.toLowerCase();
         if (!hay.includes(q)) return false;
       }
       return true;
@@ -178,6 +186,7 @@ export class InventoryListPageComponent implements OnInit {
   });
 
   readonly totalCount = computed(() => this.products().length);
+  readonly totalValue = computed(() => formatUsd(retailValue(this.products()).total));
   readonly expiringCount = computed(() => this.products().filter((p) => this.isExpiring(p)).length);
 
   async ngOnInit(): Promise<void> {
@@ -324,6 +333,11 @@ export class InventoryListPageComponent implements OnInit {
     this.addResult.set({ text, batchId: result.batchId });
     this.stopSelecting();
     await this.load();
+  }
+
+  unitPrice(p: InventoryRow): string | null {
+    const n = parsePrice(p.price);
+    return n === null ? null : formatUsd(n);
   }
 
   unitLabel(p: InventoryRow): string {

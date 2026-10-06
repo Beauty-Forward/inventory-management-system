@@ -19,7 +19,8 @@
         <div class="brand-line">
           {{ b.shelter.city }}, {{ b.shelter.state }} ·
           {{ productCount() }} product{{ productCount() === 1 ? '' : 's' }} ·
-          {{ totalUnits() }} unit{{ totalUnits() === 1 ? '' : 's' }}
+          {{ totalUnits() }} unit{{ totalUnits() === 1 ? '' : 's' }} ·
+          est. {{ valueLabel() }}
         </div>
         <div class="status-row">
           <app-status-pill [variant]="statusVariant()">{{ b.status.toLowerCase() }}</app-status-pill>
@@ -112,6 +113,17 @@
       </div>
     </div>
 
+    @if (donorSummary().length > 0) {
+      <div class="panel type-panel">
+        <div class="panel-title">donors represented</div>
+        <div class="type-pills">
+          @for (d of donorSummary(); track d) {
+            <span class="type-pill">{{ d }}</span>
+          }
+        </div>
+      </div>
+    }
+
     @if (typeSummary().length > 0) {
       <div class="panel type-panel">
         <div class="panel-title">type breakdown</div>
@@ -143,6 +155,10 @@
               <div class="prod-name">{{ p.name }}</div>
               <div class="prod-meta">
                 {{ p.brand }} · {{ typeLabel(p.type) }} · qty {{ p.quantity }}
+                @if (unitPrice(p.price); as price) { · {{ price }} ea }
+              </div>
+              <div class="prod-meta">
+                from {{ p.donation.donor.fullName }} · {{ p.donation.warehouseReference }}
               </div>
             </a>
             @if (b.status === 'DRAFT') {

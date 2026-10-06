@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, computed, input, model, signal } from '@angular/core';
-import { ALL_PRODUCT_TYPES } from '../../../core/models/product-types';
+import { ALL_PRODUCT_TYPES, productTypeSearchText } from '../../../core/models/product-types';
 import { CameraScannerComponent } from '../camera-scanner/camera-scanner.component';
 import { PillFilter, PillToolbarComponent } from '../pill-toolbar/pill-toolbar.component';
 import { SelectionBarComponent } from '../selection-bar/selection-bar.component';
@@ -61,7 +61,7 @@ export class ProductPickerComponent {
     return this.products().filter((p) => {
       if (type !== 'all' && p.type !== type) return false;
       if (q) {
-        const hay = `${p.name} ${p.brand} ${this.typeLabel(p.type)} ${p.barcode ?? ''}`.toLowerCase();
+        const hay = `${p.name} ${p.brand} ${productTypeSearchText(p.type)} ${p.barcode ?? ''}`.toLowerCase();
         if (!hay.includes(q)) return false;
       }
       return true;

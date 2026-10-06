@@ -140,6 +140,16 @@
   &.primary { @include pill-button-sm('primary'); }
   &.ghost { @include pill-button-sm('ghost'); }
   &.danger { @include pill-button-sm('destructive-ghost'); }
+  &.small { padding: 7px 14px; text-decoration: none; }
+}
+
+.panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+
+  .panel-title { margin-bottom: 10px; }
 }
 
 .danger-zone {

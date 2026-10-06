@@ -2,6 +2,7 @@
   <app-page-header eyebrow="stock" title="inventory">
     <div class="mini-stats">
       <app-stat-tile variant="butter" size="sm" label="on hand" [value]="totalCount()" />
+      <app-stat-tile variant="eucalyptus" size="sm" label="est. retail value" [value]="totalValue()" />
       @if (selecting()) {
         <button type="button" class="select-btn on" (click)="stopSelecting()">done</button>
       } @else {
@@ -13,7 +14,7 @@
   </app-page-header>
 
   <app-pill-toolbar
-    searchPlaceholder="search name, brand, or type"
+    searchPlaceholder="search name, brand, type, or category"
     [searchValue]="searchQuery()"
     (searchChange)="searchQuery.set($event)"
     [filters]="filters"
@@ -84,6 +85,9 @@
             <div class="card-foot">
               <div class="qty">
                 {{ p.quantity }}<span class="qty-unit">{{ unitLabel(p) }}</span>
+                @if (unitPrice(p); as price) {
+                  <span class="qty-unit">· {{ price }} ea</span>
+                }
               </div>
               <div class="dest">
                 <b>lot #{{ shortLot(p.id) }}</b>
@@ -127,6 +131,9 @@
             <div class="card-foot">
               <div class="qty">
                 {{ p.quantity }}<span class="qty-unit">{{ unitLabel(p) }}</span>
+                @if (unitPrice(p); as price) {
+                  <span class="qty-unit">· {{ price }} ea</span>
+                }
               </div>
               <div class="dest">
                 <b>route ASAP</b>

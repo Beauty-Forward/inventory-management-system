@@ -165,7 +165,7 @@
           [index]="i"
           [model]="product"
           [errors]="productErrorsAt(i)"
-          [canRemove]="products().length > 1"
+          [canRemove]="products().length > 1 || !preLoadedDonationId()"
           [lowConfidenceFields]="flagsFor(i)"
           (modelChange)="updateProduct(i, $event)"
           (remove)="removeProduct(i)"
@@ -215,7 +215,13 @@
         (click)="completeDonation()"
         [disabled]="saving()"
       >
-        {{ saving() ? 'saving…' : 'complete donation →' }}
+        {{
+          saving()
+            ? 'saving…'
+            : creatingEmpty()
+              ? 'create donation without products →'
+              : 'complete donation →'
+        }}
       </button>
     </div>
   }
