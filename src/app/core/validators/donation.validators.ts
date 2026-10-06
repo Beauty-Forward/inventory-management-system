@@ -11,7 +11,6 @@ export const donorFormSchema = z.object({
     .trim()
     .toUpperCase()
     .regex(/^[A-Z]{2}$/, 'Use 2-letter state code'),
-  instagramHandle: z.string().trim().optional(),
 });
 
 export type DonorFormInput = z.infer<typeof donorFormSchema>;

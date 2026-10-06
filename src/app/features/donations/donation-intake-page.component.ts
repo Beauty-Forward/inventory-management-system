@@ -24,7 +24,6 @@ type DonorFormState = {
   phone: string;
   city: string;
   state: string;
-  instagramHandle: string;
 };
 
 type Step = 'donor' | 'products' | 'saving';
@@ -35,7 +34,6 @@ const EMPTY_DONOR = (): DonorFormState => ({
   phone: '',
   city: '',
   state: '',
-  instagramHandle: '',
 });
 
 const TODAY = (): string => {
@@ -193,7 +191,6 @@ export class DonationIntakePageComponent implements OnInit {
       phone: donation.donor.phone,
       city: donation.donor.city,
       state: donation.donor.state,
-      instagramHandle: '',
     });
     this.donorLocked.set(true);
     this.step.set('products');
@@ -324,7 +321,6 @@ export class DonationIntakePageComponent implements OnInit {
         phone: donorForm.phone || undefined,
         city: donorForm.city || 'Unknown',
         state: donorForm.state || 'NY',
-        instagramHandle: donorForm.instagramHandle || undefined,
       },
       donationRequestId: this.donationRequestId() || undefined,
       warehouseReference: this.warehouseReference(),

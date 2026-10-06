@@ -154,7 +154,6 @@ export interface GetDonorByEmailData {
     phone: string;
     city: string;
     state: string;
-    instagramHandle?: string | null;
     donationCount: number;
   } & Donor_Key)[];
 }
@@ -272,7 +271,6 @@ export interface GetDonorData {
     phone: string;
     city: string;
     state: string;
-    instagramHandle?: string | null;
     linkedRequestId?: string | null;
     donationCount: number;
     createdAt: TimestampString;
@@ -2477,7 +2475,6 @@ export interface CreateDonorVariables {
   phone: string;
   city: string;
   state: string;
-  instagramHandle?: string | null;
   linkedRequestId?: string | null;
 }
 ```
@@ -2503,7 +2500,6 @@ const createDonorVars: CreateDonorVariables = {
   phone: ..., 
   city: ..., 
   state: ..., 
-  instagramHandle: ..., // optional
   linkedRequestId: ..., // optional
 };
 
@@ -2511,7 +2507,7 @@ const createDonorVars: CreateDonorVariables = {
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await createDonor(createDonorVars);
 // Variables can be defined inline as well.
-const { data } = await createDonor({ email: ..., fullName: ..., phone: ..., city: ..., state: ..., instagramHandle: ..., linkedRequestId: ..., });
+const { data } = await createDonor({ email: ..., fullName: ..., phone: ..., city: ..., state: ..., linkedRequestId: ..., });
 
 // You can also pass in a `DataConnect` instance to the action shortcut function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -2539,14 +2535,13 @@ const createDonorVars: CreateDonorVariables = {
   phone: ..., 
   city: ..., 
   state: ..., 
-  instagramHandle: ..., // optional
   linkedRequestId: ..., // optional
 };
 
 // Call the `createDonorRef()` function to get a reference to the mutation.
 const ref = createDonorRef(createDonorVars);
 // Variables can be defined inline as well.
-const ref = createDonorRef({ email: ..., fullName: ..., phone: ..., city: ..., state: ..., instagramHandle: ..., linkedRequestId: ..., });
+const ref = createDonorRef({ email: ..., fullName: ..., phone: ..., city: ..., state: ..., linkedRequestId: ..., });
 
 // You can also pass in a `DataConnect` instance to the `MutationRef` function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -2604,7 +2599,6 @@ export interface UpdateDonorVariables {
   phone?: string | null;
   city?: string | null;
   state?: string | null;
-  instagramHandle?: string | null;
   linkedRequestId?: string | null;
 }
 ```
@@ -2630,7 +2624,6 @@ const updateDonorVars: UpdateDonorVariables = {
   phone: ..., // optional
   city: ..., // optional
   state: ..., // optional
-  instagramHandle: ..., // optional
   linkedRequestId: ..., // optional
 };
 
@@ -2638,7 +2631,7 @@ const updateDonorVars: UpdateDonorVariables = {
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await updateDonor(updateDonorVars);
 // Variables can be defined inline as well.
-const { data } = await updateDonor({ id: ..., fullName: ..., phone: ..., city: ..., state: ..., instagramHandle: ..., linkedRequestId: ..., });
+const { data } = await updateDonor({ id: ..., fullName: ..., phone: ..., city: ..., state: ..., linkedRequestId: ..., });
 
 // You can also pass in a `DataConnect` instance to the action shortcut function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -2666,14 +2659,13 @@ const updateDonorVars: UpdateDonorVariables = {
   phone: ..., // optional
   city: ..., // optional
   state: ..., // optional
-  instagramHandle: ..., // optional
   linkedRequestId: ..., // optional
 };
 
 // Call the `updateDonorRef()` function to get a reference to the mutation.
 const ref = updateDonorRef(updateDonorVars);
 // Variables can be defined inline as well.
-const ref = updateDonorRef({ id: ..., fullName: ..., phone: ..., city: ..., state: ..., instagramHandle: ..., linkedRequestId: ..., });
+const ref = updateDonorRef({ id: ..., fullName: ..., phone: ..., city: ..., state: ..., linkedRequestId: ..., });
 
 // You can also pass in a `DataConnect` instance to the `MutationRef` function.
 const dataConnect = getDataConnect(connectorConfig);

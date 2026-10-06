@@ -81,7 +81,6 @@ export interface CreateDonorVariables {
   phone: string;
   city: string;
   state: string;
-  instagramHandle?: string | null;
   linkedRequestId?: string | null;
 }
 
@@ -353,7 +352,6 @@ export interface GetDonorByEmailData {
     phone: string;
     city: string;
     state: string;
-    instagramHandle?: string | null;
     donationCount: number;
   } & Donor_Key)[];
 }
@@ -370,7 +368,6 @@ export interface GetDonorData {
     phone: string;
     city: string;
     state: string;
-    instagramHandle?: string | null;
     linkedRequestId?: string | null;
     donationCount: number;
     createdAt: TimestampString;
@@ -746,7 +743,6 @@ export interface UpdateDonorVariables {
   phone?: string | null;
   city?: string | null;
   state?: string | null;
-  instagramHandle?: string | null;
   linkedRequestId?: string | null;
 }
 

@@ -12,7 +12,6 @@ mutation CreateDonor(
   $phone: String!
   $city: String!
   $state: String!
-  $instagramHandle: String
   $linkedRequestId: String
 ) @auth(level: USER) {
   donor_insert(
@@ -22,7 +21,6 @@ mutation CreateDonor(
       phone: $phone
       city: $city
       state: $state
-      instagramHandle: $instagramHandle
       linkedRequestId: $linkedRequestId
     }
   )
@@ -34,7 +32,6 @@ mutation UpdateDonor(
   $phone: String
   $city: String
   $state: String
-  $instagramHandle: String
   $linkedRequestId: String
 ) @auth(level: USER) {
   donor_update(
@@ -44,7 +41,6 @@ mutation UpdateDonor(
       phone: $phone
       city: $city
       state: $state
-      instagramHandle: $instagramHandle
       linkedRequestId: $linkedRequestId
       updatedAt_expr: "request.time"
     }

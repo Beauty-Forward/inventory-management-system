@@ -40,7 +40,6 @@ export class DonorService {
         phone: input.phone,
         city: input.city,
         state: input.state,
-        instagramHandle: input.instagramHandle ?? null,
         linkedRequestId: input.linkedRequestId ?? null,
       });
       return existing.id;
@@ -52,7 +51,6 @@ export class DonorService {
       phone: input.phone ?? '',
       city: input.city,
       state: input.state,
-      instagramHandle: input.instagramHandle ?? null,
       linkedRequestId: input.linkedRequestId ?? null,
     });
     return created.data.donor_insert.id;

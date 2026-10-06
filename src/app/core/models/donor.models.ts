@@ -5,7 +5,6 @@ export interface Donor {
   phone: string;
   city: string;
   state: string;
-  instagramHandle?: string;
   linkedRequestId?: string;
   createdAt: Date;
   updatedAt: Date;

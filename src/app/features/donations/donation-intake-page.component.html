@@ -79,18 +79,6 @@
         </div>
       </div>
 
-      <div class="section-title">optional</div>
-      <div class="field">
-        <span class="lbl-s">instagram</span>
-        <input
-          type="text"
-          class="inp"
-          [value]="donor().instagramHandle"
-          (input)="updateDonor('instagramHandle', $any($event.target).value)"
-          placeholder="@handle — so we can tag you in thank-yous"
-        />
-      </div>
-
       @if (fieldErrors()['donor']) {
         <p class="error-text">{{ fieldErrors()['donor'] }}</p>
       }

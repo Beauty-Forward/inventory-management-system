@@ -16,7 +16,6 @@ query GetDonorByEmail($email: String!) @auth(level: USER) {
     phone
     city
     state
-    instagramHandle
     donationCount
   }
 }
@@ -29,7 +28,6 @@ query GetDonor($id: UUID!) @auth(level: USER) {
     phone
     city
     state
-    instagramHandle
     linkedRequestId
     donationCount
     createdAt
