@@ -81,7 +81,6 @@ export interface CreateDonorVariables {
   phone: string;
   city: string;
   state: string;
-  smsOptIn?: boolean | null;
   instagramHandle?: string | null;
   linkedRequestId?: string | null;
 }
@@ -352,7 +351,6 @@ export interface GetDonorByEmailData {
     fullName: string;
     email: string;
     phone: string;
-    smsOptIn: boolean;
     city: string;
     state: string;
     instagramHandle?: string | null;
@@ -370,7 +368,6 @@ export interface GetDonorData {
     fullName: string;
     email: string;
     phone: string;
-    smsOptIn: boolean;
     city: string;
     state: string;
     instagramHandle?: string | null;
@@ -749,7 +746,6 @@ export interface UpdateDonorVariables {
   phone?: string | null;
   city?: string | null;
   state?: string | null;
-  smsOptIn?: boolean | null;
   instagramHandle?: string | null;
   linkedRequestId?: string | null;
 }

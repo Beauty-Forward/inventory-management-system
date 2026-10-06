@@ -22,7 +22,6 @@ type DonorFormState = {
   fullName: string;
   email: string;
   phone: string;
-  smsOptIn: boolean;
   city: string;
   state: string;
   instagramHandle: string;
@@ -34,7 +33,6 @@ const EMPTY_DONOR = (): DonorFormState => ({
   fullName: '',
   email: '',
   phone: '',
-  smsOptIn: false,
   city: '',
   state: '',
   instagramHandle: '',
@@ -193,7 +191,6 @@ export class DonationIntakePageComponent implements OnInit {
       fullName: donation.donor.fullName,
       email: donation.donor.email,
       phone: donation.donor.phone,
-      smsOptIn: false,
       city: donation.donor.city,
       state: donation.donor.state,
       instagramHandle: '',
@@ -325,7 +322,6 @@ export class DonationIntakePageComponent implements OnInit {
         fullName: donorForm.fullName,
         email: donorForm.email || undefined,
         phone: donorForm.phone || undefined,
-        smsOptIn: donorForm.smsOptIn,
         city: donorForm.city || 'Unknown',
         state: donorForm.state || 'NY',
         instagramHandle: donorForm.instagramHandle || undefined,

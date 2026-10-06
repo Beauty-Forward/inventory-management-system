@@ -14,7 +14,6 @@ query GetDonorByEmail($email: String!) @auth(level: USER) {
     fullName
     email
     phone
-    smsOptIn
     city
     state
     instagramHandle
@@ -28,7 +27,6 @@ query GetDonor($id: UUID!) @auth(level: USER) {
     fullName
     email
     phone
-    smsOptIn
     city
     state
     instagramHandle

@@ -40,7 +40,6 @@ export class DonorService {
         phone: input.phone,
         city: input.city,
         state: input.state,
-        smsOptIn: input.smsOptIn,
         instagramHandle: input.instagramHandle ?? null,
         linkedRequestId: input.linkedRequestId ?? null,
       });
@@ -53,7 +52,6 @@ export class DonorService {
       phone: input.phone ?? '',
       city: input.city,
       state: input.state,
-      smsOptIn: input.smsOptIn,
       instagramHandle: input.instagramHandle ?? null,
       linkedRequestId: input.linkedRequestId ?? null,
     });

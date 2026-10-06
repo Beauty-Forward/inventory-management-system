@@ -5,7 +5,6 @@ export const donorFormSchema = z.object({
   fullName: z.string().trim().min(1, 'Full name is required'),
   email: z.string().trim().toLowerCase().email('Valid email required').optional(),
   phone: z.string().trim().min(7, 'Phone is required').optional(),
-  smsOptIn: z.boolean().default(false),
   city: z.string().trim().min(1, 'City is required'),
   state: z
     .string()

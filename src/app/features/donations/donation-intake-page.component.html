@@ -91,15 +91,6 @@
         />
       </div>
 
-      <label class="checkbox-row">
-        <input
-          type="checkbox"
-          [checked]="donor().smsOptIn"
-          (change)="updateDonor('smsOptIn', $any($event.target).checked)"
-        />
-        <span class="cb-label"> Donor opted in to SMS updates about where their items go </span>
-      </label>
-
       @if (fieldErrors()['donor']) {
         <p class="error-text">{{ fieldErrors()['donor'] }}</p>
       }

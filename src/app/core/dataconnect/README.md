@@ -152,7 +152,6 @@ export interface GetDonorByEmailData {
     fullName: string;
     email: string;
     phone: string;
-    smsOptIn: boolean;
     city: string;
     state: string;
     instagramHandle?: string | null;
@@ -271,7 +270,6 @@ export interface GetDonorData {
     fullName: string;
     email: string;
     phone: string;
-    smsOptIn: boolean;
     city: string;
     state: string;
     instagramHandle?: string | null;
@@ -2479,7 +2477,6 @@ export interface CreateDonorVariables {
   phone: string;
   city: string;
   state: string;
-  smsOptIn?: boolean | null;
   instagramHandle?: string | null;
   linkedRequestId?: string | null;
 }
@@ -2506,7 +2503,6 @@ const createDonorVars: CreateDonorVariables = {
   phone: ..., 
   city: ..., 
   state: ..., 
-  smsOptIn: ..., // optional
   instagramHandle: ..., // optional
   linkedRequestId: ..., // optional
 };
@@ -2515,7 +2511,7 @@ const createDonorVars: CreateDonorVariables = {
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await createDonor(createDonorVars);
 // Variables can be defined inline as well.
-const { data } = await createDonor({ email: ..., fullName: ..., phone: ..., city: ..., state: ..., smsOptIn: ..., instagramHandle: ..., linkedRequestId: ..., });
+const { data } = await createDonor({ email: ..., fullName: ..., phone: ..., city: ..., state: ..., instagramHandle: ..., linkedRequestId: ..., });
 
 // You can also pass in a `DataConnect` instance to the action shortcut function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -2543,7 +2539,6 @@ const createDonorVars: CreateDonorVariables = {
   phone: ..., 
   city: ..., 
   state: ..., 
-  smsOptIn: ..., // optional
   instagramHandle: ..., // optional
   linkedRequestId: ..., // optional
 };
@@ -2551,7 +2546,7 @@ const createDonorVars: CreateDonorVariables = {
 // Call the `createDonorRef()` function to get a reference to the mutation.
 const ref = createDonorRef(createDonorVars);
 // Variables can be defined inline as well.
-const ref = createDonorRef({ email: ..., fullName: ..., phone: ..., city: ..., state: ..., smsOptIn: ..., instagramHandle: ..., linkedRequestId: ..., });
+const ref = createDonorRef({ email: ..., fullName: ..., phone: ..., city: ..., state: ..., instagramHandle: ..., linkedRequestId: ..., });
 
 // You can also pass in a `DataConnect` instance to the `MutationRef` function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -2609,7 +2604,6 @@ export interface UpdateDonorVariables {
   phone?: string | null;
   city?: string | null;
   state?: string | null;
-  smsOptIn?: boolean | null;
   instagramHandle?: string | null;
   linkedRequestId?: string | null;
 }
@@ -2636,7 +2630,6 @@ const updateDonorVars: UpdateDonorVariables = {
   phone: ..., // optional
   city: ..., // optional
   state: ..., // optional
-  smsOptIn: ..., // optional
   instagramHandle: ..., // optional
   linkedRequestId: ..., // optional
 };
@@ -2645,7 +2638,7 @@ const updateDonorVars: UpdateDonorVariables = {
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await updateDonor(updateDonorVars);
 // Variables can be defined inline as well.
-const { data } = await updateDonor({ id: ..., fullName: ..., phone: ..., city: ..., state: ..., smsOptIn: ..., instagramHandle: ..., linkedRequestId: ..., });
+const { data } = await updateDonor({ id: ..., fullName: ..., phone: ..., city: ..., state: ..., instagramHandle: ..., linkedRequestId: ..., });
 
 // You can also pass in a `DataConnect` instance to the action shortcut function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -2673,7 +2666,6 @@ const updateDonorVars: UpdateDonorVariables = {
   phone: ..., // optional
   city: ..., // optional
   state: ..., // optional
-  smsOptIn: ..., // optional
   instagramHandle: ..., // optional
   linkedRequestId: ..., // optional
 };
@@ -2681,7 +2673,7 @@ const updateDonorVars: UpdateDonorVariables = {
 // Call the `updateDonorRef()` function to get a reference to the mutation.
 const ref = updateDonorRef(updateDonorVars);
 // Variables can be defined inline as well.
-const ref = updateDonorRef({ id: ..., fullName: ..., phone: ..., city: ..., state: ..., smsOptIn: ..., instagramHandle: ..., linkedRequestId: ..., });
+const ref = updateDonorRef({ id: ..., fullName: ..., phone: ..., city: ..., state: ..., instagramHandle: ..., linkedRequestId: ..., });
 
 // You can also pass in a `DataConnect` instance to the `MutationRef` function.
 const dataConnect = getDataConnect(connectorConfig);
